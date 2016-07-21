@@ -34,6 +34,7 @@ class ApplicativeSpec extends WordSpec with Matchers {
         override def ap[A, B](ff: Foo[(A) => B])(fa: Foo[A]): Foo[B] = Foo(ff.a(fa.a))
       }
 
+
       val foo1 = Foo(1)
       val foo2 = Foo("a")
 
