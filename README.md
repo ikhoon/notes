@@ -10,6 +10,7 @@
 * [Traverse](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/TraverseSpec.scala)
 * [Identity](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/IdentitySpec.scala)
 * [Xor](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/XorSpec.scala)
+* [Validated](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/ValidatedSpec.scala)
 
 ## scala stdlib
 * [Assert](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/stdnote/AssertSpec.scala)
