@@ -3,20 +3,7 @@ package shapenote
 
 import org.scalatest.{Matchers, WordSpec}
 import shapeless._
-import shapeless.poly._
 
-object size extends Poly1 {
-  implicit def caseInt = at[Int](x => 1)
-  implicit def caseString = at[String](_.length)
-  implicit def caseTuple[T, U](implicit st: Case.Aux[T, Int], su: Case.Aux[U, Int]) =
-    at[(T, U)](t => size(t._1) + size(t._2))
-}
-
-object addSize extends Poly2 {
-  implicit def default[T](implicit st: shapenote.size.Case.Aux[T, Int]): addSize.Case[Int, T] = {
-    at[Int, T] { case (acc: Int, t) => acc + size(t) }
-  }
-}
 
 /**
   * Created by ikhoon on 2016. 8. 8..
@@ -25,6 +12,7 @@ class HeterogenousListSpec extends WordSpec with Matchers {
 
   "Heterogenous List" should {
     "map" in {
+      import poly._
       object choose extends (Set ~> Option) {
         override def apply[T](f: Set[T]): Option[T] = f.headOption
       }
@@ -45,8 +33,29 @@ class HeterogenousListSpec extends WordSpec with Matchers {
 
     "fold" in {
 
-      val l = 1 :: "foo" :: HNil
-      l.foldLeft[Int](0)(addSize)
+      val l = 23 :: "foo" :: (13, "wibble") :: HNil
+      //      FIXME not work :-(
+//      l.foldLeft(0)(addSize)
+    }
+    "zipper" in {
+      import shapeless.syntax.zipper._
+      val l = 1 :: "foo" :: 3.0 :: HNil
+      (l.toZipper)
+      println(l.toZipper.right)
+      // put == replace
+      println(l.toZipper.right.put(("wibble", 45)))
+      println(l.toZipper.right.insert(("wibble", 45)))
+      l.toZipper.right.put(("wibble", 45)).reify shouldBe 1 :: ("wibble", 45) :: 3.0 :: HNil
+
+      l.toZipper.right.delete.reify shouldBe 1 :: 3.0 :: HNil
+    }
+
+    "covariant" in {
+      import CovariantHelper._
+      import scala.reflect.runtime.universe._
+
+      implicitly[TypeTag[APAP]].tpe.typeConstructor <:< typeOf[FFFF] shouldBe true
+
     }
   }
 
