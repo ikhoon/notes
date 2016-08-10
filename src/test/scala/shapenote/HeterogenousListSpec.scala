@@ -3,6 +3,7 @@ package shapenote
 
 import org.scalatest.{Matchers, WordSpec}
 import shapeless._
+import CovariantHelper._
 
 
 /**
@@ -56,6 +57,23 @@ class HeterogenousListSpec extends WordSpec with Matchers {
 
       implicitly[TypeTag[APAP]].tpe.typeConstructor <:< typeOf[FFFF] shouldBe true
 
+    }
+
+    "instance of" in {
+      apap.isInstanceOf[FFFF] shouldBe true
+      apap.unify.isInstanceOf[FFFF] shouldBe true
+    }
+
+    "to list" in {
+      apap.toList shouldBe List(Apple(), Pear(), Apple(), Pear())
+    }
+
+    "typable" in {
+      import syntax.typeable._
+      val ffff: FFFF = apap.unify
+
+      val precise : Option[APAP] = ffff.cast[APAP]
+      precise shouldBe Some(apap)
     }
   }
 

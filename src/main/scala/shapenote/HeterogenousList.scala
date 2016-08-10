@@ -4,7 +4,6 @@ package shapenote
   * Created by ikhoon on 2016. 8. 9..
   */
 import shapeless._
-import ops.hlist._
 
 object size extends Poly1 {
   implicit def caseInt = at[Int](x => 1)
@@ -33,3 +32,9 @@ object CovariantHelper {
   val apap : APAP = a :: p :: a :: p :: HNil
 }
 
+object Main extends App {
+      val l = 23 :: "foo" :: (13, "wibble") :: HNil
+      //      FIXME not work :-(
+//      l.foldLeft(0)(addSize)
+
+}
