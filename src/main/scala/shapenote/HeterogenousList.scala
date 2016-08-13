@@ -13,7 +13,9 @@ object size extends Poly1 {
 }
 
 object addSize extends Poly2 {
-  implicit def default[T](implicit st: size.Case.Aux[T, Int]): addSize.Case[Int, T] = {
+  // it does not work if method has return type signature.
+  // implicit def default[T](implicit st: size.Case.Aux[T, Int]): addSize.Case[Int, T]
+  implicit def default[T](implicit st: size.Case.Aux[T, Int]) = {
     at[Int, T] { case (acc, t) => acc + size(t) }
   }
 }
@@ -33,8 +35,7 @@ object CovariantHelper {
 }
 
 object Main extends App {
-      val l = 23 :: "foo" :: (13, "wibble") :: HNil
-      //      FIXME not work :-(
-//      l.foldLeft(0)(addSize)
+  val l = 23 :: "foo" :: (13, "wibble") :: HNil
+  println(l.foldLeft(0)(addSize))
 
 }

@@ -34,7 +34,7 @@ class PolymorphicSpec extends WordSpec with Matchers {
       import poly._
       choose(Set(1, 2, 3)) shouldBe Option(1)
 
-      List(Set(1), Set(2), Set(3)).map(choose) shouldBe List(Option(1), Option(2), Option(3))
+      List(Set(1), Set(2), Set(3)) map choose shouldBe List(Option(1), Option(2), Option(3))
 
     }
 

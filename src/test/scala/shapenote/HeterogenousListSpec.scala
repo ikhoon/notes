@@ -35,8 +35,7 @@ class HeterogenousListSpec extends WordSpec with Matchers {
     "fold" in {
 
       val l = 23 :: "foo" :: (13, "wibble") :: HNil
-      //      FIXME not work :-(
-//      l.foldLeft(0)(addSize)
+      l.foldLeft(0)(addSize)
     }
     "zipper" in {
       import shapeless.syntax.zipper._
