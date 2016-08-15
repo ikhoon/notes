@@ -43,7 +43,7 @@ class SingletonTypedSpec extends WordSpec with Matchers {
       // select(true)("foo")  // 컴파일 안됨
       select(false)("foo") shouldBe "foo"
       // select(false)(12)    // 이것도 컴파일 안됨
-      
+
     }
   }
 
