@@ -1,8 +1,8 @@
 package catsnote
 
 import cats.data.Validated.{Invalid, Valid}
-import cats.{Applicative, Semigroup, Traverse}
 import cats.data._
+import cats.{Applicative, Semigroup, Traverse}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration.Duration
@@ -16,6 +16,21 @@ class TraverseSpec extends WordSpec with Matchers {
 
   "Traverse" should {
 
+    // sequence + map
+    // 질문 sequence : flatten(x),
+    // List[Future[String]] => Future[List[String]]
+    // F[G[T]] --- sequence ---> G[F[T]]
+    // F[G[T]] --- sequence + map[T -> R] ---> G[F[R]]  // traverse
+
+
+    // List(Option(1), Option(2), Option(3)) => Option(List(1, 2, 3))
+
+
+    // map         A => B
+    // ap        F[A => B]
+    // flatMap(f)(fa)  fa = Future, Option, List, :: f : A => F[B]
+
+
     def parseIntXor(s: String) : Xor[NumberFormatException, Int] =
       Xor.catchOnly[NumberFormatException](s.toInt)
 
@@ -24,13 +39,19 @@ class TraverseSpec extends WordSpec with Matchers {
 
 
     "traverseU - Xor - unapply with traverse for Applicative[F[A,B]]" in {
+
       import cats.std.list.listInstance
+      import cats.std.option._
+      import cats.syntax.all._
+      println(List(Option(1), Option(2), Option(3)).traverse(identity))
+      println(List(Option(1), Option(2), Option(3)).sequence)
+
 
       // does not compile, required G[B] but found G[A, B]
       // Traverse[List].traverse(List("1", "2", "3"))(parseIntXor)
 
-      Traverse[List].traverseU(List("1", "2", "3"))(parseIntXor) shouldBe Xor.Right(List(1, 2, 3))
-      Traverse[List].traverseU(List("1", "abc", "3"))(parseIntXor).isLeft shouldBe true
+     // Traverse[List].traverseU(List("1", "2", "3"))(parseIntXor) shouldBe Xor.Right(List(1, 2, 3))
+     // Traverse[List].traverseU(List("1", "abc", "3"))(parseIntXor).isLeft shouldBe true
     }
 
     "traverseU - Validated" in {
@@ -52,17 +73,32 @@ class TraverseSpec extends WordSpec with Matchers {
     case class User(id: Int, name: String)
     def getUser(id: Int): Future[User] = Future { User(id, s"name-$id") }
 
+    // userIds를 가지고 User를 가져오면 됩니다.
+    // ** Future[List[User]] **
+    // 1번째 미션 userIds를 가지고 getUser함수를 호출해서 나오는 결과값을 출력해봅시다.
+    // map 사용하면 됩니다.
+    // future.foreach
+    // Await.result(future, Duration.Inf)
+
+    import cats.syntax.all._
+    import cats.std.all._
+    // List[Future[User]] => Future[List[User]] => 출력해보세요~
+
+    //
+
     val expected = List(User(1, "name-1"), User(2, "name-2"), User(3, "name-3"), User(4, "name-4"))
 
     "parallel programming with future" in {
       import cats.std.future.futureInstance
       import cats.std.list.listInstance
 
-      // map
+      // map + sequence
       val listFutureUser: List[Future[User]] = userIds.map(getUser)
-      // sequence
-      val futureListUser: Future[List[User]] = Applicative[Future].sequence(listFutureUser)
+      val futureListUser: Future[List[User]] =
+        Applicative[Future].sequence(listFutureUser)
 
+      // traverse
+      val traverse: Future[List[User]] = Traverse[List].traverse(userIds)(getUser)
       Await.result(futureListUser, Duration.Inf) shouldBe expected
 
     }

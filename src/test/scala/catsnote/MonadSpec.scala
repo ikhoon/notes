@@ -14,7 +14,71 @@ class MonadSpec extends WordSpec with Matchers {
       Option(Option(1)).flatten shouldBe Option(1)
       Option(None).flatten shouldBe None
       List(List(1), List(2,3)).flatten shouldBe List(1, 2, 3)
+      // flatMap == map + flatten
     }
+
+    "foo monad instance" in {
+      case class Foo[T](a: T)
+
+      val fooMonadInstance = new Monad[Foo] {
+        override def pure[A](x: A): Foo[A] = Foo(x)
+        override def flatMap[A, B](fa: Foo[A])(f: (A) => Foo[B]): Foo[B] = f(fa.a)
+      }
+
+
+      val optionMonadInstance = new Monad[Option] {
+        override def pure[A](x: A): Option[A] = Option[A](x) // Some(x)
+
+        // fa.a
+        // Option(a) => ???
+        override def flatMap[A, B](fa: Option[A])
+                                  (f: (A) => Option[B]): Option[B] = {
+          // fa 에서 a를 끄집어 내서 f에 적용시킨다 f(a)
+          fa match {
+            case Some(x) => f(x)
+            case None => None
+          }
+        }
+
+      }
+      // fooMonadInstance.flatMap()
+
+    }
+
+    "트래킹 정보 알고 싶어" in {
+
+      def getAddress(userId: Long) : Option[String] = if(userId > 10) Some("팡요") else None
+
+      def getShipment(address: String): Option[String] = if(address == "팡요") Some("ship-123") else None
+
+      def getTracking(shipment: String): Option[String] = if(shipment == "ship-123") Some("track-12345") else None
+
+      val userId = 1
+
+      val track: Option[String] =
+        getAddress(userId)
+        .flatMap(getShipment)
+        .flatMap(getTracking)
+      println(track)
+
+      val userId2 = 11
+
+      val track2: Option[String] = getAddress(userId2)
+        .flatMap(getShipment)
+        .flatMap(getTracking)
+      println(track2)
+
+      val track3: Option[String] = for {
+        address <- getAddress(userId)
+        shipment <- getShipment(address)
+        track <- getTracking(shipment)
+      } yield track
+
+      println(track3)
+    }
+
+
+
 
     "implement pure and flatMap for monad instance" in {
       import cats._
@@ -48,9 +112,9 @@ class MonadSpec extends WordSpec with Matchers {
 
     "list monad" in {
       implicit val listMonad = new Monad[List] {
-        override def flatMap[A, B](fa: List[A])(f: (A) => List[B]): List[B] = fa.map(f).flatten
+        override def flatMap[A, B](fa: List[A])(f: (A) => List[B]): List[B] = fa.map(f).flatten  // bind
 
-        override def pure[A](x: A): List[A] = List(x)
+        override def pure[A](x: A): List[A] = List(x)  // unit
       }
 
       Monad[List].flatMap(List(1, 2, 3))(x => List(x, x)) shouldBe List(1, 1, 2, 2, 3, 3)

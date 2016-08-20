@@ -18,6 +18,7 @@ class ApplySpec extends WordSpec with Matchers {
 
     "implement option and list apply" in {
       import cats._
+      // F[A => B] F[A] ===> F[B]
       implicit val optionApply = new Apply[Option] {
         override def ap[A, B](ff: Option[(A) => B])(fa: Option[A]): Option[B] = fa.flatMap(a => ff.map(_ (a)))
         override def map[A, B](fa: Option[A])(f: (A) => B): Option[B] = fa map f
@@ -33,13 +34,16 @@ class ApplySpec extends WordSpec with Matchers {
       Apply[Option].ap(Option((x: Int) => x + 100))(Option(10)) shouldBe Option(110)
       Apply[Option].ap(None)(Option(10)) shouldBe None
 
-      Apply[List].ap(List((x: String) => x + "!", (x: String) => x + "@"))(List("a", "b", "c")) shouldBe List("a!", "a@", "b!", "b@", "c!", "c@")
+      Apply[List]
+        .ap(List((x: String) => x + "!", (x: String) => x + "@"))(List("a", "b", "c")) shouldBe List("a!", "a@", "b!", "b@", "c!", "c@")
 
     }
 
     "apply has functor's map" in {
       import cats.std.all._
 
+      // F[_], F[A]
+      Apply[Option].map(Some(1))(intToString) shouldBe Some("1")
       Apply[Option].map(Some(1))(intToString) shouldBe Some("1")
       Apply[Option].map(Some(1))(double) shouldBe Some(2)
       Apply[Option].map(Some(1))(addTwo) shouldBe Some(3)
@@ -81,8 +85,17 @@ class ApplySpec extends WordSpec with Matchers {
 
     "tupleN function are available" in {
       import cats.implicits.optionInstance
-      Apply[Option].tuple2(Some(1), Some(2)) shouldBe Some(1, 2)
+      import cats.implicits.listInstance
+      // F[A], F[B] => F[(A, B)]
+      // Some(1), Some("2") => Some((1, "2"))
+      // List(1, 2, 3), List("a", "b", "c") => List((1, 2, 3), ("a", "b", "c"))
+      // (List(1,2, 3), List("a", "b", "c"))
+      // List((1, "a"), (2, "b"), (3, "c"))
+      Apply[Option].tuple2(Some(1), Some(2)) shouldBe Some((1, 2))
+      Apply[Option].tuple2(Some(1), Some("2")) shouldBe Some(1, "2")
       Apply[Option].tuple3(Some(1), Some(2), Some(3)) shouldBe Some(1, 2, 3)
+      //Apply[List].tuple2(List(1, 2, 3), List("a", "b", "c")) shouldBe List((1, "a"), (2, "b"), (3, "c"))
+
     }
 
     "Apply builder `|@|` for N arity apN, tupleN, mapN" in {

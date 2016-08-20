@@ -11,9 +11,49 @@ class FoldableSpec extends WordSpec with Matchers {
 
   "Foldable" should {
     "foldLeft is an eager left-associative fold" in {
+
       import cats.std.list.listInstance
-      Foldable[List].foldLeft(List(1, 2, 3), 0)(_ + _) shouldBe (6)
-      Foldable[List].foldLeft(List("a", "b", "c"), "")(_ + _ ) shouldBe "abc"
+
+      // foldLeft(연산 대상, 초기값){ case (acc, x) => .. }
+
+      // 1. 1 ~ 5 리스트가 있고 이거의 합
+      Foldable[List].foldLeft(List[Int](1, 2, 3, 4, 5), 0) {
+        case (acc, x) =>  acc + x
+      }
+
+      List(1, 2, 3, 4, 5).filter(x => x % 2 == 0)  // List(2, 4)
+
+      // 1. 1 ~ 5의 리스트가 있고 이중에 짝수의 값만 다시 추려서 List 로 뽑아 주세요
+      // foldLeft
+      // 초기값 : List()
+      val evens = Foldable[List].foldLeft(List[Int](1, 2, 3, 4, 5), List[Int]()) {
+        case (acc, x) => if (x % 2 == 0) acc ::: List(x) else acc
+      }
+      println(evens)
+
+      // map구현해본다, foldLeft를 이용해서
+      // 2. 1 ~ 5의 리스트가 있고 이숫자들을 + 10 => 11 ~ 15
+
+      def myMap(list: List[Int])(f : Int => Int): List[Int] = {
+        Foldable[List].foldLeft(list, List[Int]()) {
+          case (acc, x) => acc ::: List(f(x))
+        }
+      }
+
+      println(myMap(List(1, 2, 3, 4, 5))((x: Int) => x + 10)) // List(11, 12, 13, 14, 15)
+
+
+
+
+
+
+
+
+
+
+//      Foldable[List].foldLeft(List(1, 2, 3), 0)(_ + _) shouldBe (6)
+//      Foldable[List].foldLeft(List("a", "b", "c"), "")(_ + _ ) shouldBe "abc"
+
     }
 
     "foldRight is a lazy right-associative fold" in {
