@@ -8,7 +8,6 @@ import org.scalatest.{Matchers, WordSpec}
 class TypeclassDerivationSpec extends WordSpec with Matchers {
 
   "Auto Typeclass Derivation" should {
-
     "monoid for case class" in {
       case class Foo(i: Int, s: String)
       case class Bar(b: Boolean, s: String, d: Double)
