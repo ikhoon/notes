@@ -6,9 +6,9 @@ import shapeless.Lazy
  * Created by Liam.M(엄익훈) on 8/22/16.
  */
 
-sealed trait List[+T]
-case class Cons[T](hd: T, tl: List[T]) extends List[T]
-sealed trait Nil extends List[Nothing]
+sealed trait List0[+T]
+case class Cons[T](hd: T, tl: List0[T]) extends List0[T]
+sealed trait Nil extends List0[Nothing]
 case object Nil extends Nil
 
 trait Show[T] {
@@ -24,13 +24,13 @@ object Show {
   }
 
   // Case for Cons[T]: note (mutually) recursive implicit argument referencing Show[List[T]]
-  implicit def showCons[T](implicit  st: Lazy[Show[T]], sl: Lazy[Show[List[T]]]) : Show[Cons[T]] = new Show[Cons[T]] {
+  implicit def showCons[T](implicit  st: Lazy[Show[T]], sl: Lazy[Show[List0[T]]]) : Show[Cons[T]] = new Show[Cons[T]] {
     override def apply(t: Cons[T]): String = s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
   }
 
   // Case for List[T]: note (mutually) recursive implicit argument referencing Show[Cons[T]]
-  implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]) = new Show[List[T]] {
-    override def apply(t: List[T]): String = t match {
+  implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]) = new Show[List0[T]] {
+    override def apply(t: List0[T]): String = t match {
       case n: Nil => show(n)
       case c: Cons[T] => show(c)(sc.value)
     }
