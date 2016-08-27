@@ -1,6 +1,7 @@
 # scala-exercise-note in https://www.scala-exercises.org
 
-## [typelevel/cats](https://github.com/typelevel/cats)
+![cats](https://camo.githubusercontent.com/c7a1d594954b34a8277bce52343fe731b14870ad/687474703a2f2f706c61737469632d69646f6c617472792e636f6d2f6572696b2f63617473322e706e67)
+## [typelevel/cats](https://github.com/typelevel/cats) 
 * [Semigroup](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/SemigroupSpec.scala)
 * [Monoid](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/MonoidSpec.scala)
 * [Functor](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/FunctorSpec.scala)
@@ -12,6 +13,7 @@
 * [Xor](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/XorSpec.scala)
 * [Validated](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/ValidatedSpec.scala)
 
+![](https://avatars0.githubusercontent.com/u/131183?v=3&s=180)
 ## [shapeless](https://github.com/milessabin/shapeless)
 * [Polymorphic Function Values](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/shapenote/PolymorphicSpec.scala)
 * [Heterogenous Lists - 1](https://github.com/ikhoon/scala-exercise-note/blob/master/src/main/scala/shapenote/HeterogenousList.scala), [Heterogenous Lists - 2](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/shapenote/HeterogenousListSpec.scala)
