@@ -38,7 +38,7 @@ class ApplySpec extends WordSpec with Matchers {
     }
 
     "apply has functor's map" in {
-      import cats.std.all._
+      import cats.instances.all._
 
       Apply[Option].map(Some(1))(intToString) shouldBe Some("1")
       Apply[Option].map(Some(1))(double) shouldBe Some(2)
@@ -48,14 +48,14 @@ class ApplySpec extends WordSpec with Matchers {
     }
 
     "compose" in {
-      import cats.implicits.listInstance, cats.implicits.optionInstance
+      import cats.instances.list._, cats.instances.option._
       val listOpt: Apply[Lambda[X => List[Option[X]]]] = Apply[List] compose Apply[Option]
       val plusOne : Int => Int = _ + 1
       listOpt.ap(List(Some(plusOne)))(List(Some(1), None, Some(3))) shouldBe List(Some(2), None, Some(4))
     }
 
     "Apply only have ap function" in {
-      import cats.implicits.optionInstance
+      import cats.instances.option._
       Apply[Option].ap(Some(intToString))(Some(1)) shouldBe Some("1")
       Apply[Option].ap(Some(double))(Some(1)) shouldBe Some(2)
       Apply[Option].ap(Some(double))(None) shouldBe None
@@ -65,7 +65,7 @@ class ApplySpec extends WordSpec with Matchers {
 
     "ap2, ap3.. apN accept arity N function" in {
 
-      import cats.implicits.optionInstance
+      import cats.instances.option._
       Apply[Option].ap2(Some(addArity2))(Some(1), Some(2)) shouldBe Some(3)
       Apply[Option].ap2(Some(addArity2))(Some(1), None) shouldBe None
 
@@ -74,13 +74,13 @@ class ApplySpec extends WordSpec with Matchers {
     }
 
     "Apply has map2, map3 " in {
-      import cats.implicits.optionInstance
+      import cats.instances.option._
       Apply[Option].map2(Some(1), Some(2))(addArity2) shouldBe Some(3)
       Apply[Option].map3(Some(1), Some(2), Some(3))(addArity3) shouldBe Some(6)
     }
 
     "tupleN function are available" in {
-      import cats.implicits.optionInstance
+      import cats.instances.option._
       Apply[Option].tuple2(Some(1), Some(2)) shouldBe Some(1, 2)
       Apply[Option].tuple3(Some(1), Some(2), Some(3)) shouldBe Some(1, 2, 3)
     }

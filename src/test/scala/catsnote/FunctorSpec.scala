@@ -66,20 +66,20 @@ class FunctorSpec extends WordSpec with Matchers {
     }
 
     "lift only accept map function and return lifted function" in {
-      import cats.implicits.optionInstance
+      import cats.implicits._
       val lengthOfOption = Functor[Option].lift[String, Int](_.length)
       lengthOfOption(Some("abcdefg")) shouldBe Some(7)
     }
 
     "fproduct produce pair of origal value and mapped value" in {
-      import cats.implicits.listInstance
+      import cats.implicits._
       val source = List("My Cat", "is", "Sarang.")
       Functor[List].fproduct(source)(_.length) shouldBe List(("My Cat",6), ("is", 2), ("Sarang.", 7))
     }
 
     "compose two functor" in {
-      import cats.implicits.listInstance
-      import cats.implicits.optionInstance
+      import cats.implicits.catsStdInstancesForList
+      import cats.implicits.catsStdInstancesForOption
       val listOpt = Functor[List] compose Functor[Option]
       listOpt.map(List(Some(1), None, Some(3)))(_ + 1) shouldBe List(Some(2), None, Some(4))
     }

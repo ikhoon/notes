@@ -8,11 +8,13 @@ resolvers += Resolver.sonatypeRepo("releases")
 
 
 
-libraryDependencies += "org.typelevel" %% "cats" % "0.6.1"
+libraryDependencies += "org.typelevel" %% "cats" % "0.7.2"
 libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.1"
+libraryDependencies += "org.tpolecat" %% "doobie-core" % "0.3.0"
+libraryDependencies += "org.tpolecat" %% "doobie-contrib-h2" % "0.3.0"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.6"
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 libraryDependencies += compilerPlugin("org.spire-math" %% "kind-projector" % "0.7.1")
 
 

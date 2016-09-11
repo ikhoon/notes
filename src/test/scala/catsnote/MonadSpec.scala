@@ -18,6 +18,7 @@ class MonadSpec extends WordSpec with Matchers {
 
     "implement pure and flatMap for monad instance" in {
       import cats._
+      import cats.instances.all._
 
       implicit def optionInstance: Monad[Option] = new Monad[Option] {
         override def pure[A](x: A): Option[A] = pure(x)
@@ -26,6 +27,7 @@ class MonadSpec extends WordSpec with Matchers {
           case Some(x) => f(x)
           case None => None
         }
+        override def tailRecM[A, B](a: A)(f: (A) => Option[Either[A, B]]): Option[B] = defaultTailRecM(a)(f)
       }
 
       Monad[Option].flatMap(Option(1))(x => Some(x.toString)) shouldBe Option("1")
@@ -38,6 +40,8 @@ class MonadSpec extends WordSpec with Matchers {
           override def flatMap[A, B](fa: I => A)(f: A => I => B): I => B =
             i => f(fa(i))(i)
           override def pure[A](x: A): (I) => A = _ => x
+
+          override def tailRecM[A, B](a: A)(f: (A) => (I) => Either[A, B]): (I) => B = defaultTailRecM(a)(f)
         }
       }
       val f : Int => String = (x: Int) => x.toString
@@ -51,6 +55,8 @@ class MonadSpec extends WordSpec with Matchers {
         override def flatMap[A, B](fa: List[A])(f: (A) => List[B]): List[B] = fa.map(f).flatten
 
         override def pure[A](x: A): List[A] = List(x)
+
+        override def tailRecM[A, B](a: A)(f: (A) => List[Either[A, B]]): List[B] = defaultTailRecM(a)(f)
       }
 
       Monad[List].flatMap(List(1, 2, 3))(x => List(x, x)) shouldBe List(1, 1, 2, 2, 3, 3)
@@ -59,8 +65,8 @@ class MonadSpec extends WordSpec with Matchers {
     "if monad `ifM`" in {
       // flatMap을 수행하면서 true 값만 그결과값에 포함시킨다.
       // flatMap(F[Boolean])(if (_) ifTrue else ifFalse)
-      import cats.std.option.optionInstance
-      import cats.std.list.listInstance
+      import cats.instances.option._
+      import cats.instances.list._
 
       Monad[Option].ifM(Option(true))(Option("truethy"), Option("falsy")) shouldBe Option("truethy")
       Monad[List].ifM(List(true, false, true))(List(1, 2), List(3, 4)) shouldBe List(1, 2, 3, 4, 1 ,2)
@@ -79,16 +85,18 @@ class MonadSpec extends WordSpec with Matchers {
           })
         }
         override def pure[A](x: A): OptionT[F, A] = OptionT(implicitly[Monad[F]].pure(Some(x)))
+
+        override def tailRecM[A, B](a: A)(f: (A) => OptionT[F, Either[A, B]]): OptionT[F, B] = defaultTailRecM(a)(f)
       }
 
-      import cats.std.list._
+      import cats.instances.list._
       optionTMonad[List].pure(42) shouldBe OptionT(List(Option(42)))
       Monad[OptionT[List, ?]].flatMap(OptionT(List(Option(10))))(x => OptionT(List(Option(x + 10)))).value shouldBe List(Option(20))
 
     }
 
     "monad transformer with implicit parameter" in {
-      import cats.std.list._
+      import cats.instances.list._
       case class ListT[F[_], A](value: F[List[A]])
 
       implicit def listTMonad[F[_]](implicit F: Monad[F]): Monad[ListT[F, ?]] = new Monad[ListT[F, ?]] {
@@ -98,9 +106,11 @@ class MonadSpec extends WordSpec with Matchers {
           )
 
         override def pure[A](x: A): ListT[F, A] = ListT(F.pure(List(x)))
+
+        override def tailRecM[A, B](a: A)(f: (A) => ListT[F, Either[A, B]]): ListT[F, B] = defaultTailRecM(a)(f)
       }
 
-      import cats.std.option._
+      import cats.instances.option._
       listTMonad[Option].pure(10) shouldBe ListT(Option(List(10)))
 
       import cats.syntax.all._

@@ -10,8 +10,8 @@ class ApplicativeSpec extends WordSpec with Matchers {
 
   "Applicative extends Apply and added `pure`" should {
 
-    import std.option.optionInstance
-    import std.list.listInstance
+    import cats.instances.option._
+    import cats.instances.list._
 
     "pure" in {
       Applicative[Option].pure(1) shouldBe Option(1)

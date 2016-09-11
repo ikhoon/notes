@@ -2,7 +2,7 @@ package catsnote
 
 import cats._
 import org.scalatest.{Matchers, WordSpec}
-import cats.std.all._
+import cats.instances.all._
 import cats.syntax.all._
 
 /**

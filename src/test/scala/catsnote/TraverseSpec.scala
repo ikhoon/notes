@@ -24,7 +24,7 @@ class TraverseSpec extends WordSpec with Matchers {
 
 
     "traverseU - Xor - unapply with traverse for Applicative[F[A,B]]" in {
-      import cats.std.list.listInstance
+      import cats.instances.list._
 
       // does not compile, required G[B] but found G[A, B]
       // Traverse[List].traverse(List("1", "2", "3"))(parseIntXor)
@@ -34,10 +34,7 @@ class TraverseSpec extends WordSpec with Matchers {
     }
 
     "traverseU - Validated" in {
-      import cats.std.list.listInstance
-
-      implicit def nelSemigroup[A]: Semigroup[NonEmptyList[A]] =
-        OneAnd.oneAndSemigroupK[List].algebra[A]
+      import cats.instances.list._
 
       Traverse[List].traverseU(List("1", "2", "3"))(parseIntValidated) shouldBe Valid(List(1, 2, 3))
       Traverse[List].traverseU(List("1", "2", "3"))(parseIntValidated).isValid shouldBe true
@@ -55,8 +52,8 @@ class TraverseSpec extends WordSpec with Matchers {
     val expected = List(User(1, "name-1"), User(2, "name-2"), User(3, "name-3"), User(4, "name-4"))
 
     "parallel programming with future" in {
-      import cats.std.future.futureInstance
-      import cats.std.list.listInstance
+      import cats.instances.future._
+      import cats.instances.list._
 
       // map
       val listFutureUser: List[Future[User]] = userIds.map(getUser)
@@ -69,8 +66,8 @@ class TraverseSpec extends WordSpec with Matchers {
 
     "easy parallel programming with traverse and future" in {
       import scala.concurrent.ExecutionContext.Implicits.global
-      import cats.std.list.listInstance
-      import cats.std.future.futureInstance
+      import cats.instances.list._
+      import cats.instances.future._
 
       // traverse == sequence with map
       // sequence == traverse with identity
@@ -83,8 +80,8 @@ class TraverseSpec extends WordSpec with Matchers {
 
     "sequence" in {
 
-      import cats.std.option.optionInstance
-      import cats.std.list.listInstance
+      import cats.instances.option._
+      import cats.instances.list._
 
       Traverse[List].traverse(List(Option(1), Option(2), Option(3)))(ga => ga) shouldBe Option(List(1, 2, 3))
       Traverse[List].traverse(List(Option(1), None, Option(3)))(ga => ga) shouldBe None
@@ -94,8 +91,8 @@ class TraverseSpec extends WordSpec with Matchers {
     }
 
     "ignore value produced" in {
-      import cats.std.list.listInstance
-      import cats.std.option.optionInstance
+      import cats.instances.list._
+      import cats.instances.option._
       Traverse[List].sequence_(List(Option(1), Option(2), Option(3))) shouldBe Some(())
       Traverse[List].sequence_(List(Option(1), None, Option(3))) shouldBe None
     }

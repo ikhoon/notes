@@ -14,7 +14,7 @@ class ValidatedSpec extends WordSpec with Matchers {
 
   "Validated" should {
 
-    import cats.implicits.listInstance
+    import cats.instances.list._
     implicit val intRead: Read[Int] = Read.intRead
     implicit val stringRead: Read[String] = Read.stringRead
 
@@ -45,7 +45,7 @@ class ValidatedSpec extends WordSpec with Matchers {
 
       invalid.isValid shouldBe false
 
-      val errors = NonEmptyList(MissingConfig("url"), ParseError("port"))
+      val errors = NonEmptyList.of(MissingConfig("url"), ParseError("port"))
       invalid == Validated.invalid(errors) shouldBe true
     }
 
@@ -105,6 +105,8 @@ class ValidatedSpec extends WordSpec with Matchers {
           case Valid(x) => f(x)
           case i @ Invalid(_) => i
         }
+
+        override def tailRecM[A, B](a: A)(f: (A) => Validated[E, Either[A, B]]): Validated[E, B] = defaultTailRecM(a)(f)
       }
 
       val v: Validated[NonEmptyList[String], (Int, Double)] = validatedMonad
