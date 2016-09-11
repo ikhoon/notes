@@ -7,6 +7,8 @@ import org.scalatest.{FunSuite, Matchers}
  */
 class ObjectsSpec extends FunSuite with Matchers {
 
+  // singleton 객체의 인스턴스가 하나이다.
+  // + object, - static
   object Greeting {
     def english = "Hi"
 
@@ -28,11 +30,21 @@ class ObjectsSpec extends FunSuite with Matchers {
     val x = Greeting
     val y = x
 
+    // == 자바(레퍼런스를 비교), 값을 비교합니다.
+    // equals 자바에서 사용하는 값비교
+    // eq 레퍼런스 비
     x eq y shouldBe true
-
     val z = Greeting
 
     x eq z shouldBe true
+
+    class Foo
+
+    val a = new Foo
+
+    val b = new Foo
+
+    a eq b shouldBe false
 
   }
 
@@ -40,18 +52,10 @@ class ObjectsSpec extends FunSuite with Matchers {
     class Movie(val name: String, val year: Short)
 
     object Movie {
-      def academyAwardBestMoviesForYear(x: Short) = {
-        //This is a match statement, more powerful than a Java switch statement!
-        x match {
-          case 1930 ⇒ Some(new Movie("All Quiet On the Western Front", 1930))
-          case 1931 ⇒ Some(new Movie("Cimarron", 1931))
-          case 1932 ⇒ Some(new Movie("Grand Hotel", 1932))
-          case _ ⇒ None
-        }
-      }
+      def apply(year: Short, name: String): Movie = new Movie(name, year)
     }
 
-    Movie.academyAwardBestMoviesForYear(1932).get.name shouldBe "Grand Hotel"
+    Movie(1992, "강시") // new Movie("강시", 1992)
   }
 
   test("companion object can access private value") {

@@ -9,7 +9,7 @@ resolvers += Resolver.sonatypeRepo("releases")
 
 
 libraryDependencies += "org.typelevel" %% "cats" % "0.7.2"
-libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.1"
+libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2"
 libraryDependencies += "org.tpolecat" %% "doobie-core" % "0.3.0"
 libraryDependencies += "org.tpolecat" %% "doobie-contrib-h2" % "0.3.0"
 

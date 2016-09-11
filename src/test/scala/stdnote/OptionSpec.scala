@@ -8,6 +8,7 @@ import org.scalatest.{FunSuite, Matchers}
 class OptionSpec extends FunSuite with Matchers {
 
   test("optional") {
+    // Optional
     val someValue : Option[String] = Some("I'm wrapped in something.")
     someValue shouldBe Some("I'm wrapped in something.")
     val noneValue : Option[String] = None
@@ -23,6 +24,8 @@ class OptionSpec extends FunSuite with Matchers {
 
   test("default value") {
 
+    // Some(123) => getOrElse(0) => 123
+    // None => getOrElse(0) => 0
     value1 getOrElse "No value" shouldBe "Found value"
     value2 getOrElse "No value" shouldBe "No value"
 
@@ -40,11 +43,15 @@ class OptionSpec extends FunSuite with Matchers {
 
   // 패턴매칭?!!! 아주 중요하다.
   test("pattern matching") {
-    val someValue: Option[Double] = Some(20.0)
+    val someValue: Option[Double] = Some(20.0) // Some[Double]
+
     val value = someValue match {
       case Some(v) ⇒ v
       case None ⇒ 0.0
     }
+
+    val value2 = someValue.getOrElse(0.0)
+
     value shouldBe 20.0
     val noValue: Option[Double] = None
     val value1 = noValue match {
@@ -62,6 +69,9 @@ class OptionSpec extends FunSuite with Matchers {
     val result1 = number.map(_ * 1.5)
     val result2 = noNumber.map(_ * 1.5)
 
+    // ---------                     ------------
+    // |   3   |  -- map(* 1.5) --> |    4.5    |
+    // ---------                    ------------
     result1 shouldBe Some(4.5)
     result2 shouldBe None
   }
