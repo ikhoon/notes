@@ -148,13 +148,60 @@ object kv {
             ()
         }
     }
+  /**
 
-  // 이 impureCompiler는 순수함수가 아니다(impure 이다)라는 점을 주목하라.
-  // kvs의 상태를 변화 시키고 println을 통해서 logging을 출력하였다.
-  // 함수형 프로그래밍의 목적은 side-effect를 막는것이 아니다.
-  // 단지 side-effect를 제어가 되는 방법으로 시스템에서 경계선을 가지고 모아 놓는 것이다.
+    이 impureCompiler는 순수함수가 아니다(impure 이다)라는 점을 주목하라.
+    kvs의 상태를 변화 시키고 println을 통해서 logging을 출력하였다.
+    함수형 프로그래밍의 목적은 side-effect를 막는것이 아니다.
+    단지 side-effect를 제어가 되는 방법으로 시스템에서 경계선을 가지고 모아 놓는 것이다.
 
-  
+    Id[_]은 단순한 타입 컨테이너이다. Id[Int]는 Int이다. 즉 우리의 프로그램은 바로 실행이 될것이고, 마지막 값이 반환될때까지 블로킹될 것이다.
+
+    다양한 행동을 위해서 우리는 다른 타입을 활용할수 있다.
+
+    * Future[_]는 비동기 연산을
+    * List[_]는 여려개의 결과를 모을때
+    * Option[_]은 선택적인 결과를 지원하기 위해
+    * Either[E, ?]는 실패를 지원하기 위해
+    * 그리고 더 있단다....
+
+    # 5. 프로그램을 실행하자
+    마지막 단계로 컴파일된 녀석을 실행시키자.
+
+    Free[_]는 단지 순차적인 연산으로 다른 연산을 만드는 재귀적인 구조일뿐이다.
+    이방식은 List[_]와 유사하다.
+    우리는 list에서 하나의 값을 얻기 위해서 종종 fold(foldRight 등등)를 사용 한다.
+    이것은 그 구조(list)를 재귀하며 그의 결과를 합친다.
+
+    **Free[_]의 실행하는 아이디어도 이것과 동일하다.**
+    우리는 재귀적인 구조를 아래 사항을 이용하여 fold한다.
+    * 각각의 연산을 소비한다.
+    * 이 연산을 impureCompiler를 이용해서 효율적인 언어로 컴파일한다.(만약 그것에 effect들이 있으면 적용한다. 어떤것이라도)
+    * 다음 연산을 실행한다.
+    * `Pure` 상태가 될때까지 재귀적으로 계속 진행하고 반환한다.
+
+    이 연산을 `Free.foldMap`이라고 부른다.
+
+    ```
+    final def foldMap[M[_]](f: FunctionK[S, M])(M: Monad[M]): M[A] = ...
+    ```
+    M은 flatten하기 위해서 모나드가 되어야 한다.
+    Id는 Monad로서 foldMap을 사용할수 있다.
+
+    */
+
+  val result: Option[Int] = program.foldMap(impureCompiler)
+
+  /**
+    foldMap의 중요한점은 stack-safety하다는 것이다.
+    stack에 있는 각각의 step을 진행 unstack하고 재시작한다.
+
+    당신의 natural tranformation이 stack-safety하는한 foldMap은 절대 stack overflow하지 않는다.
+    힙 사용에 중점을 둔, stack-safety를 제공하는 Trampoline은 데이터 집중적인 작업들과 무한대의 처리과정이 있는 stream 에 대해서도
+    Free[_]를 사용하는것을 요구함으로서 안정성을 제공한다.
+
+    *
+    */
 
 
 }
