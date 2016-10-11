@@ -79,3 +79,11 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 
+#### joe made this: http://goel.io/joe
+
+#####=== Ensime ===#####
+# Ensime specific
+.ensime
+.ensime_cache/
+.ensime_lucene/
+

@@ -11,6 +11,7 @@ class FreeMonadSpec extends WordSpec with Matchers {
 
     "kv store" in {
       kv.result shouldBe Some(14)
+      kv.result shouldBe Some(14)
     }
   }
 

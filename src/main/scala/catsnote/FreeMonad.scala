@@ -1,5 +1,7 @@
 package catsnote
 
+import java.util.Date
+
 import cats.{Id, ~>}
 
 import scala.collection.mutable
@@ -131,13 +133,15 @@ object kv {
 
   def impureCompiler: KVStoreA ~> Id =
     new (KVStoreA ~> Id) {
+      println("new transformer" + new Date)
       val kvs = mutable.Map.empty[String, Any]
 
       def apply[A](fa: KVStoreA[A]): Id[A] =
         fa match {
           case Get(key) =>
             println(s"get($key)")
-            kvs.get(key).map(_.asInstanceOf[A])
+            val a: Option[A] = kvs.get(key).map(_.asInstanceOf[A])
+            a
           case Put(key, value) =>
             println(s"put($key, $value)")
             kvs.put(key, value)
@@ -190,7 +194,7 @@ object kv {
 
     */
 
-  val result: Option[Int] = program.foldMap(impureCompiler)
+  def result: Option[Int] = program.foldMap(impureCompiler)
 
   /**
     foldMap의 중요한점은 stack-safety하다는 것이다.
