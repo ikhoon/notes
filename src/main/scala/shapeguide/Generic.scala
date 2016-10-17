@@ -168,6 +168,19 @@ object AlgebraicDataType {
 
   val iceCream2: IceCream = iceCreamGen.from(repr)
 
+  // 만약 두개의 ADT가 같은 Repr을 가지고 있다면 그것들의 제너릭을 이용하여 두개 사이를 서로 변환할수 있다.
+
+  case class Employee(name: String, number: Int, manager: Boolean)
+  // ice cream으로 부터 employee를 생성하였다.
+  val strangeEmployee = Generic[Employee].from(repr)
+
+
+  // 2.3 제너릭 coproducts
+  // 이제 우리는 shapeless가 product 타입들을 어떻게 하는지 알았다. coproducts는 어떠한가??
+  // 앞에서 Either를 보았지만 그것이 tuple과 유사한 단점들을 겪게 된다.
+  // 두개의 타입보다 작은 것에 대해서 disjunction을 표현하는 방법이 없다.
+  // 이런 연유 때문에 shapeless는 HList와 유사한 것을 제공한다
+  
 
 
 
