@@ -1,5 +1,6 @@
 package shapeguide
 
+
 import shapeless.Generic.Aux
 
 // 1.1 무엇이 제너릭 프로그래밍인가?
@@ -180,7 +181,47 @@ object AlgebraicDataType {
   // 앞에서 Either를 보았지만 그것이 tuple과 유사한 단점들을 겪게 된다.
   // 두개의 타입보다 작은 것에 대해서 disjunction을 표현하는 방법이 없다.
   // 이런 연유 때문에 shapeless는 HList와 유사한 것을 제공한다
-  
+
+  // Coproduct 타입은 disjuction에 있는 가능한 모든 타입을 인코딩한다.
+  // 하지만 각각의 구체적인 인스턴스는 가능성있는것중에 하나의 값만 포함하고 있다.
+
+  case class Red()
+  case class Amber()
+  case class Green()
+
+  import shapeless.{:+:, CNil}
+  type Light = Red :+: Amber :+: Green :+: CNil
+
+  // 제너릭 coproduct 타입은 A :+: B :+: C :+: CNil 의 타입을 취한다. 이것의 의미는 A or B or C 이다.
+  // :+: 은 Either로 느슨하게 해석되어 질수 있고, 하위 타입인 Inl과 Inr은 Left와 Right에 느슨하게 대응한다.
+  // CNil은 Nothing과 유사하게 값을 가지고 있지 않는 빈 타입이다. 이로인해 빈 coproduct는 인스턴스화 할수는 없다.
+  // 이와 유사하게 순수하게 Inr의 인스턴스로만 coproduct를 생성할수는 없다.
+  // 항상 하나의 값에는 정확히 하나의 Inl이 있다.
+
+  import shapeless.{Inl, Inr}
+  val red: Light = Inl(Red())
+  val green: Light = Inr(Inr(Inl(Green())))
+
+
+  // 2.3.1 제너릭을 이용한 인코딩으로의 변환
+  // Coproduct의 타입은 첫인상에 파싱하기 어렵다.
+  // 그러나 그것들이 제너릭 인코딩의 큰그림에 어떻게 맞추어 가는지 보면 상대적으로 쉽다.
+  // case class와 case object를 이해하기 위해서 추가적으로 shapeless의 Generic type class는 sealed trait과 abstract class를 이해한다.
+  // 어떻게?? macro인가봉가?
+
+  object generic {
+    sealed trait Shape
+    final case class Rectangle(width: Double, height: Double) extends Shape
+    final case class Circle(radius: Double) extends Shape
+    val gen = Generic[Shape]
+    // gen: shapeless.Generic[Shape]{type Repr = shapeless.:+:[Rectangle,shapeless.:+:[Circle,shapeless.CNil]]} = anon$macro$1$1@3b97a8f1
+    // trait으로 Generic을 만들면 Coproduct가 된다. awesome
+
+
+  }
+
+
+
 
 
 
