@@ -1,6 +1,7 @@
 package shapeguide
 
 
+import shapeless.{Generic, HList, ::, HNil}
 import shapeless.Generic.Aux
 
 // 1.1 무엇이 제너릭 프로그래밍인가?
@@ -65,7 +66,9 @@ object AlgebraicDataType {
   // `or types`는 coproducts라 불리는 shape이다.
 
   sealed trait Shape
+
   final case class Rectangle(width: Double, height: Double) extends Shape
+
   final case class Circle(radius: Double) extends Shape
 
   val rectangle = Rectangle(3.0, 4.0)
@@ -127,6 +130,7 @@ object AlgebraicDataType {
   // HList는 각각의 element의 타입이 전체 리스트의 타입에 관리되어 지는것을 제외하고는 일반적인 list와 유사하다.
 
   import shapeless.{HList, ::, HNil}
+
   val product: String :: Int :: Boolean :: HNil = "Sunday" :: 1 :: false :: HNil
 
   // HList의 type과 value는 서로 반영한다. 둘다 String, Int, Boolean 멤버를 표현한다.
@@ -138,7 +142,7 @@ object AlgebraicDataType {
 
   // 컴파일러는 각각의 HList의 정확한 길이를 알고 있다. 그렇기 때문에 empty list의 head나 tail은 컴파일 에러를 유발할것이다.
 
-//  product.tail.tail.tail.head  ==> 컴파일 에러 난다잉
+  //  product.tail.tail.tail.head  ==> 컴파일 에러 난다잉
 
   // 조사하고 탐색하는것 이외에 HList를 조작하고 변형할수 있다.
   // 예를 들어 앞에 `::` 함수와 함께 element를 추가할수 있다.
@@ -156,6 +160,7 @@ object AlgebraicDataType {
   import shapeless.Generic
 
   case class IceCream(name: String, numCherries: Int, inCorn: Boolean)
+
   val iceCreamGen = Generic[IceCream]
   // iceCreamGen: shapeless.Generic[IceCream]{type Repr = shapeless.::[String,shapeless.::[Int,shapeless.::[Boolean,shapeless.HNil]]]} = anon$macro$4$1@29ed4101
 
@@ -172,6 +177,7 @@ object AlgebraicDataType {
   // 만약 두개의 ADT가 같은 Repr을 가지고 있다면 그것들의 제너릭을 이용하여 두개 사이를 서로 변환할수 있다.
 
   case class Employee(name: String, number: Int, manager: Boolean)
+
   // ice cream으로 부터 employee를 생성하였다.
   val strangeEmployee = Generic[Employee].from(repr)
 
@@ -186,10 +192,13 @@ object AlgebraicDataType {
   // 하지만 각각의 구체적인 인스턴스는 가능성있는것중에 하나의 값만 포함하고 있다.
 
   case class Red()
+
   case class Amber()
+
   case class Green()
 
   import shapeless.{:+:, CNil}
+
   type Light = Red :+: Amber :+: Green :+: CNil
 
   // 제너릭 coproduct 타입은 A :+: B :+: C :+: CNil 의 타입을 취한다. 이것의 의미는 A or B or C 이다.
@@ -199,6 +208,7 @@ object AlgebraicDataType {
   // 항상 하나의 값에는 정확히 하나의 Inl이 있다.
 
   import shapeless.{Inl, Inr}
+
   val red: Light = Inl(Red())
   val green: Light = Inr(Inr(Inl(Green())))
 
@@ -208,24 +218,219 @@ object AlgebraicDataType {
   // 그러나 그것들이 제너릭 인코딩의 큰그림에 어떻게 맞추어 가는지 보면 상대적으로 쉽다.
   // case class와 case object를 이해하기 위해서 추가적으로 shapeless의 Generic type class는 sealed trait과 abstract class를 이해한다.
   // 어떻게?? macro인가봉가?
+}
 
-  object generic {
-    sealed trait Shape
-    final case class Rectangle(width: Double, height: Double) extends Shape
-    final case class Circle(radius: Double) extends Shape
-    val gen = Generic[Shape]
-    // gen: shapeless.Generic[Shape]{type Repr = shapeless.:+:[Rectangle,shapeless.:+:[Circle,shapeless.CNil]]} = anon$macro$1$1@3b97a8f1
-    // trait으로 Generic을 만들면 Coproduct가 된다. awesome
+// 아래 3줄의 코드는 특정 object안에 속해있으면 nested하면 shapeless에서 컴파일을 하지 못한다. 매크로 때문인거 같다.
+// 고로 top level에 sealed trait이 위치 해주어야 한다!!
+sealed trait Shape3
+final case class Rectangle(width: Double, height: Double) extends Shape3
+final case class Circle(radius: Double) extends Shape3
+object coproduct {
+  val gen = Generic[Shape3]
+  // gen: shapeless.Generic[Shape3]{type Repr = shapeless.:+:[Rectangle,shapeless.:+:[Circle,shapeless.CNil]]} = anon$macro$1$1@3b97a8f1
+  // trait으로 Generic을 만들면 Coproduct가 된다. awesome
 
 
+  /// 망햇다... ㅠㅠ 날라갔다.
+}
+
+
+object deriving {
+  // 3. Automatically deriving type class instances
+
+  // 3.1 복습: type class
+  // 인스턴스의 유도에 대해서 깊게 들어가기전에 짧게 type class의 중요성에 대해서 알아본다.
+  // Type class는 Haskell에서부터 가져온 프로그래밍 패턴이다.
+  // ('class'란 단어는 object oriented programming의 class와는 아무런 관계가 없다. 오해말기를..)
+  // 우리는 type class를 scala에서 trait과 implicit 파라메터를 통해서 구현할수 있다.
+  // type class는 다양한 타입에 대해서 적용하려고 범용적 함수를 표현하고자 하는 generic trait이다.
+
+  trait CsvEncoder[A] {
+    def encode(value: A): List[String]
   }
 
+  // 관심이 있는 타입에 대하여 인스턴스와 함께 type class 구현하면 된다.
+
+  // 생성자에 대한 보조함수이다.
+  def createEncoder[A](f: A => List[String]): CsvEncoder[A] =
+    new CsvEncoder[A] {
+      def encode(value: A): List[String] = f(value)
+    }
+
+  // 커스텀 타입
+  case class Employee(name: String, number: Int, manager: Boolean)
+  // 커스텀 타입에 대한 CsvEncoder의 인스턴스
+  implicit val employeeEncoder = createEncoder[Employee](e =>
+    List(e.name, e.number.toString, if(e.manager) "yes" else "no"))
+
+  // 각각의 인스턴스에 대해서는 implicit 키워드로 표시한다.
+  // 그리고 위 타입에 대응하는 implicit 파라메터를 받아들이는 제너릭 엔트리 포인트 함수(시작하는 함수)를 구현한다.
+
+  def writeCsv[A](values: List[A])(implicit encoder: CsvEncoder[A]): String =
+    values.map(value => encoder.encode(value).mkString(",")).mkString("\n")
+
+  // 시작함수를 `호출`때 컴파일러는 해당 값의 타입 파라메터를 계산하고 타엡에 해당하는 implicit CsvWriter를 찾는다.
+  val employees : List[Employee] = List(
+    Employee("Bill", 1, true),
+    Employee("Peter", 2, false),
+    Employee("Milton", 3, false)
+  )
+
+  // 컴파일러가 CsvEncoder[Employee]를 파라메터로 주입한다.
+  writeCsv(employees)
+
+  // 우리는 implicit CsvEncoder를 정의하고 scope 에 놓아 둠으로서 어떤 타입에 대해서도 wrtieCsv를 사용할수 있다.
+  case class IceCream(name: String, numCherries: Int, inCorn: Boolean)
+  implicit val iceCreamEncoder: CsvEncoder[IceCream] =
+    createEncoder[IceCream](i => List(i.name, i.numCherries.toString, if(i.inCorn) "yes" else "no"))
+
+  val iceCreams: List[IceCream] = List(
+    IceCream("Sundae", 1, false),
+    IceCream("Cornetto", 0, true),
+    IceCream("Banana Split", 0, false)
+  )
+  // 여기서는 컴파일러가 CsvEncoder[IceCream]을 파라메터로 주입한다.
+  writeCsv(iceCreams)
 
 
+  // 3.1.1 인스턴스 유도하기
+  // 타입 클래스는 매우 유연하지만 고려해야 하는 모든 타입에 대해서 인스턴스를 선언하는것이 필요하다.
+  // 다행이도 스칼라 컴파일러는 주어진 규칙을 통해서 인스턴스를 생성하는 몇가지 트릭이 있다.
+  // 예를 들어 주어진 A, B의 CsvEncoder들을 활용하여 (A, B) 쌍의 인코더를 만들수 있다.
+  // 기존에 만들어진 코드를 재활용하였다.
+  implicit def pairEncoder[A, B](
+    implicit aEncoder: CsvEncoder[A], bEncoder: CsvEncoder[B]
+  ): CsvEncoder[(A, B)] =
+    createEncoder[(A, B)]{
+      case (a, b) => aEncoder.encode(a) ++ bEncoder.encode(b)
+    }
+
+  // implicit def안의 모든 파라메터가 implicit으로 선언되어 있을때
+  // 컴파일러는 그것을 다른 인스턴스로 부터 인스턴스를 생성하는 유도하는 규칙으로 이용한다.
+  // 예를 들어 만약 writeCsv를 호출하고 List[(Employee, IceCream)]을 넘길때
+  // 컴파일러는
+  // * pairEncoder
+  // * iceCreamEncoder
+  // * employeeEncoder
+  // 를 조합하여 필요로하는 CsvEncoder[(Employee, IceCream)] 을 만들수 있다.
+
+  writeCsv(employees zip iceCreams)
+
+  // `implicit val`과 `implicit def`로 인코딩되어 있는 주어진 규칙들로 부터
+  // 컴파일러는 조합된 대상이 필요로 하는 인스턴스를 찾는 능력을 가지고 있다.
+  // "implicit derivation"으로 알려진 이 행위는 type class 패턴을 아주 강력하게 만든다.
+
+  // 이것은 통상적으로 ADT에는 제한 되어 있다.
+  // 컴파일러는 case class와 sealed trait의 별개 타입의 대해서는 선택하지 못한다.
+  // 그래서 개발자는 ADT의 instance를 항상 손으로 한땀 한딴 정의해 왔다.
+  // Shapeless의 제너릭 표현은 이 모든것을 바꾼다!!!!
+  // 어떤 ADT라도 인스턴스를 공짜로 유도할수 있게 해준다. wow! 대박이다잉
+
+  // 3.2 Deriving instances for products
+
+  // 이번 섹션은 products(ie. case class)의 type class 인스턴스를 유도하기 위해서 shapeless를 사용할것 이다.
+  // 2가지 직관(진실?, 사실?)을 이용할것이다.
+  // 1. HList의 head의 tail의 type class instance가 있다면 우리는 전체 HList의 instance를 유도할수 있다.
+  // 2. case class A, Generic[A], 제너릭의 Repr의 type class 인스턴스가 있다면 A의 인스턴스를 생성하기 위해 이를 조합할수 있다.
+
+  // CsvEncoder와 IceCream을 예로 들어
+  // * IceCream은 String :: Int :: Boolean :: HNil의 제너릭 Repr을 가지고 있다.
+  // * Repr은 String, Int, Boolean과 HNil로 구성되어 있다. 이들 타입에 대해서 CsvEncoder가 있다면 전체에 대한 encoder를 만들수 있다.
+  // * Repr에 대해서 CsvEncoder를 유도할수 있다면 IceCream에 대해서도 할수가 있다.
 
 
+  // 3.2.1 Instance for HList
+  // String, Int, Boolean 에 대해서 CsvEncoder를 작성하는것 부터 시작하자.
+
+  implicit val stringEncoder: CsvEncoder[String] = createEncoder(s => List(s))
+
+  implicit val intEncoder: CsvEncoder[Int] = createEncoder(i => List(i.toString))
+
+  implicit val booleanEncoder: CsvEncoder[Boolean] = createEncoder(b => List(if(b) "yes" else "no"))
+
+  // HList를 위한 encoder를 만들기 위해 이 블록들을 합칠수 있다.
+  // 두가지 규칙을 사용할것이다. 하나는 `HNil` 위한 것이고 또다른 하나는 `::` 위한 것이다.
+  implicit val hnilEncoder: CsvEncoder[HNil] = createEncoder[HNil](hnil => Nil)
+
+  // head와 tail을 각각 encode하고 합친다.
+  // 합치는 규칙만 여기서 정하면 된다.
+  implicit def hlistEncoder[H, T <: HList](
+    implicit hEncoder: CsvEncoder[H], tEncoder: CsvEncoder[T]
+  ): CsvEncoder[H :: T] = createEncoder[H :: T] {
+    case h :: t => hEncoder.encode(h) ++ tEncoder.encode(t)
+  }
+
+  // 이 5가지의 규칙은 String, Int, Boolean을 포함하고 있는 어떤 HList라도 CsvEncoder를 만들어 낼수 있다.
+
+  val reprEncoder: CsvEncoder[String :: Int :: Boolean :: HNil] = implicitly
+
+  reprEncoder.encode("abc" :: 123 :: true :: HNil)
+  // List(abc, 123, yes)
 
 
+  case class IceCream2(name: String, numCherries: Int, inCorn: Boolean)
+  val iceCream2s: List[IceCream2] = List(
+    IceCream2("Sundae", 1, false),
+    IceCream2("Cornetto", 0, true),
+    IceCream2("Banana Split", 0, false)
+  )
+
+  // 3.2.2 Instances for concrete products
+  // IceCream을 위한 CsvEncoder를 만들기 위해서 HList의 유도 규칙과 Generic 인스턴스를 합칠수 있다.
+  // IceCream을 받아서 List[String]을 반환하는 encoder를 만든다.
+  implicit val iceCreamEncoder2: CsvEncoder[IceCream2] = {
+    val gen = Generic[IceCream2]
+    val enc = implicitly[CsvEncoder[gen.Repr]]
+    createEncoder[IceCream2] {
+      iceCream => enc.encode(gen.to(iceCream))
+    }
+  }
+  writeCsv(iceCream2s)
+
+  // 이방법은 IceCream에만 한정되어 있다.
+  // 이상적으로 Generic과 매칭되는 CsvEncoder를 가지고 있는 모든 case class를 하나의 규칙으로 다루는 것을 가지고 싶다.
+  // 이 유도는 한단계 한단계 시작해보자.
+
+  // 첫번째로는
+  /**
+  implicit def genericEncoder[A](
+    implicit
+      gen: Generic[A],
+      enc: CsvEncoder[???]
+   ): CsvEncoder[A] =
+    createEncoder(a => enc.encode(gen.to(a)))
+  **/
+  // 첫번째 문제는 ??? 자리에 위치한 곳에 타입을 선택해서 넣는것이다.
+  // gen과 관련된 Repr타입을 작성하고 싶지만 이것은 할수 없다.
+
+  /**
+  implicit def genericEncoder2[A](
+    implicit
+      gen: Generic[A],
+      enc: CsvEncoder[gen.Repr]
+  ): CsvEncoder[A] =
+    createEncoder[A](a => enc.encode(gen.to(a)))
+    **/
+  // <console>:26: error: illegal dependent method type: parameter may only be referenced in a subsequent parameter section
+  //          gen: Generic[A],
+  //          ^
+
+  // 문제는 범위 이슈이다.
+  // 같은 블록에서는 하나의 파라메터의 타입 멤버는 다른 파라메터를 참조할수 없다.
+  // 여기서 자세한것을 다루지는 않는다.
+  // 이런 종류의 문제를 풀기위한 트릭은
+  // * 메소드에 타입 파라메터를 추가하고
+  // * 이를 각각의 관련된 타입이 참조를 하는 것이다.
+  implicit def genericEncoder3[A, R](
+    implicit gen: Generic[A] { type Repr = R },
+    enc: CsvEncoder[R]
+  ): CsvEncoder[A] =
+    createEncoder(a => enc.encode(gen.to(a)))
+
+  // 이 제너릭 스타일은 다음 장에서 보다 자세히 다룰것이다.
+  // 이 정의는 컴파일 되고 예상된데로 수행하며 예상되는 모든 case class는 이것을 사용할 수 있는것으로 충분하다고 말할수 있다.
+  
 
 
 }
+
