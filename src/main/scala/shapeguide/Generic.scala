@@ -1,12 +1,14 @@
 package shapeguide
 
 
-import shapeless.{Generic, HList, ::, HNil}
+import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr}
 import shapeless.Generic.Aux
 
-// 1.1 무엇이 제너릭 프로그래밍인가?
+// Reference : https://github.com/davegurnell/shapeless-guide
 
 object generic {
+
+  // 1.1 무엇이 제너릭 프로그래밍인가?
 
   // 스칼라 프로그래머로서 우리는 타입을 사용한다. 타입은 특별하기 때문에 유용하다.
   // 우리가 다른 코드의 조각을 어떻게 사용하는지 알려주고 버그가 생기는것을 막아준다.
@@ -223,8 +225,8 @@ object AlgebraicDataType {
 // 아래 3줄의 코드는 특정 object안에 속해있으면 nested하면 shapeless에서 컴파일을 하지 못한다. 매크로 때문인거 같다.
 // 고로 top level에 sealed trait이 위치 해주어야 한다!!
 sealed trait Shape3
-final case class Rectangle(width: Double, height: Double) extends Shape3
-final case class Circle(radius: Double) extends Shape3
+final case class Rectangle3(width: Double, height: Double) extends Shape3
+final case class Circle3(radius: Double) extends Shape3
 object coproduct {
   val gen = Generic[Shape3]
   // gen: shapeless.Generic[Shape3]{type Repr = shapeless.:+:[Rectangle,shapeless.:+:[Circle,shapeless.CNil]]} = anon$macro$1$1@3b97a8f1
@@ -348,6 +350,8 @@ object deriving {
 
   implicit val booleanEncoder: CsvEncoder[Boolean] = createEncoder(b => List(if(b) "yes" else "no"))
 
+  implicit val doubleEncoder: CsvEncoder[Double] = createEncoder(d => List(d.toString))
+
   // HList를 위한 encoder를 만들기 위해 이 블록들을 합칠수 있다.
   // 두가지 규칙을 사용할것이다. 하나는 `HNil` 위한 것이고 또다른 하나는 `::` 위한 것이다.
   implicit val hnilEncoder: CsvEncoder[HNil] = createEncoder[HNil](hnil => Nil)
@@ -421,16 +425,209 @@ object deriving {
   // 이런 종류의 문제를 풀기위한 트릭은
   // * 메소드에 타입 파라메터를 추가하고
   // * 이를 각각의 관련된 타입이 참조를 하는 것이다.
-  implicit def genericEncoder3[A, R](
-    implicit gen: Generic[A] { type Repr = R },
-    enc: CsvEncoder[R]
+  // 같은 타입에 대한 encoder가 두개 있어도 안된다. 일반적인 경우에 에러는 implicit이 모호하다고 뜨지만 이경우에는 그냥 없다고만 뜬다ㅠ.ㅠ
+  // 그래서 디버깅하는게 조금은 힘들다.
+  /*implicit*/ def genericEncoder3[A, R](
+    implicit
+      gen: Generic[A] { type Repr = R },
+      enc: CsvEncoder[R]
   ): CsvEncoder[A] =
     createEncoder(a => enc.encode(gen.to(a)))
 
   // 이 제너릭 스타일은 다음 장에서 보다 자세히 다룰것이다.
   // 이 정의는 컴파일 되고 예상된데로 수행하며 예상되는 모든 case class는 이것을 사용할 수 있는것으로 충분하다고 말할수 있다.
-  
+
+  // 직관적으로 이 정의에 대해 이야기하면 :
+  // 주어진 A와 HList R 타입에 대하여 A를 R로 바꾸는 implicit Generic과 R를 위한 CsvEncoder를 통해서 A를 위한 CsvEncoder를 만든다.
+
+  // 컴파일의 호출은 아래와 같이 확장된다.
+  writeCsv(iceCream2s)
+  // 유도의 규칙들을 사용하여
+  writeCsv(iceCream2s)(
+    genericEncoder3(
+      Generic[IceCream2],
+      hlistEncoder(stringEncoder,
+        hlistEncoder(intEncoder,
+          hlistEncoder(booleanEncoder, hnilEncoder)))))
+
+  // Aux type alias
+  // Generic[A] { type Repr = R } 와 같은 type refinement 는 장황하고 가독성이 떨어진다.
+  // > Refinement Types = Types + Logical Predicates 이라고 한다.
+  // > 스칼라는 타입 멤버로 타입에 대한 제약을 주는 경우에 사용한다.
+
+  // 그래서 shapeless는 type member를 type parameter로 재구성한 type alias인 `Generic.Aux`를 제공한다.
+  trait Generic2[T] {
+    type Repr
+  }
+  object Generic2 {
+    type Aux[A, R] = Generic2[A] { type Repr = R }
+  }
+
+  // 이 alias를 이용하면 훨씬 보다 가독성 좋은 정의를 얻을수 있다.
+  implicit def genericEncoder4[A, R](
+    implicit
+      gen: Generic.Aux[A, R],
+      enc: CsvEncoder[R]
+  ): CsvEncoder[A] =
+    createEncoder[A](a => enc.encode(gen.to(a)))
+
+  // 3.2.3 안좋은 것 무엇인가?
+  // 앞에서 보았던것들은 꽤 마법처럼 보인다, allow us to provide one significant dose of reality.
+  // 만약 무엇인가 잘못 되었으면 왜 그런지 컴파일러는 제대로 말해주지 못한다.
+
+  // 코드가 컴파일 되지 않는 큰이유가 2가지 있다.
+  // 첫번째는 타입에 대한 implicit Generic을 찾지 못하는 경우 이다.
 
 
+  // not a case class
+  class Foo(bar: String, baz: Int)
+
+//  writeCsv(List(new Foo("abc", 123)))     // 컴파일안됨요.
+
+  // <console>:30: error: could not find implicit value for parameter encoder: CsvEncoder[Foo]
+  //        writeCsv(List(new Foo("abc", 123)))
+
+  // 이 에러메시지는 상대적으로 이해하기 쉽다.
+  // 만약 Generic을 계산해내지 못한다면 그 타입은 ADT가 아닌것이다.
+  // algebra안에 어딘가 case class나 sealed abstract 타입이 *아닌것이* 있는것이다.
+
+  // 다른 가능성 있는 실패는 컴파일러가 HList에 대해서 CsvEncoder를 계산해 내지 못하는 것이다.
+  // 일반적으로 ADT의 필드중 하나의 encoder가 없는 경우에 일어난다.
+
+  import java.util.Date
+  case class Booking(room: String, date: Date)
+//  writeCsv(List(Booking("Lecture Hall", new Date)))   // 컴파일 안됨요.
+
+  // <console>:32: error: could not find implicit value for parameter encoder: CsvEncoder[Booking]
+  //        writeCsv(List(Booking("Lecture hall", new Date())))
+
+  // 이 에러 메시지는 전혀 도움이 되지 않는다.
+  // 컴파일러가 아는것은 많은 implicit 찾기 위한 규칙을 시도했지만 그것을 하지 못했다는 것이 전부이다.
+  // 어떤 조합이 바람직한 결과에 가장 밀접한지 알수 없기 때문에, 어디에 실패한 소스가 있는지 말하지 못한다.
+
+  // implicit 찾기에 대한 디버깅은 다음 챕터에서 다룰것이다.
+  // 지금의 좋은 소식은 implicit 찾기의 실패는 항상 컴파일 타임에 이루어 진다는 것이다.
+  // 코드가 실행도중에 실패를 하는것은 거의 없다.
+
+  // 3.3 Deriving instances for coproducts
+
+  // 지난 섹션에서는 어떤 product 타입에 대해서도 CsvEncoder를 자동으로 유도하는 규칙들을 만들었다.
+  // 이번 섹션에는 같은 패턴을 coproducts에 적용시킨다.
+  // shape ADT 예제로 돌아가서
+
+  /* TOP level에 선언해줘야 함
+  sealed trait Shape
+  final case class Rectangle(width: Double, height: Double) extends Shape
+  final case class Circle(radius: Double) extends Shape
+  */
+
+  // Shape에 대한 제너릭 표현은 Rectangle :+: Cirle :+: CNil 이다
+  // 우리는 HList에서 사용했던 것과 같은 원리로 :+: 와 CNil 에 대한 제너릭 CsvEncoder를 만들수 있다.
+  // 현재 존재하는 encoder들이 Retangle과 Circle을 처리해줄것이다.
+
+  import shapeless.{Coproduct, :+:, CNil, Inl, Inr}
+
+  implicit val cnilEncoder: CsvEncoder[CNil] =
+    createEncoder[CNil](cnil => throw new Exception("Universe exploded! Abort!"))
+
+  implicit def coproductEncoder[H, T <: Coproduct](
+    implicit
+      hEncoder: CsvEncoder[H],
+      tEncoder: CsvEncoder[T]
+  ): CsvEncoder[H :+: T] =
+    createEncoder[H :+: T] {
+      case Inl(h) => hEncoder.encode(h)
+      case Inr(t) => tEncoder.encode(t)
+    }
+
+  // 두가지 중요한 포인트가 있다.
+
+  // 1. 놀랍게도 CNil에 대한 encoder는 오히려 예외를 발생시킨다.
+  // 그래도 당황하지 않기!!, 실제로 CNil의 타입의 어떤 값도 만들수 없다는 것을 상기하자.
+  // 단지 컴파일러는 위한 표시일뿐이다.
+  // 이부분에 도달할수 없기 때문에 갑자기 실패하는것이 맞는것이다.
+
+  // http://www.mathgoodies.com/lessons/vol9/disjunction.html 두개의 명제는 OR로 연결
+
+  // 2. Coproducts는 타입의 논리합(disjunction)이다.
+  // :+: 를 위한 encoder는 왼쪽값을 encode할것인지 오른쪽 값을 할것인지 결정해야 한다.
+  // :+: 의 하위타입 왼쯕은 Inl, 오른쪽은 Inr 대해서 패턴 매칭을 할것이다.
+
+  // 이정의와 product type에 대한 정의로 shape의 리스트에 대해서 직렬화 할수 있다.
+  val shapes: List[Shape3] = List(
+    Rectangle3(3.0, 4.0),
+    Circle3(1.0)
+  )
+
+//  writeCsv(shapes)    // 컴파일 안됨요.
+
+  // <console>:33: error: could not find implicit value for parameter encoder: CsvEncoder[Shape]
+  //        writeCsv(shapes)
+
+  // 이런... 컴파일 안됨! 에러메시지는 앞에서 이야기 했던것 처럼 도움이 되지 않는다.
+  // 컴파일 오류가 나는 이유는 Double에 대한 CsvEncoder가 없기 때문이다.
+
+
+  writeCsv(shapes)
+
+}
+
+object exercise extends App {
+  // 3.3.1 Aligning columns in CSV Output
+
+  // 아마 rectangle과 circle를 위한 데이터를 두개의 컬럼 셋으로 구분하는게 더 좋을것이다.
+  // CsvEncoder에 width 필드를 넣음으로서 이를 해결하수 있다.
+
+  trait CsvEncoder[A] {
+    def width: Int
+    def encode(value: A): List[String]
+  }
+
+  // 모든 정의를 다 따르면 각각의 필드를 다른 컬럼에 놓게 할수 있다.
+  // width, height, radius 요런 느낌으로
+
+  def createEncoder[A](w: Int)(f: A => List[String]): CsvEncoder[A] =
+    new CsvEncoder[A] {
+      def width: Int = w
+      def encode(value: A) = f(value)
+    }
+
+
+  implicit val doubleEncoder: CsvEncoder[Double] = createEncoder[Double](1)(d => List(d.toString))
+  implicit val hnilEncoder: CsvEncoder[HNil] = createEncoder[HNil](0)(hnil => Nil)
+  implicit def hlistEncoder[H, T <: HList](
+    implicit
+      hEncoder: CsvEncoder[H],
+      tEncoder: CsvEncoder[T]
+  ): CsvEncoder[H :: T] = createEncoder[H :: T](hEncoder.width + tEncoder.width) {
+    case h :: t => hEncoder.encode(h) ++ tEncoder.encode(t)
+  }
+
+  implicit val cnilEncoder: CsvEncoder[CNil] = createEncoder[CNil](0)(cnil => throw new Exception("Never happen!"))
+  implicit def cporudctEncoder[H, T <: Coproduct](
+    implicit
+      hEncoder: CsvEncoder[H],
+      tEncoder: CsvEncoder[T]
+  ): CsvEncoder[H :+: T] = createEncoder[H :+: T](hEncoder.width + tEncoder.width) {
+    case Inl(h) => hEncoder.encode(h) ++ List.fill(tEncoder.width)("")
+    case Inr(t) => List.fill(hEncoder.width)("") ++ tEncoder.encode(t)
+  }
+
+  implicit def genericEncoder[A, R](
+    implicit
+      gen: Generic.Aux[A, R],
+      enc: CsvEncoder[R]
+   ): CsvEncoder[A] = createEncoder(enc.width) {
+    a => enc.encode(gen.to(a))
+  }
+
+  def writeCsv[A](values: List[A])(implicit encoder: CsvEncoder[A]): String =
+    values.map(value => encoder.encode(value).mkString(",")).mkString("\n")
+
+  val shapes: List[Shape3] = List(
+    Rectangle3(3.0, 4.0),
+    Circle3(1.0)
+  )
+  println(writeCsv(shapes))
 }
 
