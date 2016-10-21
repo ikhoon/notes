@@ -1,7 +1,8 @@
 package shapeguide
 
 
-import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr}
+import shapeguide.deriving.CsvEncoder
+import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
 import shapeless.Generic.Aux
 
 // Reference : https://github.com/davegurnell/shapeless-guide
@@ -631,3 +632,69 @@ object exercise extends App {
   println(writeCsv(shapes))
 }
 
+object recursive {
+  // 3.4 Deriving instances for recursive types
+  // 보다 모호한 경우에 대해서 시도를 해보자 - 이진 트리
+  sealed trait Tree[A]
+  final case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
+  final case class Leaf[A](value: A) extends Tree[A]
+
+  // 이론적으로는 위의 정의를 위한 CsvWriter를 도출해 해내기 위한것들을 이미 다 정의하였다.
+
+//  implicitly[CsvEncoder[Tree[Int]]]   // 컴파일 안됨요.
+
+  // <console>:24: error: could not find implicit value for parameter e: CsvEncoder[Tree[Int]]
+  //        implicitly[CsvEncoder[Tree[Int]]]
+
+  // 문제는 컴파일러가 implicit을 위해서 무한히 찾는것을 막고 있다는데 있다.
+  // 만약 어떤 브랜치 검색에서 같은 type 생성자는 두번 본다면 implicit를 찾는것이 끝나지 않는것으로 보고 중지한다.
+  // Branch가 재귀적이면 CsvEncoder[Branch] 규칙을 위해 이런 행위가 발생한다.
+
+  // 사실 상황은 이것보다 훨씬더 나쁘다.
+  // 만약 컴파일러가 같은 타입 생성자 두번를 만나고 타입 파라메터의 복잡도가 증가한다면 이 또한 중지할것이다.
+  // ::[H, T]과 :+:[H, T]이 다른 제너릭 표현들에서 나타나고 이는 컴파일러가 조기에 포기하게 하게 해서 shapeless에서 문제가 된다.
+
+
+  // 3.4.1 Lazy
+  // 다행히 shapeless는 차선책으로 Lazy라 불리는 타입을 제공한다.
+  // Lazy는 두가지를 한다.
+  // 1. 이는 implicit 찾기를 엄격히 필요할때 까지 늦춘고 자기참조 implicit 유도를 하게 한다.
+  // 2. 앞에서 언급한 지나친 경험적(heuristic) 방어로 부터 보호한다.
+
+  // 경험의 법칙(rule of thumbs)으로
+  // 어떤 HList나 Coproduct규칙의 "head" 파라메터와
+  // 어떤 제너릭 규칙의 "repr" 파라메터는 Lazy로 감싸는것이 항상 좋다.
+  implicit def hlistEncoder[H, T <: HList](
+    implicit
+      hEncoder: Lazy[CsvEncoder[H]],    // lazy로 감쌈
+      tEncoder: CsvEncoder[T]
+  ): CsvEncoder[H :: T] = new CsvEncoder[H :: T] {
+    def encode(value: H :: T): List[String] = value match {
+      case h :: t =>
+        hEncoder.value.encode(h) ++ tEncoder.encode(t)
+    }
+  }
+
+  implicit def cproductEncoder[H, T <: Coproduct](
+    implicit
+      hEncoder: Lazy[CsvEncoder[H]],  // lazy로 감쌈
+      tEncoder: CsvEncoder[T]
+  ): CsvEncoder[H :+: T] = new CsvEncoder[H :+: T] {
+    def encode(value: H :+: T): List[String] = value match {
+      case Inl(h) => hEncoder.value.encode(h)
+      case Inr(t) => tEncoder.encode(t)
+    }
+  }
+
+  implicit def genericEncoder[A, R](
+    implicit
+      gen: Generic.Aux[A, R],
+      enc: Lazy[CsvEncoder[R]]   // lazy로 감쌈
+  ): CsvEncoder[A] = new CsvEncoder[A] {
+    def encode(value: A): List[String] =
+      enc.value.encode(gen.to(value))
+  }
+
+  // 이것은 컴파일러가 일찍 중지하는것을 막아주고 Tree와 같은 복잡하고 재귀적인 타입에 대해서 작동하는것이 가능하다.
+  implicitly[CsvEncoder[Tree[Int]]]
+}
