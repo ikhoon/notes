@@ -697,4 +697,109 @@ object recursive {
 
   // 이것은 컴파일러가 일찍 중지하는것을 막아주고 Tree와 같은 복잡하고 재귀적인 타입에 대해서 작동하는것이 가능하다.
   implicitly[CsvEncoder[Tree[Int]]]
+
+  // 3.5 요약
+  // 이번장에서는 case class 인스턴스를 자동으로 유도하기 위해 Generic, HList와 Coproducts를 어떻게 사용하는지에 대해서 알아보았다.
+  // 또한 복잡하거나 재귀적인 타입을 다루는 수단으로서 Lazy 타입을 다루었다.
+
+  // 이것들을 하나로 모아, 우리는 type class 인스턴스를 유도하기 위한 공통된 부분을 작성할수 있다.
+
+  import shapeless.{HList, ::, HNil, Coproduct, :+:, CNil, Generic, Lazy}
+
+  // 1번째 : type class 정의
+  trait MyTC[A] {
+    // etc...
+  }
+
+  // 2번째 : 기본 인스턴스 정의
+  implicit def intInstance: MyTC[Int] = ???
+
+  // 3번째 : HList와 Coproduct를 위한 인스턴스 정의
+  implicit def hnilInstance: MyTC[HNil] = ???
+
+  implicit def hlistInsstance[H, T <: HList](
+    implicit
+      hInstance: Lazy[MyTC[H]],  // lazy로 감쌈
+      tInstance: MyTC[T]
+  ): MyTC[H :: T] = ???
+
+  implicit def cnilInstance: MyTC[CNil] = ???
+
+  implicit def coproductInstance[H, T <: Coproduct](
+    implicit
+      hInstance: Lazy[MyTC[H]],  // lazy로 감쌈
+      tInstance: MyTC[T]
+  ): MyTC[H :+: T] = ???
+
+  implicit def genericInstance[A, R](
+    implicit
+    gen: Generic.Aux[A, R],
+    enc: Lazy[MyTC[R]]    // lazy로 감쌈
+  ): MyTC[A] = ???
+
+  // 다음장에서는 이런 스타일로 코드를 작성하기 위한 몇가지 유용한 이론, 프로그래밍 패턴 그리고 디버깅 기술들에 대해서 다룰것이다.
+  // 그다음장에서는 ADT에서 필드와 타입이름을 조사하는 것을 가능하게 해주는 다양한 Generic을 이용한 type class 유도에 대해서 다시 알아볼것이다.
+
+}
+
+object tpeAndImpclits {
+
+  // 4. Working with types and implicits
+
+  // 지난장에서는 shapeless의 가장 매력적인 사용방법중에 하나를 보았다. - 자동으로 type class 인스턴스를 유도하는것.
+  // 더 많은 강력한 예가 이후에 있다.
+  // 그러나 진행하기 전에 타입과 implicit-heavy 패턴 코드를 작성과 디버깅에 대하여 보고 작성한것에 대한
+  // 이론에 대해서 이야기 하는 시간을 가져 보자.
+
+  // 4.1 Theory: dependent types
+  // 지난장에 ADT를 제너릭 표현으로 맵핑하는 type class인 Generic을 사용한는 것에 많은 시간을 보냈다.
+  // 그러나 Generic을 포함한 많은 shapeless를 떠 받치는 이론에 대해서 이야기 하지 않았다 - dependent types
+
+  // 이를 잘 설명하기 위해 Generic에 대해 보다 자세히 들여다 보자.
+  // 정의에 대한 간단화한 버전이 있다.
+
+  trait Generic[A] {
+    type Repr
+
+    def to(value: A): Repr
+
+    def from(value: Repr): A
+  }
+
+  // Generic의 인스턴스는 두개의 다른 타입을 참조한다.
+  // type parameter A와 type member Repr이다.
+  // 아래처럼 getRepr을 구현한다고 해보자. 무슨 타입을 반환받게 될까?
+
+  def getRepr[A](value: A)(implicit gen: Generic[A]) =
+    gen.to(value)
+
+  // 답은 우리가 얻게되는 gen의 instance에 달려있다.
+
+  // 호출을 getRepr로 확장할때 컴파일러는 Generic[A]를 위해서 찾고 결과 타입은 그 인스턴스에 정의된 Repr이다.
+
+  case class Vec(x: Int, y: Int)
+  case class Rec(origin: Vec, size: Vec)
+  getRepr(Vec(1, 2))
+  // res1: shapeless.::[Int,shapeless.::[Int,shapeless.HNil]] = 1 :: 2 :: HNil
+
+  getRepr(Rec(Vec(0, 0), Vec(5, 5)))
+  // res2: shapeless.::[Vec,shapeless.::[Vec,shapeless.HNil]] = Vec(0,0) :: Vec(5,5) :: HNil
+
+  // 여기에 보여진것이 dependent type이다.
+  // getRepr의 반환 타입은 파라메터의 타입 멤버에 의존한다.
+
+  // Generic의 Repr를 타입 멤버 대신 타입 파라메터로 한정해보자.
+  trait Generic2[A, Repr]
+
+  def getRepr2[A, R](value: A)(implicit gen: Generic2[A, R]): R = ???
+
+  // 우리는 원하는 Repr을 getRepr에 타입 파라메터로 전달하게 된다.
+  // 사실상 getRepr을 쓸모없게 만든다.
+
+  // 직관적으로 type parameter는 입력으로서 유용하고 type member는 결과로서 유용하다는것을 끄집어 낼수 있다.
+
+  // 4.2 Dependently typed function
+  
+
+
 }
