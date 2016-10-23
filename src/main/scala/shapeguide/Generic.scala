@@ -742,7 +742,7 @@ object recursive {
 
 }
 
-object tpeAndImpclits {
+object typeAndImplicits extends App {
 
   // 4. Working with types and implicits
 
@@ -758,7 +758,7 @@ object tpeAndImpclits {
   // 이를 잘 설명하기 위해 Generic에 대해 보다 자세히 들여다 보자.
   // 정의에 대한 간단화한 버전이 있다.
 
-  trait Generic[A] {
+  trait SimpleGeneric[A] {
     type Repr
 
     def to(value: A): Repr
@@ -799,7 +799,148 @@ object tpeAndImpclits {
   // 직관적으로 type parameter는 입력으로서 유용하고 type member는 결과로서 유용하다는것을 끄집어 낼수 있다.
 
   // 4.2 Dependently typed function
-  
+  // shapeless는 모든곳(Generic, Witness 그리고 HList가 동작하는 그외의 implicit값이 사용되는 곳)에 dependent type을 사용한다.
 
+  // 예를 들어 shapeless는 HList의 마지막 요소를 반환하는 Last라 불리는 type class를 제공한다.
+  import shapeless.ops.hlist.Last
+  val last = implicitly[Last[String :: Int :: HNil]]
+  // last: shapeless.ops.hlist.Last[shapeless.::[String,shapeless.::[Int, shapeless.HNil]]] = shapeless.ops.hlist$Last$$anon$34@14b67e4b
+  println(last("a" :: 10 :: HNil))    // 10
+
+  // 각각의 경우 주목할 점은 Out type은 우리가 시작한 HList의 type에 의존한다.
+  // 또한 인스턴스는 입력 HList가 적어도 하나의 요소가 있을때만 생성된다는 점에 주목하자.
+
+//  implicitly[Last[HNil]]    // 컴파일 안됨요.
+    // <console>:15: error: Implicit not found: shapeless.Ops.Last[shapeless.HNil]. shapeless.HNil is empty, so there is no last element.
+    //        implicitly[Last[HNil]]
+
+
+  // 추가 예제로 HList에서 두번째 요소를 반환하는 `Second`이란 이름의 type class를 직접 구현하여 보자.
+  trait Second[H <: HList] {
+    type Out
+    def apply(value: H): Out
+  }
+
+  implicit def hlistSecond[A, B, Rest <: HList]: Second[A :: B :: Rest] =
+    new Second[A :: B :: Rest]{
+      type Out = B
+      def apply(value: A :: B :: Rest): Out = value.tail.head
+    }
+
+  val second = implicitly[Second[String :: Boolean :: Int :: HNil]]
+  second("Woo!" :: true :: 321 :: HNil)
+  // res3: second.Out = true
+
+  // 4.2.1 Chaining dependent functions
+  // 우리는 하나의 타입에서 다른 타입을 계산하는 방법으로 dependently typed function를 보았다.
+  // - case clase의 Repr을 계산하기 위해 Generic을 사용하였다. 그외 더있음요.
+
+  // 계산이 하나의 단계보다 많을때는 어떠한가?
+  // 예를 들어 HList의 *마지막* 아이템을 찾고 싶다 해보자.
+  // Generic과 Last를 조합할 필요가 있다.
+  // 작성해보자.
+
+  /*  컴파일 안됨요
+  def lastField[A](input: A)(
+    implicit
+      gen: Generic[A],
+      last: Last[gen.Repr]
+  ): last.Out = last.apply(gen.to(input))
+  */
+
+  // <console>:20: error: illegal dependent method type: parameter may only be referenced in a subsequent parameter section
+  //          gen: Generic[A],
+
+  // 안타깝게도 이것은 컴파일이 되지 않는다.
+  // 이는 지난장에 HList쌍을 위한 CsvWriter를 만들때 동일한 문제를 겪었다.
+  // 일반적인 규칙으로 모든 출력 변수 타입을 type parameter로 lifting하고
+  // 컴파일러가 적합한 타입으로 합치게 한다.
+
+  def lastField[A, Repr <: HList](input: A)(
+    implicit
+      gen: Generic.Aux[A, Repr],
+      last: Last[Repr]
+  ): last.Out = last.apply(gen.to(input))
+
+  lastField(Rec(Vec(1, 2), Vec(3, 4)))
+  // res4: Vec = Vec(3,4)
+
+  // 이는 보다 미묘한 제약에서도 잘동작한다.
+  // 예를 들어 정확히 하나의 필드만 있는 case class의 내용을 원한다고 해보자.
+  // 아래와 같이 시도할수 있다.
+
+  // 여담 : 값이 하나만 있으니 WrappedValue이다.  이는 Value Object 개념을 알면 도움이 된다.
+  // http://docs.scala-lang.org/overviews/core/value-classes.html
+  def getWrappedValue[A, Head](input: A)(
+    implicit
+      gen: Generic.Aux[A, Head :: HNil]
+  ): Head = gen.to(input).head
+
+  // 결과는 더 않좋다.
+  // 함수의 정의는 컴파일 되지만 호출하려고 하는 곳에서는 컴파일을 위한 implicit을 절대 찾을수 없다.
+  case class Wrapper(value: Int)
+
+//  getWrappedValue(Wrapper(12))   // 컴파일 안됨요.
+  // <console>:21: error: could not find implicit value for parameter gen: shapeless.Generic.Aux[Wrapper,shapeless.::[Head,shapeless.HNil]]
+  //        getWrappedValue(Wrapper(42))
+
+
+  // 문제에 대한 에러메시지의 힌트는 아래와 같다.
+
+  // error: could not find implicit value for parameter gen:
+  // Generic.Aux[Wrapper, Head :: HNil]
+
+  // 단서는 type Head의 출현에 있다.
+  // 이것은 함수의 타입 파라메터의 이름이다.
+  // 이는 컴파일러가 합치려는(unify)하려는 타입에는 나타나서는 안된다.
+  // 문제는 gen paramter가 제약이 과했다.(over-constraint)
+  // 컴파일러는 Repr을 찾고 그것이 동시에 하나의 필드가 있는 HList 보장하는 능력을 가지고 있지 않다.
+
+  // 다른 유형의 타입 - Nothing을 포함하는 타입을 컴파일러가 공변(covariant)타입으로 통합하는걸 실패할때 종종 나타난다.
+
+  // 해결책은 문제를 몇가지 단계로 나누는것이다.
+  // 1. A에 대한 적합한 Repr과 함께 Gerneic을 찾는것이다.
+  // 2. Repr을 Head 타입으로 제공한다.
+
+  // `=:=`를 사용한 버전으로 수정해보자.
+  // `=:=`는 Generalized type contstraints 라 불리며 옆 링크에 설명이 잘되어 있다. http://stackoverflow.com/questions/3427345/what-do-and-mean-in-scala-2-8-and-where-are-they-documented
+
+  /* 컴파일 안됨요.
+
+  def getWrappedValue2[A, Repr <: HList, Head, Tail <: HList](input: A)(
+    implicit
+      gen: Generic.Aux[A, Repr],
+      ev: (Head :: Tail) =:= Repr
+  ): Head = gen.to(input).head
+
+  */
+
+  // <console>:21: error: could not find implicit value for parameter c: shapeless.ops.hlist.IsHCons[gen.Repr]
+  //        ): Head = gen.to(input).head
+
+  // 함수의 body에 있는 head 메소드는 implicit parameter로 IsHCons를 필요로 하기때문에 컴파일이 실패한다.
+  // 이 에러는 아까보다 훨씬 고치기 쉽다. 단지 shapeless의 toolbox에서 tool을 배우는게 필요할뿐이다.
+  // IsHCons는 shapeless에서 HList를 Head와 Tail로 나누는 type class이다.
+  // 우리는 `=:=` 대신에 IsHCons를 써야만 한다.
+
+  import shapeless.ops.hlist.IsHCons
+
+  def getWrappedValue3[A, Repr <: HList, Head, Tail <: HList](input : A)(
+    implicit
+      gen: Generic.Aux[A, Repr],
+      isHCons: IsHCons.Aux[Repr, Head, Tail]
+  ): Head = gen.to(input).head
+
+  // 드뎌 컴파일 된다.
+  // 이번건은 버그를 수정하고 위 함수가 implicit을 예상한데로 찾게 해준다.
+
+  getWrappedValue3(Wrapper(42))
+
+  // 최종적으로 가져가려는 점은 IsHCons가 아니다.
+  // shapeless는 이와 같은 툴을 많이 제공하고 있고, 필요한 툴이 없다면 우리는 직접 작성할수 있다.
+  // 중요한점은 코드를 컴파일 되게 작성하는 과정과 적합한 해답을 찾아내는 능력이다.
+  // 우리가 알아온 것들을 단계별로 정리하면서 이 섹션을 마무리 할것이다.
+
+  // 4.3 Summary
 
 }
