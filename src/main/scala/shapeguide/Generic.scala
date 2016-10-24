@@ -5,7 +5,8 @@ import shapeguide.deriving.CsvEncoder
 import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
 import shapeless.Generic.Aux
 
-// Reference : https://github.com/davegurnell/shapeless-guide
+// 원문: https://github.com/davegurnell/shapeless-guide
+// 혼자 공부하며 정리하여봄, 구글 번역기 보다 못한... ㅠ.ㅠ
 
 object generic {
 
@@ -869,8 +870,6 @@ object typeAndImplicits extends App {
   // 예를 들어 정확히 하나의 필드만 있는 case class의 내용을 원한다고 해보자.
   // 아래와 같이 시도할수 있다.
 
-  // 여담 : 값이 하나만 있으니 WrappedValue이다.  이는 Value Object 개념을 알면 도움이 된다.
-  // http://docs.scala-lang.org/overviews/core/value-classes.html
   def getWrappedValue[A, Head](input: A)(
     implicit
       gen: Generic.Aux[A, Head :: HNil]
@@ -942,5 +941,28 @@ object typeAndImplicits extends App {
   // 우리가 알아온 것들을 단계별로 정리하면서 이 섹션을 마무리 할것이다.
 
   // 4.3 Summary
+  // Shapeless로 코딩할때, 우리는 시작한 타입에 의존되는 타겟 타입을 종종 찾으려 한다.
+  // 이런 관계를 dependent type이라 부른다.
 
+  // depenpdent type을 포함하고 있는 문제들은
+  // implicit 검색을 사용한 표현에 유용하게 사용될수 있다.
+  // 컴파일러가 호출을 시작점으로 부터 중간 타입과 타겟 타입을 해석하게 할수 있게 한다.
+
+  // 결과값을 계산하기 위해 종종 몇단계의 해석하는 단계를 두어야 한다.
+  // 예을 들어 Repr을 얻기 위해 Generic을 사용하고, 그리고 다른 type을 얻기위한 다른 type class를 사용한다.
+  // 이것을 작업할때 우리의 코드가 컴파일되고 예상한데로 동작하려면 몇가지 규칙이 있다.
+
+  // 1. 모든 중간 타입을 타입 파라메터로 뽑아내라. 많은 타입 파라메터가 결과에는 사용되지 않을것이다.
+  // 하지만 컴파일러는 어떤 타입이 합쳐져야(unify) 하는지 알아야 하기 때문에 그것들을 필요로 한다.
+
+  // 2. 컴파일러는 왼쪽에서 오른쪽으로 implicit을 찾는다, 만약 적합한 조합을 찾지 못한다면 backtracking한다.
+  // 하나이상의 타입 변수가 그전의 implicit을 연결할수 있도록 implicit을 필요한 순서대로 작성한다.
+
+  // 3. 컴파일러는 하나의 제한을 한번에 풀수있다. 그렇기 때문에 어떤 implicit도 과한 제한(over-constrain)을 하면 안된다.
+
+  // 4. 명시적으로 반환 타입을 작성하라. 다른곳에 어떤 type parameters, type members가 필요하면 명확히 하라.
+
+  // 5. 만약 직접 dependently typed 함수를 작성한다면, 그것을 좀더 사용하기 쉽게 Aux type alias를 도입하는것을 고려해보라.
+
+  
 }
