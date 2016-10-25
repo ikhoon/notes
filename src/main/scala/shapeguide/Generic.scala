@@ -964,5 +964,119 @@ object typeAndImplicits extends App {
 
   // 5. 만약 직접 dependently typed 함수를 작성한다면, 그것을 좀더 사용하기 쉽게 Aux type alias를 도입하는것을 고려해보라.
 
-  
+}
+
+object labelled {
+  // 5. Access names during implicit derivation
+
+  // 종종 우리가 정의한 type class의 인스턴스는 단순히 타입보다 더 많이 접근하기를 원한다.
+  // 필드와 타입의 이름이 중요하다. 그리고 때때로 다른 조건(criteria)에 근거하여 인스턴스를 파라메터화 할 필요가 있다.
+
+  // 이번장에서는 type class 유도를 위해 shapeless가 제공해주는 추가적인 도구들을 살펴보겠다.
+  // 이번 내용의 다수가 필드의 이름과 타입의 이름에 접근할수 있게 하는 `LabelledGeneric`이라고 칭하는 다른 종류의 Generic과 관련이 있다.
+
+  // 내용을 다루기위해 몇가지 이론부터 시작하자.
+  // `LabelledGeneric`은 type level에서 필드와 타입이름을 노출하기 위해 몇가지 영리한 테크닉을 사용한다.
+  // > scala에서 type level은 http://typelevel.org/ 이싸이트를 참조하면 도움이 된다. shapeless는 cats와 함께 typelevel의 대표 프로젝트다.
+  // 이들 테크닉을 이해하는것은 literal type, singleton type, phantom type과 type tagging에 대해 이야기 하는것이다.
+
+
+  // 5.1 Literal Types
+  // 스칼라 개발자로서 값의 표기는 다양한 타입을 가진다. 예를 들어 문자열 "hello"는 적어도 3가지의 타입은 가진다. String, AnyRef 그리고 Any.
+
+  "hello" : String
+
+  "hello" : AnyRef
+
+  "hello" : Any
+
+  // 흥미롭게도 "hello"는 다른 타입도 가지고 있다. "singleton type"은 하나의 값에만 독점적으로 속한다.
+  // 이것은 우리가 companion object를 정의했을때 얻는 singleton type과 유사하다.
+
+  object Foo
+
+  val foo : Foo.type = Foo
+
+  // literal 값에 젹용되는 singleton type을 liternal type이라 부른다.
+  // 우리는 컴파일러의 기본 행위가 literal을 가장 가까운 non-singleton type으로 "cast"하기 때문에 일반적으로 이것들과 상호작용할수 없다.
+  // 예를 들어 아래 두개의 표현은 근본적으로 같다.
+  "hello"
+  // res4: String = hello
+
+  ("hello": String)
+  // res5: String = hello
+
+  // shapeless는 literal type과 함께 작동할수 있는 몇가지 툴을 제공한다.
+  // 첫번째는 literal 표현을 singleton-typed literal 표현으로 변경시키는 `narrow` 매크로가 있다.
+
+  import shapeless.syntax.singleton._
+
+  var x = 42.narrow
+  // x: Int(42) = 42
+
+  // x의 타입에 주목하라. Int(42)는 literal type이다. Int의 subtype이고 오직 값 42만 포함한다.
+  // x에 다른 숫자를 할당하려고 하면 컴파일 에러가 나온다.
+  // x에 43을 할당해봄
+
+//  x = 43        // 컴파일 안됨요.
+
+  // <console>:16: error: type mismatch;
+  //  found   : Int(43)
+  //  required: Int(42)
+  //        x = 43
+
+
+  // 하지만 x는 여전히 일반적인 subtype 규칙을 따르는 Int이다.
+  // 만약 x에 대해서 연산하면 보통의 타입 결과를 얻는다.
+
+  x + 1
+  // res6: Int = 43
+
+  // 우라는 스칼라의 어떤 literal type에도 `narrow`를 사용할수 있다.
+  1.narrow
+  // res7: Int(1) = 1
+
+  true.narrow
+  // res8: Boolean(true) = true
+
+  "hello".narrow
+  // res9: String("hello") = hello
+
+  // 그외에...
+
+  // 그러나 이것은 복합 표현에는 사용할수 없다.
+  // 컴파일러가 소스로부터 literal 값을 바로 결정이 가능해야 한다.
+
+//  math.sqrt(4).narrow    // 컴파일 안됨요.
+
+  // <console>:17: error: Expression scala.math.`package`.sqrt(4.0) does not evaluate to a constant or a stable reference value
+  //        math.sqrt(4).narrow
+  // <console>:17: error: value narrow is not a member of Double
+  //        math.sqrt(4).narrow
+
+
+
+  // Literal types in Scala - 부가 설명
+  // Lightbend에서 운영하는 표준 컴파일러 2.11에는 문법에는 literal type을 작성하기 위한 문법이 없다.
+  // Lightbend Scala 2.12.1에 포함 계획되어 있음, 하지만 그전에 Typelevel scala 2.11.8에는 문법이 추가되어 있다.
+  // > Typelevel Scala는 기존의 마틴 오던스키의 EPFL의 scala를 fork떠서 별도의 추가 기능을 제공해주고 있다.
+
+  // 이번전의 스칼라는 선언을 아래와 같이 할수 있다.
+
+//  val theAnswer : 42 = 42   // 공식 스칼라는 컴파일 못함
+
+  // Typelevel과 Lightbend의 스칼라는 바이너리 호환되는 output을 만들고 커뮤니티에 의해서 활발하게 동기화가 유지되고 있다.
+  // 추가적으로 `SBT 0.13.11-M1`에서 빌드 선언에서 컴파일러를 바꾸는것이 유효하다.
+  // > 난 써보지는 않았음
+
+  // 만약 literal type을 가지고 처리하는것에 관심이 있다면, Typelevel scala를 시도해보는것을 강하게 추천한다.
+  // https://github.com/typelevel/scala#typelevel-scala-2118 여기 링크 따라가서 설치 과정을 따라 하면 된다.
+
+
+  // 5.2 Type tagging and phantom types
+
+  // TODO
+
+
+
 }
