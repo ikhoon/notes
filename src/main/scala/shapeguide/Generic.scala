@@ -16,12 +16,15 @@ object generic {
   // 우리가 다른 코드의 조각을 어떻게 사용하는지 알려주고 버그가 생기는것을 막아준다.
   // 그리고 코딩할때 문제 해결을 위한 가이드를 해준다.
   // 아래와 같은 타입이 있다.
+
+
   case class Employee(name: String, number: Int, manager: Boolean)
   case class IceCream(name: String, numCherries: Int, inCone: Boolean)
 
   // 두개의 case class는 다른 종류의 데이터이지만 명확히 비슷한점을 가지고 있다.
   // 두개 모두 같은 타입의 필드를 가지고 있다.
   // csv file로 serialize하는 기능을 만들고 싶다면 두개의 타입의 유사점에도 불구하고 두개의 다른 serialization 함수를 만들어야 한다.
+
 
   def employeeCsv(e: Employee): List[String] =
     List(e.name, e.number.toString, e.manager.toString)
@@ -32,6 +35,7 @@ object generic {
   // 제너릭 프로그래밍은 위와 같은 경우를 해결하수 있게 한다.
   // Shapeless는 특정타입을 제너릭하게 변경시킴으로서 공통의 코드로 이를 조작할수 있게한다.
   // 예를 들어 Employee와 IceCream의 값을 같은 타입으로 변경시키는 코드를 사용할수 있다.
+
 
   import shapeless._
 
@@ -69,6 +73,7 @@ object AlgebraicDataType {
   // ADT 용어에서 `and types`는 products라 불리는 rectangle과 circle이다.
   // `or types`는 coproducts라 불리는 shape이다.
 
+
   sealed trait Shape
 
   final case class Rectangle(width: Double, height: Double) extends Shape
@@ -82,6 +87,7 @@ object AlgebraicDataType {
   // 컴파일러는 우리가 정의한 algebra들은 완전히 알고 있다.
   // 이것은 우리의 타입과 관련된 타입 관련 함수를 완벽하고 올바르게 작성할수 있도록 도와준다.
 
+
   def area(shape: Shape): Double =
     shape match {
       case Rectangle(w, h) => w * h
@@ -94,6 +100,7 @@ object AlgebraicDataType {
   // 스칼라에서는 generic product는 Tuple의 형태로 제공을 하고 generic coproduct는 Either의 형태로 제공한다.
   // 우리는 Shape를 encoding하기 위해서 이것을 선택할수 있다.
 
+
   type Rectangle2 = (Double, Double)
   type Circle2 = Double
   type Shape2 = Either[Rectangle2, Circle2]
@@ -103,6 +110,7 @@ object AlgebraicDataType {
 
   // 이 encoding은 case class보다 가독성이 떨어지지만 몇가지 매력적인 특징은 그대로 가지고 있다.
   // 우리는 여전히 Shape2와 관련되어 완전히 type safe한 연산을 구현할수 있다.
+
 
   def area2(shape: Shape2): Double =
     shape match {
@@ -133,12 +141,14 @@ object AlgebraicDataType {
   // 이런 이유 때문에 shapeless는 heterogeneous list 혹은 HList라 불리는 다른 제너릭 encoding을 사용하고 있다.
   // HList는 각각의 element의 타입이 전체 리스트의 타입에 관리되어 지는것을 제외하고는 일반적인 list와 유사하다.
 
+
   import shapeless.{HList, ::, HNil}
 
   val product: String :: Int :: Boolean :: HNil = "Sunday" :: 1 :: false :: HNil
 
   // HList의 type과 value는 서로 반영한다. 둘다 String, Int, Boolean 멤버를 표현한다.
   // 이타입들의 head와 tail을 탐색할수 있고 element의 타입은 보존이 된다.
+
 
   val first: String = product.head
   val second: Int = product.tail.head
@@ -152,6 +162,7 @@ object AlgebraicDataType {
   // 예를 들어 앞에 `::` 함수와 함께 element를 추가할수 있다.
   // 다시 결과 타입은 elememts의 숫자와 타입들의 어떻게 반영하는지 알아보자
 
+
   val newProduct: Long :: String :: Int :: Boolean :: HNil = 42L :: product
 
   // 또한 shapeless는 mapping, filtering, concatenating list 등과 같은 보다 복잡한 연상을 할수 있는 툴을 제공한다.
@@ -160,6 +171,7 @@ object AlgebraicDataType {
   // 2.2.1 표현을 `Generic`을 사용하는걸로 변경
   // shapeless는 Generic이라 불리는 type class를 제공한다. 이것은 완벽한 ADT과 제너릭 표현사이에 서로 바뀌는것을 할수 있게 한다.
   // 여기에서는 매크로의 마법이 우리로 하여금 제너릭 인스턴스를 추가코드 없이 얻는것을 가능하게 한다.
+
 
   import shapeless.Generic
 
@@ -171,6 +183,7 @@ object AlgebraicDataType {
   // 제너릭 인스턴스의 타입 멤버 Repr은 타입의 제너릭 표현을 포함하고 있는것에 주목하라.
   // 이경우 iceCreamGen.Repr은 String :: Int :: Boolean :: HNil
   // 제너릭의 인스턴스는 두가지의 함수를 가지고 있다. 하나는 Repr로(to) 변경하는것과 이로부터 복구하는것 이다.
+
 
   val iceCream = IceCream("Sundae", 1, false)
 
@@ -195,6 +208,7 @@ object AlgebraicDataType {
   // Coproduct 타입은 disjuction에 있는 가능한 모든 타입을 인코딩한다.
   // 하지만 각각의 구체적인 인스턴스는 가능성있는것중에 하나의 값만 포함하고 있다.
 
+
   case class Red()
 
   case class Amber()
@@ -211,6 +225,7 @@ object AlgebraicDataType {
   // 이와 유사하게 순수하게 Inr의 인스턴스로만 coproduct를 생성할수는 없다.
   // 항상 하나의 값에는 정확히 하나의 Inl이 있다.
 
+
   import shapeless.{Inl, Inr}
 
   val red: Light = Inl(Red())
@@ -226,6 +241,8 @@ object AlgebraicDataType {
 
 // 아래 3줄의 코드는 특정 object안에 속해있으면 nested하면 shapeless에서 컴파일을 하지 못한다. 매크로 때문인거 같다.
 // 고로 top level에 sealed trait이 위치 해주어야 한다!!
+
+
 sealed trait Shape3
 final case class Rectangle3(width: Double, height: Double) extends Shape3
 final case class Circle3(radius: Double) extends Shape3
@@ -248,6 +265,7 @@ object deriving {
   // ('class'란 단어는 object oriented programming의 class와는 아무런 관계가 없다. 오해말기를..)
   // 우리는 type class를 scala에서 trait과 implicit 파라메터를 통해서 구현할수 있다.
   // type class는 다양한 타입에 대해서 적용하려고 범용적 함수를 표현하고자 하는 generic trait이다.
+
 
   trait CsvEncoder[A] {
     def encode(value: A): List[String]
@@ -302,6 +320,8 @@ object deriving {
   // 다행이도 스칼라 컴파일러는 주어진 규칙을 통해서 인스턴스를 생성하는 몇가지 트릭이 있다.
   // 예를 들어 주어진 A, B의 CsvEncoder들을 활용하여 (A, B) 쌍의 인코더를 만들수 있다.
   // 기존에 만들어진 코드를 재활용하였다.
+
+
   implicit def pairEncoder[A, B](
     implicit aEncoder: CsvEncoder[A], bEncoder: CsvEncoder[B]
   ): CsvEncoder[(A, B)] =
@@ -317,6 +337,7 @@ object deriving {
   // * iceCreamEncoder
   // * employeeEncoder
   // 를 조합하여 필요로하는 CsvEncoder[(Employee, IceCream)] 을 만들수 있다.
+
 
   writeCsv(employees zip iceCreams)
 
@@ -346,6 +367,7 @@ object deriving {
   // 3.2.1 Instance for HList
   // String, Int, Boolean 에 대해서 CsvEncoder를 작성하는것 부터 시작하자.
 
+
   implicit val stringEncoder: CsvEncoder[String] = createEncoder(s => List(s))
 
   implicit val intEncoder: CsvEncoder[Int] = createEncoder(i => List(i.toString))
@@ -356,10 +378,14 @@ object deriving {
 
   // HList를 위한 encoder를 만들기 위해 이 블록들을 합칠수 있다.
   // 두가지 규칙을 사용할것이다. 하나는 `HNil` 위한 것이고 또다른 하나는 `::` 위한 것이다.
+
+
   implicit val hnilEncoder: CsvEncoder[HNil] = createEncoder[HNil](hnil => Nil)
 
   // head와 tail을 각각 encode하고 합친다.
   // 합치는 규칙만 여기서 정하면 된다.
+
+
   implicit def hlistEncoder[H, T <: HList](
     implicit hEncoder: CsvEncoder[H], tEncoder: CsvEncoder[T]
   ): CsvEncoder[H :: T] = createEncoder[H :: T] {
@@ -367,6 +393,7 @@ object deriving {
   }
 
   // 이 5가지의 규칙은 String, Int, Boolean을 포함하고 있는 어떤 HList라도 CsvEncoder를 만들어 낼수 있다.
+
 
   val reprEncoder: CsvEncoder[String :: Int :: Boolean :: HNil] = implicitly
 
@@ -384,6 +411,8 @@ object deriving {
   // 3.2.2 Instances for concrete products
   // IceCream을 위한 CsvEncoder를 만들기 위해서 HList의 유도 규칙과 Generic 인스턴스를 합칠수 있다.
   // IceCream을 받아서 List[String]을 반환하는 encoder를 만든다.
+
+
   implicit val iceCreamEncoder2: CsvEncoder[IceCream2] = {
     val gen = Generic[IceCream2]
     val enc = implicitly[CsvEncoder[gen.Repr]]
@@ -429,6 +458,8 @@ object deriving {
   // * 이를 각각의 관련된 타입이 참조를 하는 것이다.
   // 같은 타입에 대한 encoder가 두개 있어도 안된다. 일반적인 경우에 에러는 implicit이 모호하다고 뜨지만 이경우에는 그냥 없다고만 뜬다ㅠ.ㅠ
   // 그래서 디버깅하는게 조금은 힘들다.
+
+
   /*implicit*/ def genericEncoder3[A, R](
     implicit
       gen: Generic[A] { type Repr = R },
@@ -444,6 +475,8 @@ object deriving {
 
   // 컴파일의 호출은 아래와 같이 확장된다.
   writeCsv(iceCream2s)
+
+
   // 유도의 규칙들을 사용하여
   writeCsv(iceCream2s)(
     genericEncoder3(
@@ -458,6 +491,8 @@ object deriving {
   // > 스칼라는 타입 멤버로 타입에 대한 제약을 주는 경우에 사용한다.
 
   // 그래서 shapeless는 type member를 type parameter로 재구성한 type alias인 `Generic.Aux`를 제공한다.
+
+
   trait Generic2[T] {
     type Repr
   }
@@ -466,6 +501,8 @@ object deriving {
   }
 
   // 이 alias를 이용하면 훨씬 보다 가독성 좋은 정의를 얻을수 있다.
+
+
   implicit def genericEncoder4[A, R](
     implicit
       gen: Generic.Aux[A, R],
@@ -496,8 +533,10 @@ object deriving {
   // 다른 가능성 있는 실패는 컴파일러가 HList에 대해서 CsvEncoder를 계산해 내지 못하는 것이다.
   // 일반적으로 ADT의 필드중 하나의 encoder가 없는 경우에 일어난다.
 
+
   import java.util.Date
   case class Booking(room: String, date: Date)
+
 //  writeCsv(List(Booking("Lecture Hall", new Date)))   // 컴파일 안됨요.
 
   // <console>:32: error: could not find implicit value for parameter encoder: CsvEncoder[Booking]
@@ -526,6 +565,7 @@ object deriving {
   // Shape에 대한 제너릭 표현은 Rectangle :+: Cirle :+: CNil 이다
   // 우리는 HList에서 사용했던 것과 같은 원리로 :+: 와 CNil 에 대한 제너릭 CsvEncoder를 만들수 있다.
   // 현재 존재하는 encoder들이 Retangle과 Circle을 처리해줄것이다.
+
 
   import shapeless.{Coproduct, :+:, CNil, Inl, Inr}
 
@@ -556,6 +596,8 @@ object deriving {
   // :+: 의 하위타입 왼쯕은 Inl, 오른쪽은 Inr 대해서 패턴 매칭을 할것이다.
 
   // 이정의와 product type에 대한 정의로 shape의 리스트에 대해서 직렬화 할수 있다.
+
+
   val shapes: List[Shape3] = List(
     Rectangle3(3.0, 4.0),
     Circle3(1.0)
@@ -580,6 +622,7 @@ object exercise extends App {
   // 아마 rectangle과 circle를 위한 데이터를 두개의 컬럼 셋으로 구분하는게 더 좋을것이다.
   // CsvEncoder에 width 필드를 넣음으로서 이를 해결하수 있다.
 
+
   trait CsvEncoder[A] {
     def width: Int
     def encode(value: A): List[String]
@@ -587,6 +630,7 @@ object exercise extends App {
 
   // 모든 정의를 다 따르면 각각의 필드를 다른 컬럼에 놓게 할수 있다.
   // width, height, radius 요런 느낌으로
+
 
   def createEncoder[A](w: Int)(f: A => List[String]): CsvEncoder[A] =
     new CsvEncoder[A] {
@@ -636,6 +680,8 @@ object exercise extends App {
 object recursive {
   // 3.4 Deriving instances for recursive types
   // 보다 모호한 경우에 대해서 시도를 해보자 - 이진 트리
+
+
   sealed trait Tree[A]
   final case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
   final case class Leaf[A](value: A) extends Tree[A]
@@ -665,6 +711,8 @@ object recursive {
   // 경험의 법칙(rule of thumbs)으로
   // 어떤 HList나 Coproduct규칙의 "head" 파라메터와
   // 어떤 제너릭 규칙의 "repr" 파라메터는 Lazy로 감싸는것이 항상 좋다.
+
+
   implicit def hlistEncoder[H, T <: HList](
     implicit
       hEncoder: Lazy[CsvEncoder[H]],    // lazy로 감쌈
@@ -704,6 +752,7 @@ object recursive {
   // 또한 복잡하거나 재귀적인 타입을 다루는 수단으로서 Lazy 타입을 다루었다.
 
   // 이것들을 하나로 모아, 우리는 type class 인스턴스를 유도하기 위한 공통된 부분을 작성할수 있다.
+
 
   import shapeless.{HList, ::, HNil, Coproduct, :+:, CNil, Generic, Lazy}
 
@@ -759,6 +808,7 @@ object typeAndImplicits extends App {
   // 이를 잘 설명하기 위해 Generic에 대해 보다 자세히 들여다 보자.
   // 정의에 대한 간단화한 버전이 있다.
 
+
   trait SimpleGeneric[A] {
     type Repr
 
@@ -771,12 +821,14 @@ object typeAndImplicits extends App {
   // type parameter A와 type member Repr이다.
   // 아래처럼 getRepr을 구현한다고 해보자. 무슨 타입을 반환받게 될까?
 
+
   def getRepr[A](value: A)(implicit gen: Generic[A]) =
     gen.to(value)
 
   // 답은 우리가 얻게되는 gen의 instance에 달려있다.
 
   // 호출을 getRepr로 확장할때 컴파일러는 Generic[A]를 위해서 찾고 결과 타입은 그 인스턴스에 정의된 Repr이다.
+
 
   case class Vec(x: Int, y: Int)
   case class Rec(origin: Vec, size: Vec)
@@ -790,6 +842,8 @@ object typeAndImplicits extends App {
   // getRepr의 반환 타입은 파라메터의 타입 멤버에 의존한다.
 
   // Generic의 Repr를 타입 멤버 대신 타입 파라메터로 한정해보자.
+
+
   trait Generic2[A, Repr]
 
   def getRepr2[A, R](value: A)(implicit gen: Generic2[A, R]): R = ???
@@ -803,6 +857,8 @@ object typeAndImplicits extends App {
   // shapeless는 모든곳(Generic, Witness 그리고 HList가 동작하는 그외의 implicit값이 사용되는 곳)에 dependent type을 사용한다.
 
   // 예를 들어 shapeless는 HList의 마지막 요소를 반환하는 Last라 불리는 type class를 제공한다.
+
+
   import shapeless.ops.hlist.Last
   val last = implicitly[Last[String :: Int :: HNil]]
   // last: shapeless.ops.hlist.Last[shapeless.::[String,shapeless.::[Int, shapeless.HNil]]] = shapeless.ops.hlist$Last$$anon$34@14b67e4b
@@ -817,6 +873,8 @@ object typeAndImplicits extends App {
 
 
   // 추가 예제로 HList에서 두번째 요소를 반환하는 `Second`이란 이름의 type class를 직접 구현하여 보자.
+
+
   trait Second[H <: HList] {
     type Out
     def apply(value: H): Out
@@ -857,6 +915,7 @@ object typeAndImplicits extends App {
   // 일반적인 규칙으로 모든 출력 변수 타입을 type parameter로 lifting하고
   // 컴파일러가 적합한 타입으로 합치게 한다.
 
+
   def lastField[A, Repr <: HList](input: A)(
     implicit
       gen: Generic.Aux[A, Repr],
@@ -869,6 +928,7 @@ object typeAndImplicits extends App {
   // 이는 보다 미묘한 제약에서도 잘동작한다.
   // 예를 들어 정확히 하나의 필드만 있는 case class의 내용을 원한다고 해보자.
   // 아래와 같이 시도할수 있다.
+
 
   def getWrappedValue[A, Head](input: A)(
     implicit
@@ -921,6 +981,7 @@ object typeAndImplicits extends App {
   // 이 에러는 아까보다 훨씬 고치기 쉽다. 단지 shapeless의 toolbox에서 tool을 배우는게 필요할뿐이다.
   // IsHCons는 shapeless에서 HList를 Head와 Tail로 나누는 type class이다.
   // 우리는 `=:=` 대신에 IsHCons를 써야만 한다.
+
 
   import shapeless.ops.hlist.IsHCons
 
@@ -984,6 +1045,7 @@ object labelled {
   // 5.1 Literal Types
   // 스칼라 개발자로서 값의 표기는 다양한 타입을 가진다. 예를 들어 문자열 "hello"는 적어도 3가지의 타입은 가진다. String, AnyRef 그리고 Any.
 
+
   "hello" : String
 
   "hello" : AnyRef
@@ -992,6 +1054,7 @@ object labelled {
 
   // 흥미롭게도 "hello"는 다른 타입도 가지고 있다. "singleton type"은 하나의 값에만 독점적으로 속한다.
   // 이것은 우리가 companion object를 정의했을때 얻는 singleton type과 유사하다.
+
 
   object Foo
 
@@ -1008,6 +1071,7 @@ object labelled {
 
   // shapeless는 literal type과 함께 작동할수 있는 몇가지 툴을 제공한다.
   // 첫번째는 literal 표현을 singleton-typed literal 표현으로 변경시키는 `narrow` 매크로가 있다.
+
 
   import shapeless.syntax.singleton._
 
@@ -1073,9 +1137,85 @@ object labelled {
   // https://github.com/typelevel/scala#typelevel-scala-2118 여기 링크 따라가서 설치 과정을 따라 하면 된다.
 
 
+
   // 5.2 Type tagging and phantom types
 
-  // TODO
+  // shapeless는 literal type은 case class 필드의 이름을 만드는데 사용된다.
+  // 이것은 필드들의 타입과 그것들의 이름의 literal type을 "tagging" 함으로서 이루어진다.
+  // shapeless가 이것을 어떻게 하는지 알기 전에, 여기에 마법이 없다는것 보이기 위해 우리는 직접 이것을 해볼것이다.
+  // 숫자가 있다고 가정해보자.
+
+
+  val number = 42
+
+  // 이숫자는 두개의 세상에서 `Int`이다.
+  // 런타임에 이것은 `+`와 `*`같은 함수가 있다.
+  // 반면 컴파일러는 이타입을 코드의 조각들이 서로 동작할수 있계 계산하기 위해서, 그리고 implicit 탐색을 위해서 사용한다.
+
+  // 우리는 "phantom type"과 같이 "tagging"하는 통해서 런타임의 행위를 수정하지 않고
+  // 숫자의 타입을 컴파일 타임에 수정할수 있다.
+  // Phantom type은 아래와 같이 런타임에 아무런 의미론(semantics)이 없는 타입이다.
+
+
+  trait Cherries        // > 빈 trait은 함수가 없어서 런타임에 의미가 없다하는듯
+
+  // 우리는 숫자를 `asInstanceOf`로 tag 할수있다.
+  // > 스고이!!
+  // 결국 값이 컴파일 타임에는 `Int`와 `Cherries` 둘다이고 런타임에는 `Int`이다.
+
+
+  val numCherries = number.asInstanceOf[Int with Cherries]
+  // numCherries: Int with Cherries = 42
+
+  // shapeless는 case class안에 있는 필드를 그들의 이름의 singleton type과 tag하는 트릭을 사용한다.
+  // `asInstaceOf`를 사용하는것이 불편하다면 걱정하지마라.
+  // 불편함을 피할수 있는 tagging 문법이 있다.
+
+
+  import shapeless.labelled.{KeyTag, FieldType}
+  import shapeless.syntax.singleton._
+
+  val someNumber = 123
+
+  // 특정 타입에 tagging을 통해서 타입에 값을 저장한다. 기존 타입을 건드리지 않고 해서 좋은것 같다.
+  val numCherries2 = "numCherries" ->> someNumber
+  // numCherries: Int with shapeless.labelled.KeyTag[String("numCherries") ,Int] = 123
+
+  // `someNumber`를 phantom type `KeyTag["numCherries", Int]`과 함께 tagging 하였다.
+  // 필드의 이름과 타입 둘다 encode한 tag는, implicit resolution을 이용한 `Repr` 엔트리들을 찾을때 두개 모두 유용하다.
+  // 또한 shapeless는 타입으로 부터 key tag와 값을 편리하게 추출할수 있게 `FieldType` 타입 alias를 제공한다.
+
+
+  type Fieldtype2[K, V] = V with KeyTag[K, V]
+
+  // 이제 shapeless가 어떻게 필드의 이름을 타입의 값과 함께 tag하는지 이해하였다.
+  // 하지만 key tag는 단지 phantom type일 뿐이다. 어떻게 런타임에 사용가능하게 이것을 값으로 변환할까?
+  // Shapeless는 이런 목적으로 `Witness`라는 type class를 제공한다.
+  // 만약 `Witness`와 `FieldType`을 조합한다면 tagged 필드로 부터 필드 이름을 얻어내는 주목할만한 것을 얻게 된다.
+
+
+  import shapeless.Witness
+
+  val numCherries3 = "numCherries3" ->> 123
+  // numCherries3: Int with shapeless.labelled.KeyTag[String("numCherries3"),Int] = 123
+
+  // tag된 값으로 부터 tag를 얻는다.
+  def getFieldName[K, V](value: FieldType[K, V])(
+    implicit witness: Witness.Aux[K]
+  ): K = witness.value
+
+  getFieldName(numCherries3)
+  // res14: String = numCherries3
+
+  def getFieldValue[K, V](value: FieldType[K, V]): V = value
+
+  getFieldValue(numCherries3)
+  // res16: Int = 123
+
+
+  // 5.2.1 Records와 LabelledGeneric
+  // TODO 
+
 
 
 
