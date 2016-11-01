@@ -1214,9 +1214,53 @@ object labelled {
 
 
   // 5.2.1 Records와 LabelledGeneric
-  // TODO 
+  // Shpaeless는 `records`라 부르는 자료구조를 다루는 도구들이 있다.
+  // Record는 type-level 구분자로 tag된 아이템들의 HList이다.
 
 
+  val garfield = ("cat" ->> "Garfield") :: ("orange" ->> true) :: HNil
+  // garfield: shapeless.::[String with shapeless.labelled.KeyTag[String("cat"),String],
+  // shapeless.::[Boolean with shapeless.labelled.KeyTag[String("orange"),Boolean],shapeless.HNil]]
+  // = Garfield :: true :: HNil
+
+
+  // 명확히 하면 garfield의 타입은 아래와 같다.
+  // FieldType["cat",     String]   ::
+  // FieldType["orange",  Boolean]  ::
+  // HNil
+
+
+  // Record 타입에 대해서는 여기서는 더 깊게 들어갈필요는 없다.
+  // Record는 우리가 다음에 이야기할 LabelledGeneric type에서 사용하는 제너릭 표현이라는 것만으로 충분하다.
+  // product나 coproduct의 각각의 아이템의 LabelledGeneric tag는 완결한 ADT의 필드나 type의 이름과 대응한다.
+  // (비록 name은 String이 아니라 Symbol로 표현된다.)
+  // Reflection을 하지 않고 name에 접근하는것은 엄청나게 매력적인 것이다.
+  // LabelledGeneric을 이용하여 몇몇 type class 인스턴스를 유도하여 보자.
+
+
+  // 5.3 Deriving product instances with LabelledGeneric
+
+  // LabelledGeneric을 설명하기 위하여 사용되는 JSON encoding 예를 사용할것이다.
+  // 값을 JSON AST로 변경하는 JsonEncoder type class를 정의할것이다.
+  // 이런 접근은 Argonaut, Circe, Play JSON, Spray JSON그리고 다른 많은 라이브러리에서 사용하였다.
+
+  // 우선 우리의 JSON data type을 정의하자.
+
+
+  sealed trait JsonValue
+  case class JsonObject(fields: List[(String, JsonValue)]) extends JsonValue
+  case class JsonArray(items: List[JsonValue]) extends JsonValue
+  case class JsonString(value: String) extends JsonValue
+  case class JsonNumber(value: Double) extends JsonValue
+  case class JsonBoolean(value: Boolean) extends JsonValue
+  case object JsonNull extends JsonValue
+
+  // 그러면 값을 JSON으로 encording은
+
+
+  trait JsonEncoder[A] {
+    def encode(value: A): JsonValue
+  }
 
 
 }
