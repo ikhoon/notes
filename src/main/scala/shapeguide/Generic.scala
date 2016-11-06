@@ -1301,7 +1301,7 @@ object labelled {
   val iceCream = IceCream("Sundae", 1, false)
 
   // 이상적으로 아래와 같이 출력되길 바란다.
-  val iceCreamJson: JsonValue
+  val iceCreamJson: JsonValue =
     JsonObject(List(
       "name" -> JsonString("Sundae"),
       "numCherries" -> JsonNumber(1),
@@ -1335,7 +1335,115 @@ object labelled {
   // 구현의 세부사항은 특별히 중요하지 않다.
   // 여전히 우리는 `Witness`와 `FieldType`를 사용하여 tag를 추출할수 있다, 하지만 `String` 대신 `Symbol`이 나오게 된다.
 
-  
+
+  // 5.3.1 Instance for HList
+
+  // `HNil`과 `::`를 위하여 JsonEncoder를 정의하여 보자.
+  // 우리의 Encoder는 JsonObject들을 생성하고 조작할것이다, 이것을 쉽게하기 위하여 새로운 타입의 encoder를 소개할것이다.
+
+
+  trait JsonObjectEncoder[A] extends JsonEncoder[A] {
+    def encode(value: A): JsonObject
+  }
+
+  def createObjectEncoder[A](fn: A => JsonObject): JsonObjectEncoder[A] =
+    new JsonObjectEncoder[A] {
+      def encode(value: A): JsonObject =
+        fn(value)
+    }
+
+
+  // `HNil`을 위한 정의는 다음과 같다.
+
+  import shapeless.{HList, ::, HNil, Lazy}
+
+  implicit val hnilEncoder: JsonObjectEncoder[HNil] =
+    createObjectEncoder[HNil](hnil => JsonObject(Nil))
+
+
+  // hlistEncoder는 약간의 파트를 이동하는것을 포함하고 있다. 그래서 하나씩 차근차근 할것이다.
+  // 일반적인 `Generic`을 사용하였다면 예상되어지는 정의부터 시작할것이다.
+
+
+  implicit def hlistObjectEncoder1[H, T <: HList](
+    implicit
+      hEncoder: Lazy[JsonEncoder[H]],
+      tEncoder: JsonObjectEncoder[T]
+    ): JsonEncoder[H :: T] = ???
+
+
+  // `LabelledGeneric`은 tagged type의 HList를 줄것이다.
+  // 그렇기 때문에 key type에 대한 새로운 타입 변수를 소개하는 것부터 시작하자.
+
+
+  import shapeless.Witness
+  import shapeless.labelled.FieldType
+
+  implicit def hlistObjectEncoder2[K, H, T <: HList](
+    implicit
+      hEncoder: Lazy[JsonEncoder[H]],
+      tEncoder: JsonObjectEncoder[T]
+  ): JsonObjectEncoder[FieldType[K, H] :: T] = ???
+
+
+  // 함수의 body에는 K와 연관된 값이 필요하다. 이것을 위해서 `implicit Witness`를 넣는다.
+
+
+  implicit def hlistObjectEncoder3[K, H, T <: HList](
+    implicit
+      witness: Witness.Aux[K],
+      hEncoder: Lazy[JsonEncoder[H]],
+      tEncoder: JsonObjectEncoder[T]
+  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
+    val fieldName = witness.value
+    ???
+  }
+
+
+  // 우리는 `witness.value`를 이용해서 K의 값에 접근할수 있다.
+  // 하지만 컴파일러는 우리가 얻으려고 하는 tag의 타입에 대해서 알수 있는 방법이 없다.
+  // `LabelledGeneric` tag에 `Symbol`을 사용한다.
+  // 그래서 symbol을 이용하여 K에 대한 타입을 제약하고 `symbol.name`을 이용하여 string으로 변환하는데 사용한다.
+
+
+  implicit def hlistObjectEncoder4[K <: Symbol, H, T <: HList](
+    implicit
+      witness: Witness.Aux[K],
+      hEncoder: Lazy[JsonEncoder[H]],
+      tEncoder: JsonObjectEncoder[T]
+  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
+    val fieldName: String = witness.value.name
+    ???
+  }
+
+
+  // 나머지 정의는 Chapter 3에서 다루었던 법칙들을 적용했다.
+
+
+  implicit def hlistObjectEncoder[K <: Symbol, H, T <: HList](
+    implicit
+    witness: Witness.Aux[K],
+    hEncoder: Lazy[JsonEncoder[H]],
+    tEncoder: JsonObjectEncoder[T]
+  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
+    val fieldName: String = witness.value.name
+    createObjectEncoder { hlist =>
+      val head = hEncoder.value.encode(hlist.head)
+      val tail = tEncoder.encode(hlist.tail)
+      JsonObject((fieldName, head) :: tail.fields)
+    }
+  }
+
+
+
+  // 5.3.2 Instance for concrete products
+
+  // 마지막으로 generic instance에 착수하여 보자.
+  // `Generic`대신에 `LabelledGeneric`을 사용하는것을 제외 하고는 그전에 봐왔던것과 동일한 정의이다.
+
+
+//  implicit def genericObjectEncoder
+
 
 
 
