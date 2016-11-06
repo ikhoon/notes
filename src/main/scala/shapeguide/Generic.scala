@@ -1255,12 +1255,90 @@ object labelled {
   case class JsonBoolean(value: Boolean) extends JsonValue
   case object JsonNull extends JsonValue
 
-  // 그러면 값을 JSON으로 encording은
+
+  // 그러면 값을 JSON으로 encording은 아래와 같다.
 
 
   trait JsonEncoder[A] {
     def encode(value: A): JsonValue
   }
+
+
+  // 그리고 몇가지 기본적인 instance들이다.
+
+  def createEncoder[A](func: A => JsonValue): JsonEncoder[A] =
+    new JsonEncoder[A] {
+      def encode(value: A): JsonValue =
+        func(value)
+    }
+
+  implicit val stringEncoder: JsonEncoder[String] =
+    createEncoder[String](str => JsonString(str))
+
+  implicit val doubleEncoder: JsonEncoder[Double] =
+    createEncoder[Double](num => JsonNumber(num))
+
+  implicit val intEncoder: JsonEncoder[Int] =
+    createEncoder[Int](num => JsonNumber(num))
+
+  implicit val booleanEncoder: JsonEncoder[Boolean] =
+    createEncoder[Boolean](bool => JsonBoolean(bool))
+
+  implicit def listEncoder[A]
+    (implicit enc: JsonEncoder[A]): JsonEncoder[List[A]] =
+    createEncoder[List[A]](list => JsonArray(list.map(enc.encode)))
+
+  implicit def optionEncoder[A]
+    (implicit enc: JsonEncoder[A]): JsonEncoder[Option[A]] =
+    createEncoder[Option[A]](option => option.map(enc.encode).getOrElse(JsonNull))
+
+
+  // 이상적으로, ADT를 JSON으로 encode할때 출력 JSON에 정확한 필드이름을 사용하길 원한다.
+
+
+  case class IceCream(name: String, numCherries: Int, inCone: Boolean)
+
+  val iceCream = IceCream("Sundae", 1, false)
+
+  // 이상적으로 아래와 같이 출력되길 바란다.
+  val iceCreamJson: JsonValue
+    JsonObject(List(
+      "name" -> JsonString("Sundae"),
+      "numCherries" -> JsonNumber(1),
+      "inCone" -> JsonBoolean(false)
+    ))
+
+
+  // `LabelledGeneric` 이것을 위해 생겼다.
+  // IceCream을 위한 instance를 소환해보자. 그리그 어떤 종류의 representation이 생성되는지 알아보자.
+
+  import shapeless.LabelledGeneric
+
+  val gen = LabelledGeneric[IceCream].to(iceCream)
+  // gen: shapeless.::[String with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String("name")],String],
+  //     shapeless.::[Int with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String(" numCherries")],Int],
+  //     shapeless.::[Boolean with shapeless.labelled. KeyTag[Symbol with shapeless.tag.Tagged[String("inCone")],Boolean],
+  //     shapeless.HNil]]]
+  // = Sundae :: 1 :: false :: HNil
+
+
+  // 자세히 보면 HList의 전체 타입은 아래와 같다.
+
+  // String   with KeyTag[Symbol with Tagged["name"], String]     ::
+  // Int      with KeyTag[Symbol with Tagged["numCherries"], Int] ::
+  // Boolean  with KeyTag[Symbol with Tagged["inCone"], Boolean   ::
+  // HNil
+
+
+  // 여기에 나온 타입은 이때까지 우리가 보아온 타입보다 약간 더 복잡하다.
+  // 필드 이름들을 literal string 타입으로 표현하는 대신, shapeless는 literal string 타입이 tag된 symbol들로 표현한다.
+  // 구현의 세부사항은 특별히 중요하지 않다.
+  // 여전히 우리는 `Witness`와 `FieldType`를 사용하여 tag를 추출할수 있다, 하지만 `String` 대신 `Symbol`이 나오게 된다.
+
+  
+
+
+
 
 
 }
