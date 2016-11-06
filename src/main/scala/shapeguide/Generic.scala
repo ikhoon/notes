@@ -1027,7 +1027,7 @@ object typeAndImplicits extends App {
 
 }
 
-object labelled {
+object labelled extends App{
   // 5. Access names during implicit derivation
 
   // 종종 우리가 정의한 type class의 인스턴스는 단순히 타입보다 더 많이 접근하기를 원한다.
@@ -1263,6 +1263,9 @@ object labelled {
     def encode(value: A): JsonValue
   }
 
+  object JsonEncoder {
+    def apply[A](implicit enc: JsonEncoder[A]): JsonEncoder[A] = enc
+  }
 
   // 그리고 몇가지 기본적인 instance들이다.
 
@@ -1365,7 +1368,7 @@ object labelled {
   // 일반적인 `Generic`을 사용하였다면 예상되어지는 정의부터 시작할것이다.
 
 
-  implicit def hlistObjectEncoder1[H, T <: HList](
+  /*implicit*/ def hlistObjectEncoder1[H, T <: HList](
     implicit
       hEncoder: Lazy[JsonEncoder[H]],
       tEncoder: JsonObjectEncoder[T]
@@ -1379,7 +1382,7 @@ object labelled {
   import shapeless.Witness
   import shapeless.labelled.FieldType
 
-  implicit def hlistObjectEncoder2[K, H, T <: HList](
+  /*implicit*/ def hlistObjectEncoder2[K, H, T <: HList](
     implicit
       hEncoder: Lazy[JsonEncoder[H]],
       tEncoder: JsonObjectEncoder[T]
@@ -1389,7 +1392,7 @@ object labelled {
   // 함수의 body에는 K와 연관된 값이 필요하다. 이것을 위해서 `implicit Witness`를 넣는다.
 
 
-  implicit def hlistObjectEncoder3[K, H, T <: HList](
+  /*implicit*/ def hlistObjectEncoder3[K, H, T <: HList](
     implicit
       witness: Witness.Aux[K],
       hEncoder: Lazy[JsonEncoder[H]],
@@ -1406,7 +1409,7 @@ object labelled {
   // 그래서 symbol을 이용하여 K에 대한 타입을 제약하고 `symbol.name`을 이용하여 string으로 변환하는데 사용한다.
 
 
-  implicit def hlistObjectEncoder4[K <: Symbol, H, T <: HList](
+  /*implicit*/ def hlistObjectEncoder4[K <: Symbol, H, T <: HList](
     implicit
       witness: Witness.Aux[K],
       hEncoder: Lazy[JsonEncoder[H]],
@@ -1442,11 +1445,105 @@ object labelled {
   // `Generic`대신에 `LabelledGeneric`을 사용하는것을 제외 하고는 그전에 봐왔던것과 동일한 정의이다.
 
 
-//  implicit def genericObjectEncoder
+  implicit def genericObjectEncoder[A, H <: HList](
+    implicit
+      generic: LabelledGeneric.Aux[A, H],
+      hEncoder: Lazy[JsonObjectEncoder[H]]
+  ): JsonEncoder[A] =
+    createObjectEncoder { value =>
+      hEncoder.value.encode(generic.to(value))
+    }
+
+
+  // 이것이 우리가 원한 모든것이다!
+  // 적절한 정의와 함께 **어떤** case class의 instance라도 직렬화 가능하고 json 결과에 필드의 이름은 유지가 된다.
+
+  println(JsonEncoder[IceCream].encode(iceCream))
+  // res14: JsonValue = JsonObject(
+  //    List((name,JsonString(Sundae)),
+  //         (numCherries,JsonNumber(1.0)),
+  //         (inCone,JsonBoolean(false))))
 
 
 
+  // 5.4 Deriving coproduct instances with LabelledGeneric
+
+  // `Coproduct`에 `LabelledGeneric`을 적용하는 것은 우리가 이미 배워왔던것의 조합을 포함한다.
+  // `Coproduct` 타입을 `LabelledGeneric`으로 유도하는것을 검토해보는걸로 시작하자.
+  // 3장에 있었던 Shape ADT를 다시 참조할것이다.
 
 
+  sealed trait Shape
+  final case class Rectangle(width: Double, height: Double) extends Shape
+  final case class Circle(radius: Double) extends Shape
+
+  LabelledGeneric[Shape].to(Circle(1.0))
+  // res5: shapeless.:+:[Rectangle with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String("Rectangle")],Rectangle],
+  //       shapeless.:+:[Circle with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String("Circle")],Circle],
+  //       shapeless.CNil]] =
+  //        Inr(Inl(Circle(1.0)))
+
+
+  // 아래는 Coproduct 타입에 대해 보다 가독성있는 표현이다.
+
+  // Rectangle with KeyTag[Symbol with Tagged["Rectangle"], Rectangle]  :+:
+  // Circle    with KeyTag[Symbol with Tagged["Circle"],    Circle]     :+:
+  // CNil
+
+
+  // 결과가 각각의 타입 이름으로 tagged된 `Shape`의 하위 타입의 `Coproduct`인걸 알수 있다.
+  // 우리는 이정보를 `:+:` 과 `CNil`에 대한 JsonEncoder를 작성하는데 사용할수 있다.
+
+
+  implicit val cnilObjectEncoder: JsonObjectEncoder[CNil] =
+    createObjectEncoder(cnil => throw new Exception("Inconceivable!"))
+
+  implicit def coproudctObjectEncoder[K <: Symbol, H, T <: Coproduct](
+    implicit
+      witness: Witness.Aux[K],
+      hEncoder: Lazy[JsonEncoder[H]],
+      tEncoder: JsonObjectEncoder[T]
+  ): JsonObjectEncoder[FieldType[K, H] :+: T] = {
+    val typeName = witness.value.name
+    createObjectEncoder {
+      case Inl(h) =>
+        JsonObject(List(typeName -> hEncoder.value.encode(h)))
+      case Inr(t) =>
+        tEncoder.encode(t)
+    }
+  }
+
+  implicit def coproductGenericObjectEncoder[A, H <: Coproduct](
+      implicit
+      generic: LabelledGeneric.Aux[A, H],
+      hEncoder: Lazy[JsonObjectEncoder[H]]
+    ): JsonEncoder[A] =
+    createObjectEncoder { value =>
+      hEncoder.value.encode(generic.to(value))
+    }
+
+
+
+  // coproductEncoder는 hlistEncoder와 같은 패턴을 따른다.
+  // 3가지의 타입 파라메터가 있다.
+  // - 타입 이름을 위한 `K`
+  // - HList의 젤 앞 값 `H`
+  // - tail 값인 `T`
+  // 3가지 간의 관계를 선언하기 위해 반환 타입에서 `FieldType`과 `:+:`을 사용하였다.
+  // 결과는 하나의 key, value의 쌍을 포함하고 있다. ket는 타입 이름이고 value은 결과 이다.
+
+  val shape: Shape = Circle(1.0)
+
+  println(JsonEncoder[Shape].encode(shape))
+  // res8: JsonValue = JsonObject(List((Circle,JsonObject(List((radius, JsonNumber(1.0)))))))
+
+  // 약간의 작업을 통해서 다른 인코딩 또한 가능하다.
+  // 사용자가 포맷을 가늠할수 있게 우리는 type 필드를 결과에 추가할수 있다.
+  // Sam Halliday's의 spray-json-shapeless가 유연성을 가지고 다루는것이 가능한 좋은 예가 될것이다.
+
+
+  // 5.5 Summary
+
+  // TODO
 
 }
