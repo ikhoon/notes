@@ -1027,7 +1027,7 @@ object typeAndImplicits extends App {
 
 }
 
-object labelled extends App{
+object labelled extends App {
   // 5. Access names during implicit derivation
 
   // 종종 우리가 정의한 type class의 인스턴스는 단순히 타입보다 더 많이 접근하기를 원한다.
@@ -1046,11 +1046,11 @@ object labelled extends App{
   // 스칼라 개발자로서 값의 표기는 다양한 타입을 가진다. 예를 들어 문자열 "hello"는 적어도 3가지의 타입은 가진다. String, AnyRef 그리고 Any.
 
 
-  "hello" : String
+  "hello": String
 
-  "hello" : AnyRef
+  "hello": AnyRef
 
-  "hello" : Any
+  "hello": Any
 
   // 흥미롭게도 "hello"는 다른 타입도 가지고 있다. "singleton type"은 하나의 값에만 독점적으로 속한다.
   // 이것은 우리가 companion object를 정의했을때 얻는 singleton type과 유사하다.
@@ -1058,7 +1058,7 @@ object labelled extends App{
 
   object Foo
 
-  val foo : Foo.type = Foo
+  val foo: Foo.type = Foo
 
   // literal 값에 젹용되는 singleton type을 liternal type이라 부른다.
   // 우리는 컴파일러의 기본 행위가 literal을 가장 가까운 non-singleton type으로 "cast"하기 때문에 일반적으로 이것들과 상호작용할수 없다.
@@ -1082,7 +1082,7 @@ object labelled extends App{
   // x에 다른 숫자를 할당하려고 하면 컴파일 에러가 나온다.
   // x에 43을 할당해봄
 
-//  x = 43        // 컴파일 안됨요.
+  //  x = 43        // 컴파일 안됨요.
 
   // <console>:16: error: type mismatch;
   //  found   : Int(43)
@@ -1111,13 +1111,12 @@ object labelled extends App{
   // 그러나 이것은 복합 표현에는 사용할수 없다.
   // 컴파일러가 소스로부터 literal 값을 바로 결정이 가능해야 한다.
 
-//  math.sqrt(4).narrow    // 컴파일 안됨요.
+  //  math.sqrt(4).narrow    // 컴파일 안됨요.
 
   // <console>:17: error: Expression scala.math.`package`.sqrt(4.0) does not evaluate to a constant or a stable reference value
   //        math.sqrt(4).narrow
   // <console>:17: error: value narrow is not a member of Double
   //        math.sqrt(4).narrow
-
 
 
   // Literal types in Scala - 부가 설명
@@ -1127,7 +1126,7 @@ object labelled extends App{
 
   // 이번전의 스칼라는 선언을 아래와 같이 할수 있다.
 
-//  val theAnswer : 42 = 42   // 공식 스칼라는 컴파일 못함
+  //  val theAnswer : 42 = 42   // 공식 스칼라는 컴파일 못함
 
   // Typelevel과 Lightbend의 스칼라는 바이너리 호환되는 output을 만들고 커뮤니티에 의해서 활발하게 동기화가 유지되고 있다.
   // 추가적으로 `SBT 0.13.11-M1`에서 빌드 선언에서 컴파일러를 바꾸는것이 유효하다.
@@ -1135,7 +1134,6 @@ object labelled extends App{
 
   // 만약 literal type을 가지고 처리하는것에 관심이 있다면, Typelevel scala를 시도해보는것을 강하게 추천한다.
   // https://github.com/typelevel/scala#typelevel-scala-2118 여기 링크 따라가서 설치 과정을 따라 하면 된다.
-
 
 
   // 5.2 Type tagging and phantom types
@@ -1157,7 +1155,9 @@ object labelled extends App{
   // Phantom type은 아래와 같이 런타임에 아무런 의미론(semantics)이 없는 타입이다.
 
 
-  trait Cherries        // > 빈 trait은 함수가 없어서 런타임에 의미가 없다하는듯
+  trait Cherries
+
+  // > 빈 trait은 함수가 없어서 런타임에 의미가 없다하는듯
 
   // 우리는 숫자를 `asInstanceOf`로 tag 할수있다.
   // > 스고이!!
@@ -1205,6 +1205,7 @@ object labelled extends App{
   ): K = witness.value
 
   getFieldName(numCherries3)
+
   // res14: String = numCherries3
 
   def getFieldValue[K, V](value: FieldType[K, V]): V = value
@@ -1219,6 +1220,7 @@ object labelled extends App{
 
 
   val garfield = ("cat" ->> "Garfield") :: ("orange" ->> true) :: HNil
+
   // garfield: shapeless.::[String with shapeless.labelled.KeyTag[String("cat"),String],
   // shapeless.::[Boolean with shapeless.labelled.KeyTag[String("orange"),Boolean],shapeless.HNil]]
   // = Garfield :: true :: HNil
@@ -1248,11 +1250,17 @@ object labelled extends App{
 
 
   sealed trait JsonValue
+
   case class JsonObject(fields: List[(String, JsonValue)]) extends JsonValue
+
   case class JsonArray(items: List[JsonValue]) extends JsonValue
+
   case class JsonString(value: String) extends JsonValue
+
   case class JsonNumber(value: Double) extends JsonValue
+
   case class JsonBoolean(value: Boolean) extends JsonValue
+
   case object JsonNull extends JsonValue
 
 
@@ -1288,11 +1296,11 @@ object labelled extends App{
     createEncoder[Boolean](bool => JsonBoolean(bool))
 
   implicit def listEncoder[A]
-    (implicit enc: JsonEncoder[A]): JsonEncoder[List[A]] =
+  (implicit enc: JsonEncoder[A]): JsonEncoder[List[A]] =
     createEncoder[List[A]](list => JsonArray(list.map(enc.encode)))
 
   implicit def optionEncoder[A]
-    (implicit enc: JsonEncoder[A]): JsonEncoder[Option[A]] =
+  (implicit enc: JsonEncoder[A]): JsonEncoder[Option[A]] =
     createEncoder[Option[A]](option => option.map(enc.encode).getOrElse(JsonNull))
 
 
@@ -1305,11 +1313,11 @@ object labelled extends App{
 
   // 이상적으로 아래와 같이 출력되길 바란다.
   val iceCreamJson: JsonValue =
-    JsonObject(List(
-      "name" -> JsonString("Sundae"),
-      "numCherries" -> JsonNumber(1),
-      "inCone" -> JsonBoolean(false)
-    ))
+  JsonObject(List(
+    "name" -> JsonString("Sundae"),
+    "numCherries" -> JsonNumber(1),
+    "inCone" -> JsonBoolean(false)
+  ))
 
 
   // `LabelledGeneric` 이것을 위해 생겼다.
@@ -1318,6 +1326,7 @@ object labelled extends App{
   import shapeless.LabelledGeneric
 
   val gen = LabelledGeneric[IceCream].to(iceCream)
+
   // gen: shapeless.::[String with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String("name")],String],
   //     shapeless.::[Int with shapeless.labelled.KeyTag[Symbol with shapeless.tag.Tagged[String(" numCherries")],Int],
   //     shapeless.::[Boolean with shapeless.labelled. KeyTag[Symbol with shapeless.tag.Tagged[String("inCone")],Boolean],
@@ -1369,10 +1378,10 @@ object labelled extends App{
 
 
   /*implicit*/ def hlistObjectEncoder1[H, T <: HList](
-    implicit
-      hEncoder: Lazy[JsonEncoder[H]],
-      tEncoder: JsonObjectEncoder[T]
-    ): JsonEncoder[H :: T] = ???
+                                                       implicit
+                                                       hEncoder: Lazy[JsonEncoder[H]],
+                                                       tEncoder: JsonObjectEncoder[T]
+                                                     ): JsonEncoder[H :: T] = ???
 
 
   // `LabelledGeneric`은 tagged type의 HList를 줄것이다.
@@ -1383,21 +1392,21 @@ object labelled extends App{
   import shapeless.labelled.FieldType
 
   /*implicit*/ def hlistObjectEncoder2[K, H, T <: HList](
-    implicit
-      hEncoder: Lazy[JsonEncoder[H]],
-      tEncoder: JsonObjectEncoder[T]
-  ): JsonObjectEncoder[FieldType[K, H] :: T] = ???
+                                                          implicit
+                                                          hEncoder: Lazy[JsonEncoder[H]],
+                                                          tEncoder: JsonObjectEncoder[T]
+                                                        ): JsonObjectEncoder[FieldType[K, H] :: T] = ???
 
 
   // 함수의 body에는 K와 연관된 값이 필요하다. 이것을 위해서 `implicit Witness`를 넣는다.
 
 
   /*implicit*/ def hlistObjectEncoder3[K, H, T <: HList](
-    implicit
-      witness: Witness.Aux[K],
-      hEncoder: Lazy[JsonEncoder[H]],
-      tEncoder: JsonObjectEncoder[T]
-  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
+                                                          implicit
+                                                          witness: Witness.Aux[K],
+                                                          hEncoder: Lazy[JsonEncoder[H]],
+                                                          tEncoder: JsonObjectEncoder[T]
+                                                        ): JsonObjectEncoder[FieldType[K, H] :: T] = {
     val fieldName = witness.value
     ???
   }
@@ -1410,11 +1419,11 @@ object labelled extends App{
 
 
   /*implicit*/ def hlistObjectEncoder4[K <: Symbol, H, T <: HList](
-    implicit
-      witness: Witness.Aux[K],
-      hEncoder: Lazy[JsonEncoder[H]],
-      tEncoder: JsonObjectEncoder[T]
-  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
+                                                                    implicit
+                                                                    witness: Witness.Aux[K],
+                                                                    hEncoder: Lazy[JsonEncoder[H]],
+                                                                    tEncoder: JsonObjectEncoder[T]
+                                                                  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
     val fieldName: String = witness.value.name
     ???
   }
@@ -1424,11 +1433,11 @@ object labelled extends App{
 
 
   implicit def hlistObjectEncoder[K <: Symbol, H, T <: HList](
-    implicit
-    witness: Witness.Aux[K],
-    hEncoder: Lazy[JsonEncoder[H]],
-    tEncoder: JsonObjectEncoder[T]
-  ): JsonObjectEncoder[FieldType[K, H] :: T] = {
+                                                               implicit
+                                                               witness: Witness.Aux[K],
+                                                               hEncoder: Lazy[JsonEncoder[H]],
+                                                               tEncoder: JsonObjectEncoder[T]
+                                                             ): JsonObjectEncoder[FieldType[K, H] :: T] = {
     val fieldName: String = witness.value.name
     createObjectEncoder { hlist =>
       val head = hEncoder.value.encode(hlist.head)
@@ -1438,7 +1447,6 @@ object labelled extends App{
   }
 
 
-
   // 5.3.2 Instance for concrete products
 
   // 마지막으로 generic instance에 착수하여 보자.
@@ -1446,10 +1454,10 @@ object labelled extends App{
 
 
   implicit def genericObjectEncoder[A, H <: HList](
-    implicit
-      generic: LabelledGeneric.Aux[A, H],
-      hEncoder: Lazy[JsonObjectEncoder[H]]
-  ): JsonEncoder[A] =
+                                                    implicit
+                                                    generic: LabelledGeneric.Aux[A, H],
+                                                    hEncoder: Lazy[JsonObjectEncoder[H]]
+                                                  ): JsonEncoder[A] =
     createObjectEncoder { value =>
       hEncoder.value.encode(generic.to(value))
     }
@@ -1459,11 +1467,11 @@ object labelled extends App{
   // 적절한 정의와 함께 **어떤** case class의 instance라도 직렬화 가능하고 json 결과에 필드의 이름은 유지가 된다.
 
   println(JsonEncoder[IceCream].encode(iceCream))
+
   // res14: JsonValue = JsonObject(
   //    List((name,JsonString(Sundae)),
   //         (numCherries,JsonNumber(1.0)),
   //         (inCone,JsonBoolean(false))))
-
 
 
   // 5.4 Deriving coproduct instances with LabelledGeneric
@@ -1474,7 +1482,9 @@ object labelled extends App{
 
 
   sealed trait Shape
+
   final case class Rectangle(width: Double, height: Double) extends Shape
+
   final case class Circle(radius: Double) extends Shape
 
   LabelledGeneric[Shape].to(Circle(1.0))
@@ -1499,11 +1509,11 @@ object labelled extends App{
     createObjectEncoder(cnil => throw new Exception("Inconceivable!"))
 
   implicit def coproudctObjectEncoder[K <: Symbol, H, T <: Coproduct](
-    implicit
-      witness: Witness.Aux[K],
-      hEncoder: Lazy[JsonEncoder[H]],
-      tEncoder: JsonObjectEncoder[T]
-  ): JsonObjectEncoder[FieldType[K, H] :+: T] = {
+                                                                       implicit
+                                                                       witness: Witness.Aux[K],
+                                                                       hEncoder: Lazy[JsonEncoder[H]],
+                                                                       tEncoder: JsonObjectEncoder[T]
+                                                                     ): JsonObjectEncoder[FieldType[K, H] :+: T] = {
     val typeName = witness.value.name
     createObjectEncoder {
       case Inl(h) =>
@@ -1514,14 +1524,13 @@ object labelled extends App{
   }
 
   implicit def coproductGenericObjectEncoder[A, H <: Coproduct](
-      implicit
-      generic: LabelledGeneric.Aux[A, H],
-      hEncoder: Lazy[JsonObjectEncoder[H]]
-    ): JsonEncoder[A] =
+                                                                 implicit
+                                                                 generic: LabelledGeneric.Aux[A, H],
+                                                                 hEncoder: Lazy[JsonObjectEncoder[H]]
+                                                               ): JsonEncoder[A] =
     createObjectEncoder { value =>
       hEncoder.value.encode(generic.to(value))
     }
-
 
 
   // coproductEncoder는 hlistEncoder와 같은 패턴을 따른다.
@@ -1544,6 +1553,21 @@ object labelled extends App{
 
   // 5.5 Summary
 
-  // TODO
+  // 이장에서는 제너릭의 한종류로서 제너릭 표현에 타입과 필드 이름을 노출하는 LabelledGeneric에 대해서 알아보았다.
+
+  // LabelledGeneric에 의해서 type-level tag로 인코딩되기 때문에 그것을 implicit resolution 하는 동안 지정할수 있다.
+  // 이장의 시작은 literal type에 대한 이야기와 shapeless에서 그것을 tag에 사용하는 것을 배웠다.
+  // 또한 타입을 값으로 구체화하는 `Witness` type class에 대해 알아보았다.
+
+  // 마지막으로 우리는 `LabelledGeneric`과 literal type 그리고 Witness를 합쳐서 알맞는 이름을 출력에 붙여주는 JsonEncoder library를 만들었다.
+  // 이장의 중요한 점은 우리의 코드는 runtime reflection을 사용하지 않았다는것이다.
+  // 타입과 implicits 그리고 shapeless 내부의 작은 메크로의 셋으로 모든것이 구현되었다.
+
+  // 우리가 만든 코드는 결과적으로 매우 빠르고 runtime에 믿을수 있다.
 
 }
+
+
+
+
+
