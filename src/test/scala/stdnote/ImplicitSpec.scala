@@ -12,7 +12,72 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class ImplicitSpec extends FunSuite with Matchers {
 
-  // implict : 은연중의 <-> 대놓고, 명시적 : explicit
+  // implicit : 은연중의 <-> 대놓고, 명시적 : explicit
+
+
+  // lambda, for comprehension, flatMap, trait,
+  // implicit 기존에 만들어진 라이브러리/프레임워크도 잘이해하고 갖다쓸수 있다.
+
+  // 함수의 파라메터
+
+  test("parameter") {
+    def foo(a: Int): String = {
+      a + " " + a
+    }
+    val bar: Int = 10
+    // 명시적
+    println(foo(10))
+    // 암묵적으로 함수의 파라메터를 바인딩하고 싶다.
+    def foo2(implicit a: Int): String = {
+      a + " " + a
+    }
+
+    // 찾는 조건
+    // 1. 같은 타입
+    // 2. 현재스코프 implicit
+    // 3. import 된 스코프 implicit
+    // 4. companion object implicit
+
+  }
+
+  object barInt {
+    implicit val bar : Int = 10
+  }
+
+  test("example") {
+    // 1. 함수의 인자를 implicit 으로 받는 함수를 만든다.
+    // 2. implicit 변수도 만든다.
+    // 3. 실행을 해보면 된다.
+    // 4. 다양한 scope에 넣어서 실행해보면 좋을것 같아요.
+    // 5. 현재 찾을수 있는 scope에 같은 타입의 implicit이 2개 이상이면 어떻게 되나?
+  }
+
+  test("함수의 implicit") {
+    // 형변환
+    // Int => String
+    def foo(a: Int): String = a.toString + " " + a.toString
+
+    val foo1: String = foo(10)
+
+    case class Alcol(name: String)
+    case class Edina(want: String)
+
+    implicit def to(edina: Edina) : Alcol =
+      Alcol(edina.want)
+
+    val edina = Edina("와인")
+    println(to(edina))
+
+    // 현재의 타입에서 바뀔 타입으로 구성된 implicit 함수를 찾습니다.
+    val alcol : Alcol = edina
+    val alcol2 : Alcol = to(edina)
+
+  }
+
+
+
+
+
 
 
   test("explicit1") {
