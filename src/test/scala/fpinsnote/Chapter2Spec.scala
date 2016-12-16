@@ -45,19 +45,58 @@ class Chapter2Spec extends WordSpec with Matchers {
       }
 
       val sorted = List(1, 2, 3, 4, 6)
-      val predicate = (_: Int) < (_: Int)
 
-      isSorted(sorted.toArray, predicate) shouldBe true
+      // 함수, method
+      def predicate1(a: Int, b: Int): Boolean = a < b
+
+      // function
+      val predicate2 : (Int, Int) => Boolean = (a: Int, b: Int) => a < b
+
+      val predicate3 = (_: Int) < (_: Int)
+
+      // Function2 trait
+      val predicate4 : Function2[Int, Int, Boolean] =
+        new Function2[Int, Int, Boolean] {
+        override def apply(v1: Int, v2: Int): Boolean = v1 < v2
+      }
+
+      val predicate5 : Function2[Int, Int, Boolean] = (_: Int) < (_: Int)
+
+      isSorted(sorted.toArray, predicate3) shouldBe true
 
       val unsorted = List(1, 2, 5, 4, 6)
-      isSorted(unsorted.toArray, predicate) shouldBe false
+      isSorted(unsorted.toArray, predicate3) shouldBe false
     }
 
-    "2.3 curring" in {
-      def curry[A, B, C](f: (A, B) => C): A => (B => C) = a => b => f(a, b)
+    // 커링의 어원
+    // 하스켈 커리
+    // (A, B, C) => D
+    // (A => (B => (C => D)))
+    // A => B => C => D
 
-      def foo(a:Int, b: Int) = a + b
-      foo(10, 20) shouldBe curry(foo)(10)(20)
+
+    "2.3 curring" in {
+
+      def curry[A, B, C, D, E](f: (A, B, C, D) => E): A => B => C => D => E =
+        a => b => c => d => f(a, b, c, d)
+
+      def uncurry[A, B, C](f: A => B => C): (A, B) => C =
+        (a, b) => f(a)(b)
+
+
+      def foo1(a:Int, b: Int) = a + b
+      foo1(1, 2) shouldBe 3
+
+      def foo2(a:Int)(b: Int) = a + b
+      val addWithOne: (Int) => Int = foo2(1)
+      addWithOne(10) == 11
+      val addWithTwo : (Int) => Int = foo2(2)
+      addWithTwo(10) == 12
+
+      def foo3(a:Int): Int => Int = b => a + b
+
+
+
 
 
     }
