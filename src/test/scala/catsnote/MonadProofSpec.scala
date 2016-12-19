@@ -129,6 +129,6 @@ class MonadProofSpec extends WordSpec with Matchers{
       type IdentifyObject[A] = Id[A]
     }
 
-    
+
   }
 }

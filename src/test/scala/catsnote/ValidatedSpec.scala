@@ -1,10 +1,11 @@
 package catsnote
 
 import cats.{Monad, Semigroup, SemigroupK}
-import cats.data.{NonEmptyList, Validated, Xor}
+import cats.data.{NonEmptyList, Validated}
 import org.scalatest.{Matchers, WordSpec}
 import ParallelValidation._
 import cats.data.Validated.{Invalid, Valid}
+import cats.syntax.either._
 
 /**
   * Created by ikhoon on 2016. 8. 2..
@@ -106,7 +107,7 @@ class ValidatedSpec extends WordSpec with Matchers {
           case i @ Invalid(_) => i
         }
 
-        override def tailRecM[A, B](a: A)(f: (A) => Validated[E, Either[A, B]]): Validated[E, B] = defaultTailRecM(a)(f)
+        override def tailRecM[A, B](a: A)(f: (A) => Validated[E, Either[A, B]]): Validated[E, B] = ???
       }
 
       val v: Validated[NonEmptyList[String], (Int, Double)] = validatedMonad
@@ -136,14 +137,14 @@ class ValidatedSpec extends WordSpec with Matchers {
     }
 
     "withXor" in {
-      def positive(field: String, i: Int): ConfigError Xor Int = {
-        if(i >= 0) Xor.right(i)
-        else Xor.left(ParseError(field))
+      def positive(field: String, i: Int): ConfigError Either Int = {
+        if(i >= 0) Either.right(i)
+        else Either.left(ParseError(field))
       }
 
       val config1 = Config(Map("houseNumber" -> "-42"))
 
-      val houseNumber = config1.parse[Int]("houseNumber").withXor { (xor: ConfigError Xor Int) =>
+      val houseNumber = config1.parse[Int]("houseNumber").withEither { (xor: ConfigError Either Int) =>
         xor.flatMap(i => positive("houseNumber", i))
       }
 

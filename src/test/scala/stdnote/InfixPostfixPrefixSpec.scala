@@ -60,28 +60,31 @@ class InfixPostfixPrefixSpec extends FunSuite with Matchers {
     val my2 = new MyList2
     "cheese" :: my2 shouldBe List("cheese", "cheese")
 
-    trait AB[A, B]
+    object test {
 
-    type IntAndString = AB[Int, String]
+      trait AB[A, B]
 
-    type IntAndString2 = Int AB String
+      type IntAndString = AB[Int, String]
 
-    // natural transformation
+      type IntAndString2 = Int AB String
 
-    // F[A] === functor map ===> F[B]
-    // F[A] === natural transformation ~> ===> G[A]
-    val someInt: Option[Int] = Some(1)
-    val someString: Option[String] = someInt.map(_.toString)
-    val listInt: List[Int] = someInt.toList
+      // natural transformation
 
-    new AB[Int, String]{}
+      // F[A] === functor map ===> F[B]
+      // F[A] === natural transformation ~> ===> G[A]
+      val someInt: Option[Int] = Some(1)
+      val someString: Option[String] = someInt.map(_.toString)
+      val listInt: List[Int] = someInt.toList
 
-    trait ~>[F, G] {
-      def apply(f: F): G
-    }
+      new AB[Int, String] {}
 
-    new (Int ~> String) {
-      override def apply(f: Int): String = ???
+      trait ~>[F, G] {
+        def apply(f: F): G
+      }
+
+      new (Int ~> String) {
+        override def apply(f: Int): String = ???
+      }
     }
   }
 

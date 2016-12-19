@@ -2,6 +2,9 @@ package catsnote
 
 import cats.Monad
 import org.scalatest.{Matchers, WordSpec}
+import cats.syntax.either._
+
+import scala.annotation.tailrec
 
 /**
   * Created by ikhoon on 2016. 7. 21..
@@ -27,21 +30,37 @@ class MonadSpec extends WordSpec with Matchers {
           case Some(x) => f(x)
           case None => None
         }
-        override def tailRecM[A, B](a: A)(f: (A) => Option[Either[A, B]]): Option[B] = defaultTailRecM(a)(f)
+
+        @tailrec
+        def tailRecM[A, B](a: A)(f: A => Option[Either[A, B]]): Option[B] =
+          f(a) match {
+            case None => None
+            case Some(Left(a1)) => tailRecM(a1)(f)
+            case Some(Right(b)) => Some(b)
+          }
+
       }
 
       Monad[Option].flatMap(Option(1))(x => Some(x.toString)) shouldBe Option("1")
     }
 
     "function1 monad" in {
-      implicit def function1Instance[I] : Monad[({type L[O]=Function1[I, O]})#L] = {
+      implicit def function1Instance[I] : Monad[Function1[I, ?]] = {
         new Monad[({type L[O] = Function1[I, O]})#L] {
 
           override def flatMap[A, B](fa: I => A)(f: A => I => B): I => B =
             i => f(fa(i))(i)
           override def pure[A](x: A): (I) => A = _ => x
 
-          override def tailRecM[A, B](a: A)(f: (A) => (I) => Either[A, B]): (I) => B = defaultTailRecM(a)(f)
+          def tailRecM[A, B](a: A)(fn: A => I => Either[A, B]): I => B =
+            (t: I) => {
+              @tailrec
+              def step(thisA: A): B = fn(thisA)(t) match {
+                case Right(b) => b
+                case Left(nextA) => step(nextA)
+              }
+              step(a)
+            }
         }
       }
       val f : Int => String = (x: Int) => x.toString
@@ -56,7 +75,19 @@ class MonadSpec extends WordSpec with Matchers {
 
         override def pure[A](x: A): List[A] = List(x)
 
-        override def tailRecM[A, B](a: A)(f: (A) => List[Either[A, B]]): List[B] = defaultTailRecM(a)(f)
+        def tailRecM[A, B](a: A)(f: A => List[Either[A, B]]): List[B] = {
+          val buf = List.newBuilder[B]
+          @tailrec def go(lists: List[List[Either[A, B]]]): Unit = lists match {
+            case (ab :: abs) :: tail => ab match {
+              case Right(b) => buf += b; go(abs :: tail)
+              case Left(a) => go(f(a) :: abs :: tail)
+            }
+            case Nil :: tail => go(tail)
+            case Nil => ()
+          }
+          go(f(a) :: Nil)
+          buf.result
+        }
       }
 
       Monad[List].flatMap(List(1, 2, 3))(x => List(x, x)) shouldBe List(1, 1, 2, 2, 3, 3)
@@ -78,6 +109,7 @@ class MonadSpec extends WordSpec with Matchers {
       case class OptionT[F[_], A](value: F[Option[A]])
 
       implicit def optionTMonad[F[_]: Monad]: Monad[OptionT[F, ?]] = new Monad[OptionT[F, ?]] {
+
         override def flatMap[A, B](fa: OptionT[F, A])(f: (A) => OptionT[F, B]): OptionT[F, B] = {
           OptionT(implicitly[Monad[F]].flatMap(fa.value){
             case Some(x) => f(x).value
@@ -86,7 +118,10 @@ class MonadSpec extends WordSpec with Matchers {
         }
         override def pure[A](x: A): OptionT[F, A] = OptionT(implicitly[Monad[F]].pure(Some(x)))
 
-        override def tailRecM[A, B](a: A)(f: (A) => OptionT[F, Either[A, B]]): OptionT[F, B] = defaultTailRecM(a)(f)
+        def tailRecM[A, B](a: A)(f: A => OptionT[F, Either[A, B]]): OptionT[F, B] =
+          OptionT(implicitly[Monad[F]].tailRecM(a)(a0 => implicitly[Monad[F]].map(f(a0).value)(
+            _.fold(Either.right[A, Option[B]](None))(_.map(b => Some(b): Option[B]))
+          )))
       }
 
       import cats.instances.list._
@@ -107,7 +142,7 @@ class MonadSpec extends WordSpec with Matchers {
 
         override def pure[A](x: A): ListT[F, A] = ListT(F.pure(List(x)))
 
-        override def tailRecM[A, B](a: A)(f: (A) => ListT[F, Either[A, B]]): ListT[F, B] = defaultTailRecM(a)(f)
+        override def tailRecM[A, B](a: A)(f: (A) => ListT[F, Either[A, B]]): ListT[F, B] = ???
       }
 
       import cats.instances.option._

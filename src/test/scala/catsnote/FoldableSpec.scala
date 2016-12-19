@@ -1,8 +1,9 @@
 package catsnote
 
-import cats.data.Xor
 import cats.{Applicative, Apply, Eval, Foldable, Later, Now}
 import org.scalatest.{Matchers, WordSpec}
+import cats.syntax.either._
+
 
 /**
   * Created by ikhoon on 2016. 7. 22..
@@ -94,7 +95,7 @@ class FoldableSpec extends WordSpec with Matchers {
       import cats.instances.list._
       import cats.instances.option._
       def parseInt(s: String) : Option[Int] =
-        Xor.catchOnly[NumberFormatException](s.toInt).toOption
+        Either.catchOnly[NumberFormatException](s.toInt).toOption
       Foldable[List].traverse_(List("1", "2", "3"))(parseInt) shouldBe Option(())
       Foldable[List].traverse_(List("a", "b", "c"))(parseInt) shouldBe None
     }

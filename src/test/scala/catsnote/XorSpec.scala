@@ -1,13 +1,16 @@
 package catsnote
 
-import cats.data.Xor
 import org.scalatest.{Matchers, WordSpec}
+import cats._
+import cats.implicits._
 
+import cats.syntax.either._
 /**
   * Created by ikhoon on 2016. 8. 1..
   */
 class XorSpec extends WordSpec with Matchers {
 
+  /*
   "xor" should {
 
     "why not either" in {
@@ -20,26 +23,27 @@ class XorSpec extends WordSpec with Matchers {
       e1.right.map(_ + 1) shouldBe Right(6)
       e2.left.map(_ + " world") shouldBe Left("hello world")
 
-      // 하지만 Xor에서는 바로 사용할수 있다.
-      val x1 : Xor[String, Int] = Xor.right(5)
-      val x2 : Xor[String, Int] = Xor.left("hello")
+      type Xor[A, B] = Either[A, B]
+      // 하지만 Either에서는 바로 사용할수 있다.
+      val x1 : Either[String, Int] = Either.right(5)
+      val x2 : Either[String, Int] = Either.left("hello")
 
-      x1.map(_ + 1) shouldBe cats.data.Xor.right(6)
+      x1.map(_ + 1) shouldBe Either.right(6)
 
       // right에 관한 값만 map의 대상이 된다. 왼쪽값은 영향을 받지 않는다.
-      x2.map(_ + 1) shouldBe Xor.left("hello")
+      x2.map(_ + 1) shouldBe Either.left("hello")
 
       // 조금더 직관적으로 타입을 표현할수 있다.
-      val x3 : String Xor Int = Xor.right(10)
-      val x4 : String Xor Int = Xor.left("world")
+      val x3 : String Either Int = Either.right(10)
+      val x4 : String Either Int = Either.left("world")
 
-      x3 shouldBe Xor.right(10)
-      x4 shouldBe Xor.left("world")
+      x3 shouldBe Either.right(10)
+      x4 shouldBe Either.left("world")
     }
 
     "right-biased, it is possible to define monad instance" in {
-      val x1 : String Xor Int = Xor.right(10)
-      x1.flatMap(x => Xor.right(x + 10)) shouldBe Xor.right(20)
+      val x1 : String Either Int = Either.right(10)
+      x1.flatMap(x => Either.right(x + 10)) shouldBe Either.right(20)
     }
 
     "scala infix type" in {
@@ -75,19 +79,19 @@ class XorSpec extends WordSpec with Matchers {
 
     // Xor를 이용하여 에러에 대해서는 left에 저장한다.
     object XorStyle {
-      def parse(s: String): Xor[NumberFormatException, Int] =
-        if (s.matches("-?[0-9]+")) Xor.right(s.toInt)
-        else Xor.left(new NumberFormatException(s"${s} is not a valid integer."))
+      def parse(s: String): Either[NumberFormatException, Int] =
+        if (s.matches("-?[0-9]+")) Either.right(s.toInt)
+        else Either.left(new NumberFormatException(s"${s} is not a valid integer."))
 
-      def reciprocal(i: Int): Xor[IllegalArgumentException, Double] =
-        if (i == 0) Xor.left(new IllegalArgumentException("Cannot take reciprocal of 0."))
-        else Xor.right(1.0 / i)
+      def reciprocal(i: Int): Either[IllegalArgumentException, Double] =
+        if (i == 0) Either.left(new IllegalArgumentException("Cannot take reciprocal of 0."))
+        else Either.right(1.0 / i)
 
       def stringify(d: Double): String = d.toString
 
       // 그러면 마술이 일어난다.
       // 에러핸들링을 아주 멋지게 할수 있다.
-      def magic(s: String): Xor[Exception, String] =
+      def magic(s: String): Either[Exception, String] =
         parse(s).flatMap(reciprocal).map(stringify)
 
     }
@@ -105,10 +109,10 @@ class XorSpec extends WordSpec with Matchers {
       import XorStyle._
 
       val result = magic("2") match {
-        case Xor.Left(_: NumberFormatException) ⇒ "Not a number!"
-        case Xor.Left(_: IllegalArgumentException) ⇒ "Can't take reciprocal of 0!"
-        case Xor.Left(_) ⇒ "Unknown error"
-        case Xor.Right(r) ⇒ s"Got reciprocal: $r"
+        case Either.left(_: NumberFormatException) ⇒ "Not a number!"
+        case Either.left(_: IllegalArgumentException) ⇒ "Can't take reciprocal of 0!"
+        case Either.left(_) ⇒ "Unknown error"
+        case Either.right(r) ⇒ s"Got reciprocal: $r"
       }
       result shouldBe "Got reciprocal: 0.5"
     }
@@ -118,17 +122,17 @@ class XorSpec extends WordSpec with Matchers {
       final case class NotANumber(string: String) extends Error
       case object NoZeroReciprocal extends Error
 
-      def parse(s: String): Xor[Error, Int] =
-        if (s.matches("-?[0-9]+")) Xor.right(s.toInt)
-        else Xor.left(NotANumber(s))
+      def parse(s: String): Either[Error, Int] =
+        if (s.matches("-?[0-9]+")) Either.right(s.toInt)
+        else Either.left(NotANumber(s))
 
-      def reciprocal(i: Int): Xor[Error, Double] =
-        if (i == 0) Xor.left(NoZeroReciprocal)
-        else Xor.right(1.0 / i)
+      def reciprocal(i: Int): Either[Error, Double] =
+        if (i == 0) Either.left(NoZeroReciprocal)
+        else Either.right(1.0 / i)
 
       def stringify(d: Double): String = d.toString
 
-      def magic(s: String): Xor[Error, String] =
+      def magic(s: String): Either[Error, String] =
         parse(s).flatMap(reciprocal).map(stringify)
     }
 
@@ -136,42 +140,43 @@ class XorSpec extends WordSpec with Matchers {
       import XorStyleWithAdts._
 
       val result = magic("2") match {
-        case Xor.Left(NotANumber(_)) ⇒ "Not a number!"
-        case Xor.Left(NoZeroReciprocal) ⇒ "Can't take reciprocal of 0!"
-        case Xor.Right(r) ⇒ s"Got reciprocal: ${r}"
+        case Either.left(NotANumber(_)) ⇒ "Not a number!"
+        case Either.left(NoZeroReciprocal) ⇒ "Can't take reciprocal of 0!"
+        case Either.right(r) ⇒ s"Got reciprocal: ${r}"
       }
       result shouldBe "Got reciprocal: 0.5"
     }
 
     "leftMap and map" in {
-      val right: String Xor Int = Xor.Right(41)
-      right.map(_ + 1) shouldBe Xor.right(42)
+      val right: String Either Int = Either.right(41)
+      right.map(_ + 1) shouldBe Either.right(42)
 
-      val left: String Xor Int = Xor.Left("Hello")
-      left.map(_ + 1) shouldBe Xor.left("Hello")
-      left.leftMap(_.reverse) shouldBe Xor.left("olleH")
+      val left: String Either Int = Either.left("Hello")
+      left.map(_ + 1) shouldBe Either.left("Hello")
+      left.leftMap(_.reverse) shouldBe Either.left("olleH")
     }
 
     "catch only" in {
       // error 핸들링을 Xor를 이용해서 아래와 같이 할수 있다. 하지만 길다.
-      val xor: Xor[NumberFormatException, Int] =
+      val xor: Either[NumberFormatException, Int] =
         try {
-          Xor.right("abc".toInt)
+          Either.right("abc".toInt)
         } catch {
-          case nfe: NumberFormatException => Xor.left(nfe)
+          case nfe: NumberFormatException => Either.left(nfe)
         }
 
       // 더 간단히 해보자.
       // NumberFormatException만 catch 하자
-      val xor1: Xor[NumberFormatException, Int] = Xor.catchOnly[NumberFormatException]("abc".toInt)
+      val xor1: Either[NumberFormatException, Int] = Either.catchOnly[NumberFormatException]("abc".toInt)
 
       // 이것도 귀찮은면 fatal만 제외한 에러는 다 잡자.
-      val xor2: Xor[Throwable, Int] = Xor.catchNonFatal(1 / 0)
+      val xor2: Either[Throwable, Int] = Either.catchNonFatal(1 / 0)
 
       xor1.isLeft shouldBe true
       xor2.isLeft shouldBe true
 
     }
   }
+  */
 
 }

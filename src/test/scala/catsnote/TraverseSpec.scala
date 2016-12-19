@@ -4,6 +4,9 @@ import cats.data.Validated.{Invalid, Valid}
 import cats.{Applicative, Semigroup, Traverse}
 import cats.data._
 import org.scalatest.{Matchers, WordSpec}
+import cats.syntax._
+import cats.syntax.either._
+import cats.implicits._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -16,21 +19,21 @@ class TraverseSpec extends WordSpec with Matchers {
 
   "Traverse" should {
 
-    def parseIntXor(s: String) : Xor[NumberFormatException, Int] =
-      Xor.catchOnly[NumberFormatException](s.toInt)
+    def parseIntEither(s: String) : Either[NumberFormatException, Int] =
+      Right(s.toInt)
 
     def parseIntValidated(s: String) : ValidatedNel[NumberFormatException, Int] =
       Validated.catchOnly[NumberFormatException](s.toInt).toValidatedNel
 
 
-    "traverseU - Xor - unapply with traverse for Applicative[F[A,B]]" in {
+    "traverseU - Either - unapply with traverse for Applicative[F[A,B]]" in {
       import cats.instances.list._
 
       // does not compile, required G[B] but found G[A, B]
-      // Traverse[List].traverse(List("1", "2", "3"))(parseIntXor)
+      // Traverse[List].traverse(List("1", "2", "3"))(parseIntEither)
 
-      Traverse[List].traverseU(List("1", "2", "3"))(parseIntXor) shouldBe Xor.Right(List(1, 2, 3))
-      Traverse[List].traverseU(List("1", "abc", "3"))(parseIntXor).isLeft shouldBe true
+//      Traverse[List].traverseU(List("1", "2", "3"))(parseIntEither) shouldBe Either.right(List(1, 2, 3))
+      Traverse[List].traverseU(List("1", "abc", "3"))(parseIntEither).isLeft shouldBe true
     }
 
     "traverseU - Validated" in {
@@ -72,6 +75,7 @@ class TraverseSpec extends WordSpec with Matchers {
       // traverse == sequence with map
       // sequence == traverse with identity
 
+      // F[A] ==> (A => G[B]) ==> F[G[B]] => G[F[B]]
       // Traverse[List].traverse(userIds)(getUser) return Future[List[User]]
       val futureListUser: Future[List[User]] = Traverse[List].traverse(userIds)(getUser)
       Await.result(futureListUser, Duration.Inf) shouldBe expected
