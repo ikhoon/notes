@@ -95,11 +95,46 @@ class Chapter2Spec extends WordSpec with Matchers {
 
       def foo3(a:Int): Int => Int = b => a + b
 
+    }
+    "2.5 compose" in {
+      // g . f = g(f(x)) = g after f = f compose g ? = g compose f
+
+      def foo(a: Int): String = a.toString
+
+      def bar(b: String): Long = b.toLong
+
+      def barComposedWithFoo(a: Int): Long = bar(foo(a))
+
+      // f . g = f(g(x)
+      def compose[A,B,C](f: B => C, g: A => B): A => C = x => f(g(x))
+
+      // 함수의 합성의 일반화
+      compose(bar, foo)
 
 
+      barComposedWithFoo(100) shouldBe compose(bar, foo)(100)
 
 
     }
+
+    /**
+      * []
+      * [10 , 20, 30]
+      * List list = new List()
+      * list.append(10)
+      * list.append(20)
+      * list.append(30)
+      * [10 , 20, 30]
+      */
+
+    /**
+      *
+      * []
+      * val list = List()
+      * val list1 = list :: 10
+      * val list2 = list1 :: 20
+      * val list3 = list2 :: 30
+      */
 
   }
 

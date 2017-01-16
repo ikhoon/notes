@@ -9,6 +9,7 @@ import simulacrum._
   @op("|+|") def append(x: A, y: A): A
 }
 
+
 @typeclass trait Monoid[A] extends Semigroup[A] {
   def zero: A
 }
