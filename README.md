@@ -3,7 +3,7 @@
 ## ![cats](https://camo.githubusercontent.com/c7a1d594954b34a8277bce52343fe731b14870ad/687474703a2f2f706c61737469632d69646f6c617472792e636f6d2f6572696b2f63617473322e706e67)
 
 [typelevel/cats](https://github.com/typelevel/cats) 
-* [Semigroup](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/SemigroupSpec.scala)
+* [Semigroup](https://github.com/ikhoon/scala-exercise-note/blob/master/scala-exercise/src/test/scala/catsnote/SemigroupSpec.scala)
 * [Monoid](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/MonoidSpec.scala)
 * [Functor](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/FunctorSpec.scala)
 * [Apply](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/catsnote/ApplySpec.scala)
