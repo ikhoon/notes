@@ -41,7 +41,10 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.0" % "test",
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
     "com.thoughtworks.each" %% "each" % "3.1.1",
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.7.1")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.7.1"),
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value
+
+
   ),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 )
