@@ -147,8 +147,29 @@ object comonad {
 
 
   // Writer comonad
-  // TODO
+  // Wirter monad와 같이, writer comonad는log를 추가하거나 monoid를 이용하여 계산을 수행할수 있다.
+  // 하지만 log를 항상 사용가능하게 간직하고 있는것이 아니라 추가할수 있게 한다.
+  // 이것은 연산을 합성하고 실행을 했을때 로그가 이용가능한것과 reader monad에서 사용했던것과 같은 트릭이다.
 
+  case class Cowriter[W: Monoid, A](tell: W => A) {
+    def map[B](f: A => B): Cowriter[W, B] = Cowriter(tell andThen f)
+    def extract: A = tell(Monoid[W].zero)
+    def duplicate: Cowriter[W, Cowriter[W, A]] =
+      Cowriter(w1 => Cowriter(w2 => tell(Monoid[W].append(w1, w2))))
+    def extend[B](f: Cowriter[W, A] => B): Cowriter[W, B] =
+      duplicate map f
+  }
+
+  // duplicate는 run 함수로 생성된 전체 Cowriter를 반환한다는것을 주의해 보면,
+  // 이것의 의미는 하위 연산(map이나 extend로 으로 합성된)의 기존의 로그에 추가하거나 합사하는 `tell`함수의 하나의 의해서만 접근된다.
+  // 예를 들어 `foo.extend(_.tell("hi"))는 "hi"를 foo의 로그에 추가한다.
+
+
+  // Comonad laws
+  // Comonad의 규칙은 monad의 규칙과 유사하다.
+  // 1. left identity : wa.duplicate.extract = wa
+  // 2. right identity : wa.extend(extract) = wa
+  // 3. associativity: wa.duplicate.duplicate = wa.extend(duplicate)
 
 
 
