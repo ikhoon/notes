@@ -153,7 +153,7 @@ object comonad {
 
   case class Cowriter[W: Monoid, A](tell: W => A) {
     def map[B](f: A => B): Cowriter[W, B] = Cowriter(tell andThen f)
-    def extract: A = tell(Monoid[W].zero)
+     def extract: A = tell(Monoid[W].zero)
     def duplicate: Cowriter[W, Cowriter[W, A]] =
       Cowriter(w1 => Cowriter(w2 => tell(Monoid[W].append(w1, w2))))
     def extend[B](f: Cowriter[W, A] => B): Cowriter[W, B] =
@@ -170,6 +170,87 @@ object comonad {
   // 1. left identity : wa.duplicate.extract = wa
   // 2. right identity : wa.extend(extract) = wa
   // 3. associativity: wa.duplicate.duplicate = wa.extend(duplicate)
+
+
+
+  // scala comonad tutorial, part 2
+
+  // Nonempty structures
+  // comonad는 반드시 counit을 가지고 있었야한다. 이것은 반드시 "pointed"이거나 nonempty가 경우에 맞다.
+  // 주어진 어떤 comonad `W`의 타입 `W[A]`의 값에 대하여, 반드시 타입 `A`의 값을 얻을수 있어야 한다.
+
+  // identity comonad가 이것의 간단한 예이다. 우리는 항상 Id[A]로 부터 A 타입의 값을 얻을수 있다.
+  // 약간 더 재미있는 예가 non-empty 리스트 이다.
+
+  case class NEL[A](head: A, tail: Option[NEL[A]]) {
+    def map[B](f: A => B): NEL[B] = NEL(f(head), tail.map(_.map(f)))
+    def tails: NEL[NEL[A]] =
+      NEL(this, tail.map(_.tails))
+    def extend[B](f: NEL[A] => B): NEL[B] =
+      tails map f
+  }
+  // nonempty 리스트는 type A의 값과 다른 리스트나 None으로 마크되어 있는 리스트의 종료를 포함하고 있다.
+  // 전통적인 `List`와는 달리 head값을 얻는것이 언제나 안전하다.
+
+  // 하지만 `comonadic`한 duplicate 연산은 여기서 무언인가?
+  // 그것은 comonad의 연산을 준수하여 NEL[A]을 NEL[NEL[A]으로 가게 하는것을 허락한다.
+  // nonempty list에 대해서, 하나의 구연히 이들의 규칙을 만족하는것으로 나온다
+  // `def tails: NEL[NEL[A]] = NEL(this, tail.map(_.tails))`
+
+  // tails 연산은 주어진 리스트의 부분 모든 suffix를 반환한다.
+  // [1, 2, 3]의 tails연산은 [[1,2,3], [2,3], [3]]이 된다.
+
+  // 이것이 comonadic 프로그램의 context에서 아이디어를 얻기 위해서,
+  // coKleisli의 합성 측면, 혹은 comonad의 `extend`에서 생각해보면
+  // `def extend[B](f: NEL[A] => B): NEL[B] = tails map f`
+
+  // tails에 대해서 map을 행할때, 함수 f는 모든 리스트의 suffix를 받게 된다.
+  // 우리는 각각의 suffix에 대해서 f를 적용하고 그 결과를 리스트(nonempty)에 모은다.
+  // 그래서 [1, 2, 3].extend(f)는 [f([1, 2, 3]), f([2, 3]), f([3])]가 된다.
+
+  // extend의 이름은 "local" 연산을 받고(여기에서의 연산은 리스트에 대한 것이다)
+  // "global" 연산으로 확장된다.(여기서는 리스트의 모든 suffix가 여기에 해당한다)
+
+
+  // 또는 nonempty tree를 고려해보라 (Rose Trees로 불린기도 한다.)
+  case class Tree[A](tip: A, sub: List[Tree[A]]) {
+    def duplicate: Tree[Tree[A]] =
+      Tree(this, sub.map(_.duplicate))
+  }
+  // tip에 A타입의 값을 가지고 있는 트리이다. 그리고 바로 아래 sub 트리를 가지고 있다(이것은 empty가 될수 도 있다.)
+  // 하나의 명확한 use case는 디렉토리 구조와 같은 것이다.
+  // tip이 하나의 디렉토리이고 sub은 그에 해당하는 하위 디렉토리이다.
+
+  // 이것 또한 comonad이다. `counit`이 명확하다. 단지 `tip`만 get하면 된다. 그리고 duplicate의 구조이다.
+  // `def duplicate: Tree[Tree[A]] = Tree(this, sub.map(_.duplicate))`
+
+  // 이것은 명확히 우리에게 tree of tree를 준다. 하지만 이 트리는 무슨 구조인가?
+  // 이것은 모든 하위 트리의 트리일것이다.
+  // `tip`은 `this` 트리가 되고
+  // 각각의 하위 트리의 `tip`은 원래 트리의 전체 subtree에 상응한다.
+
+  // 그것은 `t.duplicate.map(f)`(혹은 동일하게 `t extend f`)를 말할때
+  // 우리의 f는 `t`의 하위 트리를 차례로 받고 하위 트리 전체에 대해서 특정 연산을 수행하게 된다.
+  // `t extend f` 전체 표현식의 결과가
+  // 각각의 노드가 상응하는 하위 트리 `t`에 적용된 f를 포함하는 노드를 제외하고는 (뭔말이레??)
+  // `t`의 구조를 미러링한 트리의 구조일것이다.
+
+
+  // 디렉토리 예제에 관철하기 위해서,
+  // 우리는 디렉토리 구조가 사용하는 자세한 공간의 용량
+  // tip의 전체 트리 사이즈와 각각의 하위 트리의 tip들의 사이즈를 등등
+  // 을 원하는건 상상할수 있다.
+
+  // 그럴땐 `d extend size`는 d의 하위 디렉토리의 사이즈 트리를 재귀적으로 만들수 있다.
+
+
+  // The cofree monad
+  // TODO
+
+
+
+
+
 
 
 
