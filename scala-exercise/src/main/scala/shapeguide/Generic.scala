@@ -1,6 +1,10 @@
 package shapeguide
 
 
+/*
+ * 2.12.1 업그레이드 이후 컴파일 오류남 ㅠㅠ
+ * 추후에 수정
+
 import shapeguide.deriving.CsvEncoder
 import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
 import shapeless.Generic.Aux
@@ -1432,7 +1436,7 @@ object labelled extends App {
   // 나머지 정의는 Chapter 3에서 다루었던 법칙들을 적용했다.
 
 
-  implicit def hlistObjectEncoder[K <: Symbol, H, T <: HList](
+  /*implicit*/ def hlistObjectEncoder[K <: Symbol, H, T <: HList](
                                                                implicit
                                                                witness: Witness.Aux[K],
                                                                hEncoder: Lazy[JsonEncoder[H]],
@@ -1466,7 +1470,7 @@ object labelled extends App {
   // 이것이 우리가 원한 모든것이다!
   // 적절한 정의와 함께 **어떤** case class의 instance라도 직렬화 가능하고 json 결과에 필드의 이름은 유지가 된다.
 
-  println(JsonEncoder[IceCream].encode(iceCream))
+//  println(JsonEncoder[IceCream].encode(iceCream))
 
   // res14: JsonValue = JsonObject(
   //    List((name,JsonString(Sundae)),
@@ -1543,7 +1547,7 @@ object labelled extends App {
 
   val shape: Shape = Circle(1.0)
 
-  println(JsonEncoder[Shape].encode(shape))
+//  println(JsonEncoder[Shape].encode(shape))
   // res8: JsonValue = JsonObject(List((Circle,JsonObject(List((radius, JsonNumber(1.0)))))))
 
   // 약간의 작업을 통해서 다른 인코딩 또한 가능하다.
@@ -1569,5 +1573,4 @@ object labelled extends App {
 
 
 
-
-
+*/

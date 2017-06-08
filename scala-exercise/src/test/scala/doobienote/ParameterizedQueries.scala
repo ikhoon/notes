@@ -55,6 +55,7 @@ class ParameterizedQueries extends WordSpec with Matchers {
     }
 
     "dealing with in clauses" in {
+      /*
       def populationIn(range: Range, codes: NonEmptyList[String]): Query0[Country] = {
         implicit val codesParam = Param.many(codes)
         sql"""
@@ -73,6 +74,7 @@ class ParameterizedQueries extends WordSpec with Matchers {
         .map(_.name)
 
       countriesNames shouldBe List("Spain", "France")
+      */
 
     }
   }
