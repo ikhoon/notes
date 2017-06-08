@@ -5,11 +5,12 @@ import cats.data.{Kleisli, Reader}
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import cats.implicits._
 
 /**
   * Created by ikhoon on 20/12/2016.
   */
-/*
 class ReaderSpec extends WordSpec with Matchers {
 
   "reader" should {
@@ -55,11 +56,11 @@ class ReaderSpec extends WordSpec with Matchers {
           } yield sameNameItems
       }
 
-      object ProductService extends ProductService
+      object ProductServiceImpl extends ProductService
 
       val sameNameById: Reader[ItemRepository, List[Item]] =
-        ProductService.getSameNameById(10)
-//      sameNameById.run()
+        ProductServiceImpl.getSameNameById(10)
+      sameNameById.run(ItemRepositoryImpl)
 
       trait ItemService {
         def getItem(id: Int): Kleisli[Future, ItemRepository, Item] =
@@ -94,4 +95,3 @@ class ReaderSpec extends WordSpec with Matchers {
   }
 
 }
-*/

@@ -33,7 +33,7 @@ lazy val commonSettings = Seq(
     "-language:implicitConversions"),
   resolvers += Resolver.sonatypeRepo("releases"),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats" % "0.8.1",
+    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
     "org.tpolecat" %% "doobie-core" % "0.3.0",
     "org.tpolecat" %% "doobie-contrib-h2" % "0.3.0",
