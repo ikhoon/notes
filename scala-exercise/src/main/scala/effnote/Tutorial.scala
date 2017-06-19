@@ -71,6 +71,8 @@ object Tutorial extends App {
       _ <- ot.map(t => store[T, R](key, f(t))).getOrElse(Eff.pure(()))
     } yield ()
 
+  // 각각의 함수는 KVStore를 필요로 한다. 이 effect는 effect stack R의 member가 된다.
+  // Eff[R, A]
 
 
 

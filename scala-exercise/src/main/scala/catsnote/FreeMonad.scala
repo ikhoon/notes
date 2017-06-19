@@ -3,6 +3,9 @@ package catsnote
 import java.util.Date
 
 import cats.{Id, ~>}
+import cats.implicits._
+import cats.data._
+import cats.syntax._
 
 import scala.collection.mutable
 
@@ -57,6 +60,7 @@ import scala.collection.mutable
 
 */
 
+/**
 // ## 문법에 대해서 ADT를 만들어 보자.
 sealed trait KVStoreA[A]
 case class Put[T](key: String, value: T) extends KVStoreA[Unit]
@@ -79,7 +83,6 @@ case class Delete(key: String) extends KVStoreA[Unit]
 
 // 구현
 object kv {
-  import cats.free.Free
   // 1. ADT기반으로 Free type을 만들어라.
   // KVStoreA에 A를 뒤에 붙인 이유가 있었구만. type alias에 사용할라 했었다.
   type KVStore[A] = Free[KVStoreA, A]
@@ -212,3 +215,4 @@ object kv {
   private val map: Int = List(1, 2, 3).foldMap(i => i)
 
 }
+  **/

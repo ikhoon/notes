@@ -38,7 +38,7 @@ class RealWorldSeqSpec extends FunSuite with Matchers{
 
       // print it
       val file = "/Users/liamm/IdeaProjects/scala-exercise-note/src/test/scala/stdnote/visit.csv"
-      val lines: List[String] = io.Source.fromFile(file).getLines().toList
+      val lines: List[String] = scala.io.Source.fromFile(file).getLines().toList
 
       val s1: Seq[(String, String)] = lines.map(line => {
         val tokens = line.split(",")

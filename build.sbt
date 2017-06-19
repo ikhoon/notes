@@ -33,7 +33,8 @@ lazy val commonSettings = Seq(
     "-feature",
     "-language:existentials",
     "-language:higherKinds",
-    "-language:implicitConversions"
+    "-language:implicitConversions",
+    "-language:experimental.macros"
   ),
 
     resolvers += Resolver.sonatypeRepo("releases"),
@@ -43,10 +44,15 @@ lazy val commonSettings = Seq(
     "org.tpolecat" %% "doobie-core" % "0.4.1",
     "org.tpolecat" %% "doobie-h2" % "0.4.1",
     "org.scalactic" %% "scalactic" % "3.0.1",
+
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
     "com.thoughtworks.each" %% "each" % "3.3.1",
     "org.atnos" %% "eff" % "4.2.0",
+
+    "io.reactivex.rxjava2" % "rxjava" % "2.1.0",
+    "junit" % "junit" % "4.12" % "test",
+
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
