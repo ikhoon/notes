@@ -23,7 +23,7 @@ class MonadSpec extends WordSpec with Matchers {
       import cats._
       import cats.instances.all._
 
-      implicit def optionInstance: Monad[Option] = new Monad[Option] {
+      implicit val optionInstance: Monad[Option] = new Monad[Option] {
         override def pure[A](x: A): Option[A] = pure(x)
 
         override def flatMap[A, B](fa: Option[A])(f: (A) => Option[B]): Option[B] = fa match {
@@ -43,6 +43,11 @@ class MonadSpec extends WordSpec with Matchers {
 
       Monad[Option].flatMap(Option(1))(x => Some(x.toString)) shouldBe Option("1")
     }
+
+    // Option[A] * -> *, A => Option[A]
+    // Monad[F[_]] * -> * -> *, A => Option => Monad[Option[A]]
+
+    // Function[I, ?] => ? => Function1 => Fuction1[I, ?]
 
     "function1 monad" in {
       implicit def function1Instance[I] : Monad[Function1[I, ?]] = {
@@ -66,7 +71,7 @@ class MonadSpec extends WordSpec with Matchers {
       val f : Int => String = (x: Int) => x.toString
       val g : String => Int => (String, Int) = (y: String) => (x: Int) => (y, x)
 
-      Monad[({type L[O] = Function1[Int, O]})#L].flatMap(f)(g)(10) shouldBe ("10", 10)
+      Monad[Function1[Int, ?]].flatMap(f)(g)(10) shouldBe ("10", 10)
     }
 
     "list monad" in {
