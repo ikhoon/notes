@@ -8,11 +8,15 @@ import io.reactivex.disposables.Disposable;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.Scanner;
 
 /**
  * Created by ikhoon on 20/06/2017.
  */
 public class Chapter1 {
+    // 신규 java project setting, gradle이 편하지 않을까 싶다
+    //
     // # RxJava가 무엇이가에 대해서 전체적으로 알아본다.
     // 전체 책구성은 앞의 1, 2장에서 많은 포괄적인 내용이 나온다.
     // 리엄 - 시작부터 몰아 많은 내용에 당황하지 않길 바란다.
@@ -49,8 +53,6 @@ public class Chapter1 {
 
     }
 
-
-
     /**
      * 우리가 자주 사용하는 pull방식은 값을 꺼내온다.
      * {@link Iterator#next()}
@@ -64,7 +66,8 @@ public class Chapter1 {
 
     /**
      * push 방식을 구현하기 위해서는
-     * Observable 과 Observer 쌍을 {@link Observable#subscribe(Observer)} 함수를 이용해서 연결한다.
+     * Observable 과 Observer 쌍을
+     * {@link Observable#subscribe(Observer)} 함수를 이용해서 연결한다.
      */
 
 
@@ -88,7 +91,7 @@ public class Chapter1 {
     }
 
 
-    // Observable 은 데이터 스트림, 이벤트 스트림을 의미한다.
+    // Observable <=> List 은 데이터 스트림, 이벤트 스트림을 의미한다.
     // 즉 Observable ~= Stream 이라 생각해도 무방하다.
 
     // 그러면 Observer 는 뭔가?
@@ -111,6 +114,62 @@ public class Chapter1 {
             s.onComplete();
         });
         helloWorld.subscribe(hello -> System.out.println(hello));
+    }
+
+
+    // 연습문제
+    //
+    public static void main(String[] args) throws InterruptedException {
+       // blocking();
+        nonblocking();
+    }
+
+    private static void blocking() throws InterruptedException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("## input any");
+        Observable<String> inputStream = Observable.create(s -> {
+            while (!s.isDisposed() && scanner.hasNext()) {
+                String next = scanner.next();
+                s.onNext(next);
+                if (Objects.equals(next, "END")) {
+                    scanner.close();
+                    s.onComplete();
+                }
+            }
+        });
+        Disposable subscribe = inputStream
+                .map(input -> "Blocking Hello, " + input)
+                .subscribe(input -> System.out.println(input));
+
+        System.out.println("## start sleep");
+        Thread.sleep(10000);
+        System.out.println("## end sleep");
+        subscribe.dispose();
+
+    }
+    private static void nonblocking() throws InterruptedException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("## input any");
+        Observable<String> inputStream = Observable.create(s -> {
+            new Thread(() -> {
+                while (!s.isDisposed() && scanner.hasNext()) {
+                    String next = scanner.next();
+                    s.onNext(next);
+                    if (Objects.equals(next, "END")) {
+                        s.onComplete();
+                        scanner.close();
+                    }
+                }
+            }).start();
+        });
+        Disposable subscribe = inputStream
+                .map(input -> "Non Blocking Hello, " + input)
+                .subscribe(input -> System.out.println(input));
+        System.out.println("## start sleep");
+        Thread.sleep(10000);
+        System.out.println("## end sleep");
+        subscribe.dispose();
+
     }
 }
 

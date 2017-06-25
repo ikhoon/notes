@@ -8,6 +8,7 @@ import cats.data._
 import cats.syntax._
 
 import scala.collection.mutable
+import scala.concurrent.Future
 
 /**
   * Created by ikhoon on 2016. 10. 4..
@@ -77,6 +78,8 @@ case class Delete(key: String) extends KVStoreA[Unit]
   4. DSL 연산을 위한 컴파일러를 만들어라.
   5. 컴파일된 코드를 실행하라.
 
+  doobie,
+
   */
 
 
@@ -134,6 +137,46 @@ object kv {
 
   // key value store를 표현하기 위해서 단순히 mutable map을 사용할것 이다.
 
+  // F[A] => F[B] // functor
+  val a: Option[Int] = Some(1)
+  val b: Option[String] = a.map(_.toString)
+
+  // F[G[A]] => G[F[A]] // sequence
+  // F[G[A]] => G[F[B]] // sequence + map = traverse
+  // F[A] => G[A] // natural transformation
+
+
+  // ## 문법에 대해서 ADT를 만들어 보자.
+  sealed trait KVStoreA[A]
+  case class Put[T](key: String, value: T) extends KVStoreA[Unit]
+  case class Get[T](key: String) extends KVStoreA[Option[T]]
+  case class Delete(key: String) extends KVStoreA[Unit]
+
+  val c: List[Int] = a.toList
+
+  def impureCompiler: KVStoreA ~> Future =
+    new (KVStoreA ~> Id) {
+      println("new transformer" + new Date)
+      val kvs = mutable.Map.empty[String, Any]
+
+      def apply[A](fa: KVStoreA[A]): Future[A] =
+        fa match {
+          case Get(key) =>
+            println(s"get($key)")
+            val a: Option[A] = kvs.get(key).map(_.asInstanceOf[A])
+            Future.successful(a)
+          case Put(key, value) =>
+            println(s"put($key, $value)")
+            kvs.put(key, value)
+            Future.successful(())
+          case Delete(key) =>
+            println(s"delete($key)")
+            kvs.remove(key)
+            ()
+        }
+    }
+  // KVStoreA[A] => Id[A]
+  //
   def impureCompiler: KVStoreA ~> Id =
     new (KVStoreA ~> Id) {
       println("new transformer" + new Date)
