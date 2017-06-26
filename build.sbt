@@ -51,6 +51,10 @@ lazy val commonSettings = Seq(
     "org.atnos" %% "eff" % "4.2.0",
 
     "io.reactivex.rxjava2" % "rxjava" % "2.1.0",
+    "org.twitter4j" % "twitter4j-core" % "4.0.0",
+    "org.twitter4j" % "twitter4j-stream" % "4.0.0",
+
+    "org.asynchttpclient" % "async-http-client" % "2.0.0",
     "junit" % "junit" % "4.12" % "test",
 
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
