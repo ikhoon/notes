@@ -1,5 +1,9 @@
 package shapenote
 
+import shapenote.TypeLevelQuickSort.LT.<
+import shapenote.TypeLevelQuickSort.LTEq.<=
+import shapenote.TypeLevelQuickSort.hlist._
+
 /**
   * Created by ikhoon on 12/07/2017.
   * shapeless 집중 공부 시간을 가져보자.
@@ -93,10 +97,14 @@ object TypeLevelQuickSort {
 
     type <=[A <: Nat, B <: Nat] = LTEq[A, B]
 
+    // 이건 base case
     implicit def lteq1[B <: Nat] : _0 <= B = new (_0 <= B) {}
 
+    // 이것 또한 base case
     implicit def lteq2: _0 <= _0 = new (_0 <= _0) {}
 
+    // 이건 Succ(x) < Succ(y) <=> x < y
+    // x > y 이면 implicit not found가 뜨게 될것이다.
     implicit def lteq3[A <: Nat, B <: Nat](implicit lteq: A <= B): Succ[A] <= Succ[B] =
       new (Succ[A] <= Succ[B]) {}
   }
@@ -119,5 +127,117 @@ object TypeLevelQuickSort {
     // 왜냐면 그냥 list를 사용하면 타입 정보가 다 날라갈것이다.
     type NS = _1 :: _0 :: _3 :: _2 :: HNil
   }
+
+  // Partitioning
+  // quick sort를 위한 대부분이 준비 되었다.
+  // 이제 우리는 HList를 3개의 element로 나누는 것이 필요하다.
+  // * pivot
+  // * pivot 보다 작은 HList
+  // * pivot 보다 큰 HList
+
+  trait LTEqs[H <: HList, A <: Nat] {
+    type Out <: HList
+  }
+
+  object LTEqs {
+    import  LT._
+    type Aux[H <: HList, A <: Nat, O <: HList] = LTEqs[H, A] { type Out = O }
+
+    def apply[H <: HList, A <: Nat]
+      (implicit lteqs: LTEqs[H, A]): Aux[H, A, lteqs.Out] = lteqs
+
+    // 또다시 implicit resolution을 해보자
+    implicit def hnilLTEqs[A <: Nat]: Aux[HNil, A, HNil] =
+      new LTEqs[HNil, A] { type Out = HNil }
+
+    // 일단 첫번째 element 부터 비교를 하고 그다음으로 넘어가자.
+    // implicit으로 H <= A, 즉 H가 pivot보다 작은 경우에만 이를 호출하게 된다.
+    implicit def hlistLTEqsLower[A <: Nat, H <: Nat, T <: HList]
+      (implicit lts: LTEqs[T, A], lt: H <= A): Aux[H :: T, A, H :: lts.Out] =
+      new LTEqs[H :: T, A] { type Out = H :: lts.Out }  // 여기서 concat한다.
+
+    // 그렇지 않은 경우 H > A 인경우에는 무시하게 된다.
+    implicit def hlistLTEqsGreater[A <: Nat, H <: Nat, T <: HList]
+      (implicit lts: LTEqs[T, A], l: A < H): Aux[H :: T, A, lts.Out] =
+      new LTEqs[H :: T, A] { type Out = lts.Out }
+  }
+
+  trait GTs[H <: HList, A <: Nat] {
+    type Out <: HList
+  }
+  object GTs {
+    type Aux[H <: HList, A <: Nat, O <: HList] = GTs[H, A] { type Out = O }
+
+    def apply[H <: HList, A <: Nat](implicit gts: GTs[H, A]): Aux[H, A, gts.Out] = gts
+
+    // base case
+    implicit def hnilGTs[A <: Nat]: Aux[HNil, A, HNil] =
+      new GTs[HNil, A] { type Out = HNil }
+
+    implicit def hlistGTsLower[H <: Nat, T <: HList, A <: Nat]
+      (implicit gts: GTs[T, A], gt: A < H): Aux[H :: T, A, H :: gts.Out] =
+      new GTs[H :: T, A] { type Out = H :: gts.Out }
+
+    implicit def hlistGTsGreater[H <: Nat, T <: HList, A <: Nat]
+      (implicit gts: GTs[T, A], gt: H <= A): Aux[H :: T, A, gts.Out] =
+      new GTs[H :: T, A] { type Out = gts.Out }
+
+  }
+
+  // 또 다왔단다.
+  // quicksort 알고리즘은 일부 list를 concat 해야한다.
+  trait Prepend[P <: HList, S <: HList] { type Out <: HList }
+
+  object Prepend {
+    type Aux[P <: HList, S <: HList, O <: HList] = Prepend[P, S] { type Out = O }
+
+    def apply[P <: HList, S <: HList](implicit prepend: Prepend[P, S]): Aux[P, S, prepend.Out] = prepend
+
+    // base case
+    def hnilPrepend[P <: HNil, S <: HList]: Aux[P, S, S] =
+      new Prepend[P, S] {
+        type Out = S
+      }
+
+    def hlistPrepend[PH, PL <: HList, S <: HList]
+      (implicit prepend: Prepend[PL, S]): Aux[PH :: PL, S, PH :: prepend.Out] =
+      new Prepend[PH :: PL, S] {
+        type Out = PH :: prepend.Out
+      }
+
+  }
+
+  // 마지막으로 진짜 마지막이다.
+  // 정렬알고리즘은 list를 받아서 list를 반환한다.
+  trait Sorted[L <: HList] {
+    type Out <: HList
+  }
+
+  object Sorted {
+    type Aux[L <: HList, O <: HList] = Sorted[L] { type Out = O }
+
+    def apply[L <: HList](implicit sorted: Sorted[L]): Aux[L, sorted.Out] = sorted
+
+    // 늘 그래 왔듯이 base case
+    implicit def hnilSorted: Aux[HNil, HNil] =
+      new Sorted[HNil] {
+        type Out = HNil
+      }
+
+    implicit def hlistSorted
+      [H <: Nat, T <: HList, lsOut <: HList, gsOut <: HList, smOut: HList, slOut: HList]
+      (implicit
+        ls: LTEqs.Aux[T, H, lsOut], // head 기준으로 작거나 같은걸 찾고
+        gs: GTs.Aux[T, H, gsOut],   // head 기준으로 더 큰것을 찾고
+        sortedSmaller: Sorted.Aux[lsOut, smOut], // lsOut을 이용해서 다시 정렬한다. 재귀 호출이 된다.
+        sortedGreater: Sorted.Aux[gsOut, slOut], // gsOut을 이용해서 다시 정렬한다. 이또한 재귀 호출이다.
+        preps: Prepend[smOut, H :: slOut]
+      ): Sorted.Aux[H :: T, preps.Out] =
+        new Sorted[H :: T] {
+          type Out = preps.Out
+        }
+
+  }
+
 
 }
