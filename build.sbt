@@ -50,6 +50,8 @@ lazy val commonSettings = Seq(
     "com.thoughtworks.each" %% "each" % "3.3.1",
     "org.atnos" %% "eff" % "4.2.0",
 
+    "com.twitter" %% "util-core" % "6.45.0",
+
     "io.reactivex.rxjava2" % "rxjava" % "2.1.0",
     "org.twitter4j" % "twitter4j-core" % "4.0.0",
     "org.twitter4j" % "twitter4j-stream" % "4.0.0",

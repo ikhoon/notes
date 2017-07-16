@@ -225,7 +225,7 @@ object TypeLevelQuickSort {
       }
 
     implicit def hlistSorted
-      [H <: Nat, T <: HList, lsOut <: HList, gsOut <: HList, smOut: HList, slOut: HList]
+      [H <: Nat, T <: HList, lsOut <: HList, gsOut <: HList, smOut <: HList, slOut <: HList]
       (implicit
         ls: LTEqs.Aux[T, H, lsOut], // head 기준으로 작거나 같은걸 찾고
         gs: GTs.Aux[T, H, gsOut],   // head 기준으로 더 큰것을 찾고
