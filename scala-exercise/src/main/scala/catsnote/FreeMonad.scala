@@ -3,8 +3,8 @@ package catsnote
 import java.util.Date
 
 import cats.{Id, ~>}
+import cats.free.Free
 import cats.implicits._
-import cats.data._
 import cats.syntax._
 
 import scala.collection.mutable
@@ -61,15 +61,14 @@ import scala.concurrent.Future
 
 */
 
-/**
 // ## 문법에 대해서 ADT를 만들어 보자.
 sealed trait KVStoreA[A]
 case class Put[T](key: String, value: T) extends KVStoreA[Unit]
 case class Get[T](key: String) extends KVStoreA[Option[T]]
 case class Delete(key: String) extends KVStoreA[Unit]
 
-/**
 
+/**
   ## ADT를 free 해보자.
   "freeing" ADT를 위해서는 6가지 스탭이 있다. - 아따 많다잉
   1. 타입 기반의 Free[_] 와 KVStoreA[_]를 만들어라.
@@ -77,8 +76,6 @@ case class Delete(key: String) extends KVStoreA[Unit]
   3. key-value DSL 연산에 기인한 program을 만들어라.
   4. DSL 연산을 위한 컴파일러를 만들어라.
   5. 컴파일된 코드를 실행하라.
-
-  doobie,
 
   */
 
@@ -107,7 +104,7 @@ object kv {
   def update[T](key: String, f: T => T): KVStore[Unit] =
     for {
       maybeV <- get[T](key)
-      _ <- maybeV.map(v => put[T](key, f(v))).getOrElse(Free.pure(()))
+      _ <- maybeV.map(v => put[T](key, f(v))).getOrElse(cats.free.Free.pure(()))
     }  yield ()
 
   // 3. 프로그램을 만들어 보자.
@@ -146,35 +143,9 @@ object kv {
   // F[A] => G[A] // natural transformation
 
 
-  // ## 문법에 대해서 ADT를 만들어 보자.
-  sealed trait KVStoreA[A]
-  case class Put[T](key: String, value: T) extends KVStoreA[Unit]
-  case class Get[T](key: String) extends KVStoreA[Option[T]]
-  case class Delete(key: String) extends KVStoreA[Unit]
 
   val c: List[Int] = a.toList
 
-  def impureCompiler: KVStoreA ~> Future =
-    new (KVStoreA ~> Id) {
-      println("new transformer" + new Date)
-      val kvs = mutable.Map.empty[String, Any]
-
-      def apply[A](fa: KVStoreA[A]): Future[A] =
-        fa match {
-          case Get(key) =>
-            println(s"get($key)")
-            val a: Option[A] = kvs.get(key).map(_.asInstanceOf[A])
-            Future.successful(a)
-          case Put(key, value) =>
-            println(s"put($key, $value)")
-            kvs.put(key, value)
-            Future.successful(())
-          case Delete(key) =>
-            println(s"delete($key)")
-            kvs.remove(key)
-            ()
-        }
-    }
   // KVStoreA[A] => Id[A]
   //
   def impureCompiler: KVStoreA ~> Id =
@@ -186,8 +157,7 @@ object kv {
         fa match {
           case Get(key) =>
             println(s"get($key)")
-            val a: Option[A] = kvs.get(key).map(_.asInstanceOf[A])
-            a
+            kvs.get(key).map(_.asInstanceOf[A])
           case Put(key, value) =>
             println(s"put($key, $value)")
             kvs.put(key, value)
@@ -240,7 +210,7 @@ object kv {
 
     */
 
-  def result: Option[Int] = program.foldMap(impureCompiler)
+  def result = program.foldMap(impureCompiler)
 
   /**
     foldMap의 중요한점은 stack-safety하다는 것이다.
@@ -258,4 +228,3 @@ object kv {
   private val map: Int = List(1, 2, 3).foldMap(i => i)
 
 }
-  **/

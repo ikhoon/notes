@@ -1,8 +1,7 @@
-package catsnote
+package freemonad
 
 import cats.Monad
-import cats.syntax._
-import catsnote.Free._
+import freemonad.Free._
 
 /**
   * Created by ikhoon on 10/05/2017.
@@ -11,7 +10,7 @@ import catsnote.Free._
   * 주된 내용은 Free Monad 만들어 직접 만들어 보면서 이해하기
   */
 
-trait ~>[F[_], G[_]] {
+sealed trait ~>[F[_], G[_]] {
   def apply[A](fa: F[A]): G[A]
 }
 

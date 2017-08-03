@@ -1,5 +1,4 @@
-package catsnote
-
+package freemonad
 
 object free {
   /**
@@ -287,7 +286,8 @@ object free {
   val KnowSecret = "KnowSecret"
 
   def prg[F[_]](implicit I: Interacts[F], A: Auths[F]): Free[F, Unit] = {
-    import I._, A._
+    import A._
+    import I._
     for {
       uid <- ask("What's your user ID?")
       pwd <- ask("Password Please.")
