@@ -227,4 +227,5 @@ object kv {
   import cats.implicits._
   private val map: Int = List(1, 2, 3).foldMap(i => i)
 
+  println(map)
 }
