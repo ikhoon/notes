@@ -6,7 +6,7 @@ import shapeless._
 /**
   * Created by ikhoon on 06/08/2017.
   */
-trait Poly {
+trait Poly { self =>
 
   def apply[A, B](a: A)(implicit C: this.Case[A, B]): B = C(a)
   def at[A] = new {

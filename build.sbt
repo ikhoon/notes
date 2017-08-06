@@ -36,7 +36,9 @@ lazy val commonSettings = Seq(
     "-language:existentials",
     "-language:higherKinds",
     "-language:implicitConversions",
-    "-language:experimental.macros"
+    "-language:experimental.macros",
+    "-language:reflectiveCalls",
+    "-language:postfixOps"
   ),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
