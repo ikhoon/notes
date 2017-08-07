@@ -14,6 +14,7 @@ import twitter4j.auth.AccessToken;
 import java.awt.*;
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -192,6 +193,7 @@ public class Chapter2 {
 
 
     // ## Observable 만들기
+    // 37쪽
     @Test
     public void newObservable() {
         // Just
@@ -249,11 +251,11 @@ public class Chapter2 {
     @Test
     public void publishSubscribe1() {
         Observable<Integer> ints =
-                Observable.create(subscriber -> {
+                Observable.<Integer>create(subscriber -> {
                     System.out.println("Create : " + Thread.currentThread().getName());
                     subscriber.onNext(1);
                     subscriber.onComplete();
-                });
+                }).cache();
         System.out.println("Starting");
         ints.subscribe(i -> System.out.println("Element A : " + i));
         ints.subscribe(i -> System.out.println("Element B : " + i));
@@ -274,6 +276,7 @@ public class Chapter2 {
     public void publishSubscriber3() {
         Observable<Integer> ints =
                 Observable.range(1, 10);
+        Observable.interval(1, TimeUnit.MICROSECONDS);
         System.out.println("Starting");
         ints.subscribe(i -> System.out.println("Element A : " + i));
         ints.subscribe(i -> System.out.println("Element B : " + i));
@@ -285,7 +288,29 @@ public class Chapter2 {
     // 라고 개인적으로 생각한다.
 
 
-   // ## 뜨거운 Observable vs. 차가운 Observable
+   // ## 뜨거운 hot Observable vs. 차가운 cold Observable
+
+
+   //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // 차가운 Observable - 이벤트를 구독하지 않으면 시작하지 않는다.
     // 구독자가 없으면 그냥 자료구조일뿐
@@ -311,7 +336,6 @@ public class Chapter2 {
     // # 사례 : 콜백 API를 Observable 스트림으로
     public void callbackToObservable() {
         TwitterStream  twitterStream = TwitterStreamFactory.getSingleton();
-        twitterStream.setOAuthConsumer("ThH4c18RfcZqFV3WwOhNphOjy", "bVOLRagShDuzE3rokJi0MtcaOGEN8hIppgqaee1JUYNDWJaGCT");
         twitterStream.addListener(new StatusListener() {
             @Override
             public void onStatus(Status status) {
@@ -338,9 +362,18 @@ public class Chapter2 {
     // 그럼 비지니스 영역과 twitter 모듈 영역을 분리하자.
     // 일단 자바 8님에게 감사하자.
     // lambda가 없었다면 이 코드는 아주 구렸을것이다.
+    // 마틴 대실망!
+    // 소비, (1) -> (1)
+    // 소비, (1) -> ()
+
+    /**
+     * () => ()
+     * @see Runnable
+     * @param onStatus
+     * @param onException
+     */
     void consume(Consumer<Status> onStatus, Consumer<Exception> onException) {
         TwitterStream  twitterStream = TwitterStreamFactory.getSingleton();
-        twitterStream.setOAuthConsumer("ThH4c18RfcZqFV3WwOhNphOjy", "bVOLRagShDuzE3rokJi0MtcaOGEN8hIppgqaee1JUYNDWJaGCT");
         twitterStream.addListener(new StatusListener() {
             @Override
             public void onStatus(Status status) {
@@ -363,6 +396,9 @@ public class Chapter2 {
 
     }
 
+
+    // Observable.create
+
     @Test
     public void consumeTweet() {
         // 이제 트위터 로직이랑 비지니스 로직을 조금은 분리할수 있다.
@@ -375,8 +411,12 @@ public class Chapter2 {
     // 허나 사실 문제점을 다른 계층으로 옮긴것 뿐이다.
     // * 초당 트윗이 몇개인지 세아리려면?
     // * 처음 N개의 트윗만 가져오려면?
-    // * 여러면에게 구독자에게 트윗을 전송하려면?
-    // * 구독해지는 가능한가?
+    // * 여러명의 구독자에게 트윗을 전송하려면?
+    // * 구독 해지는 가능한가?
+
+
+
+
 
     // 이런 다양한 문제점을 지금의 코드에서는 해결할수가 없다.
     // 어떻게 끼워 넣으면 해결될수는 있을것이다. 하지만 왜?
@@ -416,7 +456,8 @@ public class Chapter2 {
         // 그냥 함수를 호출하고 필요하면 subscribe하면 된다
         // 훨씬더 유연한 함수가 된것이다.
 
-        observe().subscribe(
+        observe()
+                .subscribe(
             status -> System.out.println("Status: " + status),
             ex -> ex.printStackTrace()
         );

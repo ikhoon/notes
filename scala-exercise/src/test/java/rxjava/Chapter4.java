@@ -4,6 +4,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import scala.collection.immutable.ListSet;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,10 +41,24 @@ public class Chapter4 {
 
 
 
+
+
+
+
+
     Observable<Person> listPeople3() {
         List<Person> people = query("SELECT * FROM people");
         return fromIterable(people);
     }
+
+
+
+
+
+
+
+
+
 
 
     // Observable를 한번 만들면 줄줄이 들고 다녀야 한다.
@@ -51,6 +66,21 @@ public class Chapter4 {
 
     // 그렇지만 이렇게 바꾸기에는 한번에 바꾸어야 하는 코드량이 많다.
     // Rx를 순차 적용하기 위해서 일부만 Observable을 사용하고(nonblocking) 다시 Blocking IO로 바꾸는방식을 취해보겠다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // ## BlockingObservable: 리액티브 세상 벗어나기
     // QUIZ : Observable<T>를 다시 List<T>로 바꾸기
@@ -63,10 +93,30 @@ public class Chapter4 {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public List<Person> toBlockingList1(Observable<Person> peopleStream)  {
         Single<List<Person>> listSingle = peopleStream.toList();
         return listSingle.blockingGet();
     }
+
+
+
+
 
 
 
@@ -84,6 +134,18 @@ public class Chapter4 {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
     // 이게왜 유용할까?
     // 얼마나 유용할까?
     // 리소스를 언제, 어떤순서로 가져올지 우리는 신경쓸 필요가 없어진다.
@@ -91,6 +153,23 @@ public class Chapter4 {
     Book recommend(Person person) { throw new UnknownError("unknown error"); }
     Book bestSeller() { return new Book(); }
     void display(String title) {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // FIXME 흔히 우리가 너와 내가 만드는 코드이다.
     // 역시나 자바의 고질적인 문제는 try catch 문이 실제 로직을 방해한다.
@@ -118,7 +197,6 @@ public class Chapter4 {
         title.subscribe(this::display);
     }
 
-
     // 위의 코드는 좀 길게 되었고 실제 구현하면
     // 훨씬더 깔끔하게 된다.
     // 에러일때만 best seller 호출한다. lazy하지 않으면 best seller는 에러건 아니건 일단 무조건 호출될것이다.
@@ -128,6 +206,9 @@ public class Chapter4 {
         .map(b -> b.title)
         .subscribe(this::display);
     }
+
+
+
 
     // onErrorResumeNext => 이것이 Rx에서 try-catch를 구현하는 방식이다!!!
     // try-catch에 대해서는 276쪽에 좀더 자세히 나온다고 한다.
@@ -145,9 +226,11 @@ public class Chapter4 {
         return query(String.format("SELECT * FROM PEOPLE LIMIT %d OFFSET %d",  PAGE_SIZE, PAGE_SIZE * page));
     }
 
+
     // 그리고 보통 이렇게 구현한다. 나도 그랬다. Rx를 만나기 전까지.
     // 어설프게 구현하긴 했지만 데이터가 부족하면 다시 호출헤서 채우고 하는 형태의 코드는 많았다.
     // 하지만 정형화 되어 있지 않다.
+    // Source.scala
     List<Person> getFriends() {
        List<Person> friends = listPeoplePage(0);
        List<Person> agedFriends = friends.stream().filter(friend -> friend.age > 20).collect(Collectors.toList());
@@ -160,16 +243,12 @@ public class Chapter4 {
        // 그리고 결과값중에 10명을 반환한다.
        return agedFriends.subList(0, 10);
     }
-
-
-
     // Rx로 구현한다면?
     // 놀라지 마라.
     Observable<Person> allPeople(int initialPage) {
         return defer(() -> fromIterable(listPeoplePage(initialPage)))
                 .concatWith(defer(() -> allPeople(initialPage + 1)));
     }
-
     // 이게 끝이다.
     // 신기 방기 하지 않는가?
     Observable<Person> getFriends2() {
@@ -177,6 +256,12 @@ public class Chapter4 {
                 .filter(person -> person.age > 20)
                 .take(10);
     }
+
+
+
+
+
+
 
     // Rx Observable과 비슷하게 finagle, finatra에서 사용할수 있는건 AsyncStream이라고 있다.
     // 이건 아래 AsyncStreamSpec 예를 참고하자.

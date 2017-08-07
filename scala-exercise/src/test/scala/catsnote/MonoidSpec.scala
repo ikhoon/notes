@@ -13,6 +13,7 @@ class MonoidSpec extends WordSpec with Matchers {
   "monoid extends semigroup and add empty" should {
     "empty and combineAll" in {
 
+
       Monoid[String].empty shouldBe ""
       Monoid[String].combineAll(List("a", "b", "c")) shouldBe "abc"
       Monoid[String].combineAll(List()) shouldBe ""

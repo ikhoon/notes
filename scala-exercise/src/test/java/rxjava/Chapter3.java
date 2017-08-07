@@ -7,6 +7,7 @@ import org.junit.Test;
 import scalaz.Alpha;
 
 import java.time.DayOfWeek;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -28,15 +29,36 @@ public class Chapter3 {
         // 이번 쳅터는 실습이다!
 
         // QUIZ : 1 ~ 10 까지의 값을 가지고 있는 observable을 하나 만들어보자.
-        Observable<Integer> ints = Observable.empty();
+        // [1, 2, 3, ... 10]
+        Observable<Integer> ints = Observable.range(1, 10);
+        ints.subscribe(i -> System.out.println(i));
+
+
+
+
+
+
+
 
         // QUIZ : filter를 이용해서 짝수만 뽑아내라
-        Observable<Integer> evens = ints;
-
-        // QUIZ : map 연산자를 이용해서 모든 값을 1씩 증가시켜라
-        Observable<Integer> addOnes = evens;
+        Observable<Integer> evens = ints.filter(i -> i % 2 == 0);
 
 
+
+
+
+
+
+
+
+        // QUIZ : 연산자를 이용해서 모든 값을 1씩 증가시켜라
+        Observable<Integer> addOnes = evens.map(i -> i + 1);
+        // 2 ~ 10 -> 3 ~ 11
+
+
+
+   // ----- 8|9 -- --- 10
+        Arrays.asList(1, 2,3);
         // doOnNext - 연산자 사이에 로깅하기
         Observable
                 .just(8, 9, 10)
@@ -49,17 +71,55 @@ public class Chapter3 {
                 .subscribe(s -> System.out.println("D: " + s));
 
         // QUIZ : 위의 연산의 결과값은 어떤 순서로 나올까요?
-        // 1. A -> B -> C -> D -> A -> B -> C ....
-        // 2. A -> A -> A -> B -> B -> B -> C ....
+        // 1. A -> B -> C -> D -> A -> A -> B -> C .... ta, mar, ca, ro, ka, li
+        // 2. A -> A -> A -> B -> B -> C -> D .... c, e, mau, ju,
+        // 3. cameo,
+
+
+
+
+
+
+
+
+
+
 
 
         // QUIZ : flatMap 연산자를 이용해서 모든 값을 1씩 증가 시켜라
+        Observable<Integer> addTwos = addOnes.map(i -> i);
+        Observable<Integer> addTwo2s = addOnes.flatMap(i -> Observable.just(i));
+
+
+
+
+
+
+
         // 우린 flatMap이란 용어를 참 많이 본다.
+        // map + flatten
+        // be why?
+        //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // 언제 유용한가?
 
 
     }
 
+    @Test
     public void delay() throws InterruptedException {
 
         // delay
@@ -75,6 +135,10 @@ public class Chapter3 {
 
         TimeUnit.SECONDS.sleep(10);
         //
+
+
+
+
 
 
         // with timer
@@ -101,14 +165,15 @@ public class Chapter3 {
         switch (dow) {
             case SUNDAY:
                 return Observable
-                        .interval(90, MILLISECONDS)
+                        .interval(1000, MILLISECONDS)
                         .take(5)
-                        .map(i -> "Sun-" + i);
+                        .map(i -> new Date() + " Sun-" + i);
+                // 1 .... 2 ..... 3 ..... 4 .... 5
             case MONDAY:
                 return Observable
-                        .interval(90, MILLISECONDS)
+                        .interval(1000, MILLISECONDS)
                         .take(5)
-                        .map(i -> "Mon-" + i);
+                        .map(i -> new Date() + " Mon-" + i);
             default:
                 return Observable.empty();
         }
@@ -123,7 +188,7 @@ public class Chapter3 {
 
         days.subscribe(d -> System.out.println(d));
 
-        TimeUnit.SECONDS.sleep(3);
+        TimeUnit.SECONDS.sleep(20);
     }
 
     @Test
@@ -134,7 +199,7 @@ public class Chapter3 {
 
         days.subscribe(d -> System.out.println(d));
 
-        TimeUnit.SECONDS.sleep(3);
+        TimeUnit.SECONDS.sleep(20);
 
     }
 
