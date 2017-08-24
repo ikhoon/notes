@@ -1,7 +1,7 @@
 name := "the-notes"
 
 version := "1.0"
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.2"
 //scalaOrganization in ThisBuild := "org.typelevel"
 
 
@@ -17,7 +17,7 @@ lazy val `macro-exercise` = (project in file("macro-exercise"))
   .settings(commonSettings)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.1",
+  scalaVersion := "2.12.2",
 //  scalaOrganization in ThisBuild := "org.typelevel",
   scalacOptions ++= Seq(
     // See other posts in the series for other helpful options
@@ -64,6 +64,7 @@ lazy val commonSettings = Seq(
 
     "com.twitter" %% "util-core" % "6.45.0",
 
+    "eu.timepit" %% "refined"            % "0.8.2",
 
     // rxjava
     "io.reactivex.rxjava2" % "rxjava" % "2.1.0",
@@ -79,7 +80,7 @@ lazy val commonSettings = Seq(
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M8" cross CrossVersion.full)
+  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M9" cross CrossVersion.full)
 
 
 )

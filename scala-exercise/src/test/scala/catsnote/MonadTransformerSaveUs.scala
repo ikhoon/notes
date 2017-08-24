@@ -60,6 +60,8 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
   def findOrders(userId: Long): Future[List[Order]] = Future.successful(List(Order(getId, userId, getId), Order(getId, userId, getId)))
   def findOrderItems(orderId: Long): Future[List[OrderItem]] = Future.successful(List(OrderItem(getId, orderId), OrderItem(getId, orderId)))
 
+  // Future[List[Option[A]]]
+  // List(Some(1), Some(2), None) => List(1, 2)
 
   // 다양하다 해도 이게 다일것 같다.
   // 더 생각나는 사람있으면 이야기 해도 좋다
@@ -81,41 +83,52 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
   // 힘들것이다. 사용하기 어렵다. 짜증난다. 이게 뭐다냐. 쪼사뿔까.
   def optionFuture1: Future[Option[Address]] = {
     for {
-      optionUser <- findUser(10) // Future[Option[User]]
-      optionAddress <- optionUser match {
+      optionUser <- findUser(10) // Future[Option[User]] => FutureOption[User] => User
+      optionAddress: Option[Address] <- optionUser match {
         case Some(user) => findAddress(user.id)  // Future[Option[Address]]
         case None => Future.successful(None)
       }
     } yield optionAddress
   }
 
+  //
+  /** Future[Option[A]]있다면 OptionT로 감싸라. */
   // QUIZ 이걸 OptionT를 이용해서 구현해보라.
+  def optionFuture3: Future[Option[Address]] = {
+    val value1: OptionT[Future, Address] = for {
+      user: User <- OptionT(findUser(10)) // Future[Option[User]] => FutureOption[User] => User
+      address <- OptionT(findAddress(user.id)) // Future[Option[Address]]
+    } yield address
+    value1.value
+  }
 
 
 
 
 
   // QUIZ 이번엔 아래함수를 합성해보자. 아직은 동작하지 않는다
-  /*
-  def optionFuture2: Future[Option[Device]] = {
-    val userId = toUserId("10") // Option[Long]
-    val user = findUser(userId)  // Future[Option[User]]
-    val userDto = toUserDto(user)  // UserDto
-    val device = findOrder(userDto.id)  // Future[Option[Order]]
-    device
-  }
-  */
+//  def optionFuture2: Future[Option[Device]] = {
+//    val userId = toUserId("10") // Option[Long]
+////    val user = findUser(userId)  // Future[Option[User]]
+////    val userDto = toUserDto(user)  // UserDto
+//    val device = findDevice(userDto.id)  // Future[Device]
+//    device
+//  }
 
 
 
 
   /** Future[Option[A]]를 반환한다면 무조건 OptionT를 고려해야한다.
-    * 중간에 A => Future[B] 이런게 들어있다면? 무조건 OptionT 이다!
-    * 중간에 A => Option[C] 이런게 들어있다면? 무조건 OptionT.fromOption 이다.
-    * 중간에 A => D         이런게 들어있다면? 무조건 OptionT.pure 이다!
-    * 중간에 A => Future[E] 이런게 들어왔다면? 무조건 OptionT.liftF 이다.
+    * 중간에 A => Future[Option[B]] 이런게 들어있다면? 무조건 OptionT 이다!
+    * 중간에 A => Option[C]         이런게 들어있다면? 무조건 OptionT.fromOption[Future] 이다.
+    * 중간에 A => D                 이런게 들어있다면? 무조건 OptionT.pure[Future, A] 이다!
+    * 중간에 A => Future[E]         이런게 들어왔다면? 무조건 OptionT.liftF 이다.
     * 어떤함수를 쓰던지 여기에 맞추어라 무조건!!!!
     */
+
+
+
+
   def findDeviceByUserId(userId: String): Future[Option[Device]] =
     (for {
       userId <- OptionT.fromOption[Future](toUserId(userId)) // Option[Long] => Future[Option[Long]]
@@ -132,7 +145,9 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
   def findAllOrderItemsByUserId(userId: Long): Future[List[OrderItem]] = {
     val orders: Future[List[Order]] = findOrders(userId)
     // 아놔 내가 뭘 잘못했다고 이런 시련을 주시나이까! 살려주세요.
-    val value1: Future[List[Future[List[OrderItem]]]] = orders.map(_.map(order => findOrderItems(order.id)))
+    val value1: Future[List[Future[List[OrderItem]]]] =
+      orders.map(_.map(order => findOrderItems(order.id)))
+
     // Future와 Future를 합성할때는 절때 map을 쓰면 아니아니된다.
     // 우선 안에 있는 Future를 밖으로 끄내자
     val value2: Future[Future[List[List[OrderItem]]]] = value1.map(Future.sequence(_))
@@ -193,6 +208,11 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
     val value2: Future[List[OrderItem]] = value1.map(_.flatten) // 헐 flatten이라니!
     value2
   }
+
+
+
+
+
 
   // map + sequence + flatten = flatTraverse
   def findAllOrderItemdByUserId6(friends: List[Long]): Future[List[OrderItem]] = {

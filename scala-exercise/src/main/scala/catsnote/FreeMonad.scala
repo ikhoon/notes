@@ -2,12 +2,12 @@ package catsnote
 
 import java.util.Date
 
-import cats.{Id, ~>}
+import cats.{Id, Monad, ~>}
 import cats.free.Free
 import cats.implicits._
 import cats.syntax._
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 
 /**
@@ -66,6 +66,7 @@ sealed trait KVStoreA[A]
 case class Put[T](key: String, value: T) extends KVStoreA[Unit]
 case class Get[T](key: String) extends KVStoreA[Option[T]]
 case class Delete(key: String) extends KVStoreA[Unit]
+case class Gets[T](key: List[String]) extends KVStoreA[List[T]]
 
 
 /**
@@ -87,6 +88,15 @@ object kv {
   // KVStoreA에 A를 뒤에 붙인 이유가 있었구만. type alias에 사용할라 했었다.
   type KVStore[A] = Free[KVStoreA, A]
 
+
+
+
+
+
+
+
+
+
   import cats.free.Free.liftF
   // 2. liftF을 이용하여 똑똑한 생성자를 만들라.
   // liftF를 이용해서 KVStoreA를 KVStore로 바꾸었다.
@@ -94,11 +104,32 @@ object kv {
   def put[T](key: String, value: T): KVStore[Unit] =
     liftF[KVStoreA, Unit](Put(key, value))
 
+
+
+
+
+
+
+
+
+
+
+
+
   def get[T](key: String): KVStore[Option[T]] =
     liftF[KVStoreA, Option[T]](Get(key))
 
   def delete(key: String): KVStore[Unit] =
     liftF[KVStoreA, Unit](Delete(key))
+
+
+
+
+
+
+
+
+
 
   // get이랑 put을 조합해서 만들자.
   def update[T](key: String, f: T => T): KVStore[Unit] =
@@ -117,6 +148,13 @@ object kv {
     n <- get[Int]("wild-cats")
     _ <- delete("tame-cats")
   } yield n
+
+
+
+
+
+
+
 
   // 이것은 monadic flow 처럼 보인다. 그러나 **일련의 작업을 표현하기 위해 재귀적인 데이터 구조를 만든것 뿐이다.**
 
@@ -138,6 +176,7 @@ object kv {
   val a: Option[Int] = Some(1)
   val b: Option[String] = a.map(_.toString)
 
+  type MapInt[K] = Map[Int, K]
   // F[G[A]] => G[F[A]] // sequence
   // F[G[A]] => G[F[B]] // sequence + map = traverse
   // F[A] => G[A] // natural transformation
@@ -148,26 +187,30 @@ object kv {
 
   // KVStoreA[A] => Id[A]
   //
-  def impureCompiler: KVStoreA ~> Id =
-    new (KVStoreA ~> Id) {
+
+  def impureCompiler[M[_]: Monad]: KVStoreA ~> M =
+    new (KVStoreA ~> M) {
       println("new transformer" + new Date)
       val kvs = mutable.Map.empty[String, Any]
 
-      def apply[A](fa: KVStoreA[A]): Id[A] =
+      def apply[A](fa: KVStoreA[A]): M[A] =
         fa match {
           case Get(key) =>
             println(s"get($key)")
-            kvs.get(key).map(_.asInstanceOf[A])
+             Monad[M].pure(kvs.get(key).map(_.asInstanceOf[A]))
           case Put(key, value) =>
             println(s"put($key, $value)")
             kvs.put(key, value)
-            ()
+            Monad[M].pure(())
           case Delete(key) =>
             println(s"delete($key)")
             kvs.remove(key)
-            ()
+            Monad[M].pure(())
         }
     }
+
+
+
   /**
 
     이 impureCompiler는 순수함수가 아니다(impure 이다)라는 점을 주목하라.

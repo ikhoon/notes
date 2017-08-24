@@ -7,17 +7,80 @@ import Remover.Aux
   */
 
 
+
+// remove
+// Int :: String :: Boolean :: HNil
+
+// remove[String] => Int :: Boolean :: HNil
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 trait Remover[A, L <: HList] {
   type Out <: HList
   def apply(xs: L): Out
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 trait RemoverLowPriorityImplicits {
+
+
+
+
+
+
   implicit def hnilRemove[A]: Aux[A, A :: HNil, HNil] =
+
+
+
+
+
     new Remover[A, A :: HNil] {
       type Out = HNil
       def apply(xs: A :: HNil): Out = HNil
     }
+
+
+
+
+
 
   implicit def base[A, L <: HList] : Aux[A, A :: L, L] =
     new Remover[A, A :: L] {
@@ -31,7 +94,6 @@ object RichRemover {
     def remove[A](implicit R: Remover[A, L]): R.Out = R(self)
   }
 }
-
 
 object Remover extends RemoverLowPriorityImplicits {
   type Aux[A, L <: HList, Out0 <: HList] = Remover[A, L] { type Out = Out0 }
@@ -59,7 +121,7 @@ object RemoveTest {
 
   import RichRemover._
   def main(args: Array[String]): Unit = {
-    val hlist = 1 :: "hello" :: true :: 10 :: HNil
+    val hlist : Int :: String :: Boolean :: HNil = 1 :: "hello" :: true :: HNil
 
 
     println(hlist.remove[Int])
