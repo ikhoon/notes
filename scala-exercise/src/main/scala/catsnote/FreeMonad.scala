@@ -2,13 +2,11 @@ package catsnote
 
 import java.util.Date
 
-import cats.{Id, Monad, ~>}
 import cats.free.Free
 import cats.implicits._
-import cats.syntax._
+import cats.{Monad, ~>}
 
-import scala.collection.{immutable, mutable}
-import scala.concurrent.Future
+import scala.collection.mutable
 
 /**
   * Created by ikhoon on 2016. 10. 4..
@@ -266,7 +264,6 @@ object kv {
     *
     */
 
-  import cats._
   import cats.implicits._
   private val map: Int = List(1, 2, 3).foldMap(i => i)
 

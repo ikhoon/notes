@@ -1,6 +1,6 @@
 package catsnote
 
-import cats.free.{Free, FreeApplicative}
+import cats.free.FreeApplicative
 
 /**
   * Created by ikhoon on 04/08/2017.

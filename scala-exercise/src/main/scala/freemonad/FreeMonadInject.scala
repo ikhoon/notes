@@ -314,7 +314,7 @@ object free {
           if(uid == "john.show" && pwd == "Ghost")
             Some(User("john.show"))
           else None
-        case HasPermission(u, permission) =>
+        case HasPermission(u, _) =>
           u.id == "john.show"
       }
     }

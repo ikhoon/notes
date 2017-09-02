@@ -6,7 +6,7 @@ import scala.reflect.runtime.universe._
   */
 class Macros {
   def createMacro[A: WeakTypeTag]: Tree = {
-    val targetType = weakTypeOf[A]
+    weakTypeOf[A]
 //    val applyMethod = find
     ???
   }

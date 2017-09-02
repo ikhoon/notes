@@ -10,6 +10,7 @@ import shapeless._
   * Created by Liam.M on 2017. 08. 24..
   * 24/08/2017
   */
+/*
 object normal {
 
 
@@ -39,3 +40,4 @@ object refined {
   factorial(-2)
 
 }
+*/

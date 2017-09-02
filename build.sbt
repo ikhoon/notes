@@ -19,6 +19,7 @@ lazy val `macro-exercise` = (project in file("macro-exercise"))
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.2",
 //  scalaOrganization in ThisBuild := "org.typelevel",
+//  scalacOptions += "-Xfatal-warnings",
   scalacOptions ++= Seq(
     // See other posts in the series for other helpful options
     "-target:jvm-1.8",
@@ -26,6 +27,7 @@ lazy val commonSettings = Seq(
     "-unchecked",
     "-deprecation",
     "-Xfuture",
+//    "-Xfatal-warnings",
     //  "-Yno-adapted-args",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
@@ -46,7 +48,10 @@ lazy val commonSettings = Seq(
     Resolver.jcenterRepo
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats" % "0.9.0",
+    "org.typelevel" %% "cats-core" % "1.0.0-MF",
+    "org.typelevel" %% "cats-effect" % "0.4",
+    "io.monix" %% "monix" % "3.0.0-22bf9c6",
+//    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
     "org.tpolecat" %% "doobie-core" % "0.4.1",
     "org.tpolecat" %% "doobie-h2" % "0.4.1",

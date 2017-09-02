@@ -133,7 +133,7 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
     (for {
       userId <- OptionT.fromOption[Future](toUserId(userId)) // Option[Long] => Future[Option[Long]]
       user <- OptionT(findUser(userId))  // Future[Option[User]]
-      userDto <- OptionT.pure[Future, UserDto](toUserDto(user))  // UserDto => Future[Option[UserDto]]
+      userDto <- OptionT.pure[Future](toUserDto(user))  // UserDto => Future[Option[UserDto]]
       device <- OptionT.liftF(findDevice(userDto.id)) // Future[Device] => Future[Option[Device]]
     } yield device).value
 

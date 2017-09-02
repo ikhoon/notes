@@ -42,7 +42,6 @@ object Tutorial extends App {
   // 1. Eff.send를 활용하여 KVStore[_]의 똑똑한 생성자를 만든다
 
   import org.atnos.eff._
-  import cats.implicits._
   // T |= R 은 MemberIn[T, R]의 alias이다.
   // T[_]타입의 effect는 R의 effect stack에 삽입될수 있다.
 

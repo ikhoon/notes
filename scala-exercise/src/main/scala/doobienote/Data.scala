@@ -57,5 +57,6 @@ object Data {
                  """
 
     Update[Country](insert).updateMany(countries).transact(xa).unsafePerformSync
+    ()
   }
 }

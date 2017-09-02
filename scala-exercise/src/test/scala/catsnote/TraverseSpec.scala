@@ -33,16 +33,16 @@ class TraverseSpec extends WordSpec with Matchers {
       // Traverse[List].traverse(List("1", "2", "3"))(parseIntEither)
 
 //      Traverse[List].traverseU(List("1", "2", "3"))(parseIntEither) shouldBe Either.right(List(1, 2, 3))
-      Traverse[List].traverseU(List("1", "abc", "3"))(parseIntEither).isLeft shouldBe true
+      Traverse[List].traverse(List("1", "abc", "3"))(parseIntEither).isLeft shouldBe true
     }
 
     "traverseU - Validated" in {
       import cats.instances.list._
 
-      Traverse[List].traverseU(List("1", "2", "3"))(parseIntValidated) shouldBe Valid(List(1, 2, 3))
-      Traverse[List].traverseU(List("1", "2", "3"))(parseIntValidated).isValid shouldBe true
+      Traverse[List].traverse(List("1", "2", "3"))(parseIntValidated) shouldBe Valid(List(1, 2, 3))
+      Traverse[List].traverse(List("1", "2", "3"))(parseIntValidated).isValid shouldBe true
 
-      Traverse[List].traverseU(List("1", "abc", "3", "def"))(parseIntValidated).isValid shouldBe false
+      Traverse[List].traverse(List("1", "abc", "3", "def"))(parseIntValidated).isValid shouldBe false
 
 
     }
