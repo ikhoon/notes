@@ -278,13 +278,13 @@ object experiment {
     import api._
     itemRepository.findById(itemId).flatMap { item =>
       (
-        catalogRepository.findById(item.catalogId) |@|
-        brandRepository.findById(item.brandId) |@|
-        itemWishCountRepository.findByItemId(item.id) |@|
-        categoryRepository.findOneByBrandId(item.brandId) |@|
-        itemDetailRepository.findByItemId(item.id) |@|
+        catalogRepository.findById(item.catalogId),
+        brandRepository.findById(item.brandId),
+        itemWishCountRepository.findByItemId(item.id),
+        categoryRepository.findOneByBrandId(item.brandId),
+        itemDetailRepository.findByItemId(item.id),
         itemCertificationRepository.findByItemId(item.id)
-      ).map { case (catalog, brand, wish, category, detail, cert) =>
+      ).mapN { case (catalog, brand, wish, category, detail, cert) =>
         List(brand, catalog, wish, category, detail, cert)
       }
     }
