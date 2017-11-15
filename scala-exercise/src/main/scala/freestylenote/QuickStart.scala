@@ -13,8 +13,6 @@ import freestyle._
 import freestyle.implicits._
 
 
-object quickstart {
-  /*
 // algebra를 선언해보자
 // 앞에 @free라고 쓴걸 주의 깊게 보자
 // FS는 빨간불이 난다. 하지만 신경쓰지 말자
@@ -40,6 +38,7 @@ object quickstart {
 }
 
 
+object quickstart {
 // 벌써 프로그램!!
 def program[F[_]](implicit A: Application[F]) = {
   import A._
@@ -100,6 +99,5 @@ val value = Await.result(futureValue, Duration.Inf)
 // onion-style이 뭔지는 모르겠으나. 
 // coproduct와 interpreter의 순서를 수동으로 관리하는 복잡함을 없앰
 // boilerplate free - 행사코드가 없는 application, library이다
-*/
 
 }

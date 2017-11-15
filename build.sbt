@@ -5,7 +5,7 @@ scalaVersion := "2.12.2"
 //scalaOrganization in ThisBuild := "org.typelevel"
 
 
-lazy val `the-notes` = (project in file("."))
+lazy val `scala-notes` = (project in file("."))
   .dependsOn(`scala-exercise`,  `macro-exercise`)
 
 lazy val `scala-exercise` = (project in file("scala-exercise"))
