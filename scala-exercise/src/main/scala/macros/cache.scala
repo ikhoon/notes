@@ -13,7 +13,8 @@ object cache {
     def put(k: K, v: V): Unit
   }
 
-  val cacheBackEnd = new SyncCache[Int, Int]
+  // TODO FIXME
+//  val cacheBackEnd = new SyncCache[Int, Int]
 
 
 //  @cache(cacheBackEnd)

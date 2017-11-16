@@ -20,6 +20,8 @@ object Data {
   case class Code(code: String)
   case class CountryInfo(name: String, pop: Int, gnp: Option[Double])
 
+  // TODO FIXME
+  /*
   val xa = DriverManagerTransactor[Task](
     driver = "org.h2.Driver",
     url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
@@ -59,4 +61,5 @@ object Data {
     Update[Country](insert).updateMany(countries).transact(xa).unsafePerformSync
     ()
   }
+  */
 }

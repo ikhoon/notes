@@ -88,9 +88,10 @@ import cats.implicits._
 import scala.concurrent.duration.Duration
 import scala.concurrent.Await
 
-val futureValue = program[Application.Op].interpret[Future]
+// FIXME
+//val futureValue = program[Application.Op].interpret[Future]
 
-val value = Await.result(futureValue, Duration.Inf)
+//val value = Await.result(futureValue, Duration.Inf)
 
 
 // 다양한 선택지중에 만약 고민을 하는 중이라면 왜 Freestyle을 고려해야 하는가?

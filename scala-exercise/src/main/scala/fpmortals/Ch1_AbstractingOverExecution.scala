@@ -48,7 +48,72 @@ object Ch1_AbstractingOverExecution {
     def write(t: String): Future[Unit] = ???
   }
 
+  // C를 Context르 생각할수 있다.
+  // 이유는 실행의 context를 지금(Now)할것인가? 나중에 할것인가(Future)인가를 이야기 해주기 때문이다..
+
+  // 지금은 C[String]을 가지고 할수 있는게 없다..
+  // C[_]을 감싸는 값이 필요하다.
+
+  trait Execution[C[_]] {
+    def doAndThen[A, B](c: C[A])(f: A => C[B]): C[B]
+    def create[B](b: B): C[B]
+  }
+
+  // 그리고
+  def echo[C[_]](t: Terminal[C], e: Execution[C]): C[String] = {
+    e.doAndThen(t.read) {in : String=>
+      e.doAndThen(t.write(in)) { _: Unit =>
+        e.create(in)
+      }
+    }
+  }
+
+  // 이제 sync와 async사이에 구현을 공유 할수 있다.
+  // Terminal[Now]의 Mock코드를 통해서 테스트 할수 있다.
+
+  // 근데 echo 코드는 더럽다.
+
+  // 코드를 좀 깔금하게 하고 싶다.
+  object Execution {
+    implicit class Ops[A, C[_]](c: C[A]) {
+      def flatMap[B](f: A => C[B])(implicit e: Execution[C]): C[B] =
+        e.doAndThen(c)(f)
+
+      def map[B](f: A => B)(implicit e: Execution[C]): C[B] =
+        e.doAndThen(c)(f andThen e.create)
+    }
+  }
+  import Execution._
+
+  class Cell[T]
+
+  //그리고 코드는
+  def echo2[C[_]](implicit t: Terminal[C], e: Execution[C]): C[String] =
+    t.read.flatMap { in: String =>
+      t.write(in).map { _: Unit =>
+        in
+      }
+    }
+
+  def echo3[C[_]](implicit t: Terminal[C], e: Execution[C]): C[String] =
+    for {
+      in <- t.read
+      _ <- t.write(in)
+    } yield in
+
+
+
+  // 1.2 Pure Functional Programming
+  // * Totally - 가능한 모든 입력값에 대해 return 값이 있다.
+  // * Determinism - 같은 입력값에 대해서 같은 return 값이다.
+  // * Purity - effect는 단지 return 값에 대한 연산이다.
+
+
+
+
+
 }
+
 
 
 

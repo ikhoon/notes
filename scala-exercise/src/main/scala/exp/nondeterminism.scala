@@ -154,7 +154,7 @@ object catseffect {
   }
 
   def runMonixInstance(): Unit = {
-    implicit val a = monix.eval.instances.ApplicativeStrategy.parallel[IO]
+    implicit val a = monix.eval.instances.ApplicativeStrategy.Parallel
     withTS {
       val tc = ta.map2(tb)(_ + _)
       tc.unsafeRunSync()

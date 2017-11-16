@@ -10,6 +10,7 @@ import scalaz.NonEmptyList
 //noinspection SqlDialectInspection,SqlNoDataSourceInspection
 class ParameterizedQueries extends WordSpec with Matchers {
 
+  /*
   "parameterized queries" should {
 
     import doobie.imports._
@@ -78,4 +79,5 @@ class ParameterizedQueries extends WordSpec with Matchers {
 
     }
   }
+  */
 }

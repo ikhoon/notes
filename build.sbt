@@ -4,6 +4,7 @@ version := "1.0"
 scalaVersion := "2.12.2"
 //scalaOrganization in ThisBuild := "org.typelevel"
 
+useJCenter := true
 
 lazy val `scala-notes` = (project in file("."))
   .dependsOn(`scala-exercise`,  `macro-exercise`)
@@ -48,13 +49,13 @@ lazy val commonSettings = Seq(
     Resolver.jcenterRepo
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-core" % "1.0.0-MF",
+    "org.typelevel" %% "cats-core" % "1.0.0-RC1",
     "org.typelevel" %% "cats-effect" % "0.4",
-    "io.monix" %% "monix" % "3.0.0-22bf9c6",
+    "io.monix" %% "monix" % "3.0.0-M1",
 //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.tpolecat" %% "doobie-core" % "0.4.1",
-    "org.tpolecat" %% "doobie-h2" % "0.4.1",
+    "org.tpolecat" %% "doobie-core" % "0.5.0-M9",
+    "org.tpolecat" %% "doobie-h2" % "0.5.0-M9",
     "org.scalactic" %% "scalactic" % "3.0.1",
 
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
@@ -62,20 +63,23 @@ lazy val commonSettings = Seq(
     "org.atnos" %% "eff" % "4.2.0",
 
     // freestyle
-    "io.frees" %% "freestyle" % "0.3.1",
+    "io.frees" %% "frees-core" % "0.4.2",
     // optional - effects and patterns
-    "io.frees" %% "freestyle-effects"      % "0.3.1",
-    "io.frees" %% "freestyle-tagless"      % "0.3.1",
+    "io.frees" %% "frees-effects"      % "0.4.2",
+    "io.frees" %% "frees-tagless"      % "0.4.2",
 
     "com.twitter" %% "util-core" % "6.45.0",
 
     "eu.timepit" %% "refined"            % "0.8.2",
 
     // rxjava
-    "io.reactivex.rxjava2" % "rxjava" % "2.1.0",
+    "io.reactivex.rxjava2" % "rxjava" % "2.1.6",
     "org.twitter4j" % "twitter4j-core" % "4.0.0",
     "org.twitter4j" % "twitter4j-stream" % "4.0.0",
     "org.asynchttpclient" % "async-http-client" % "2.0.0",
+
+    "org.scalaz" %% "scalaz-core" % "7.2.16",
+    "org.scalaz" %% "scalaz-concurrent" % "7.2.16",
 
 
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",

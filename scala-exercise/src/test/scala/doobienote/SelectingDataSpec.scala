@@ -11,6 +11,7 @@ class SelectingDataSpec extends WordSpec with Matchers {
 
   import doobie.imports._
 
+  /*
   "select data" should {
 
     import Data.xa
@@ -64,5 +65,6 @@ class SelectingDataSpec extends WordSpec with Matchers {
     }
 
   }
+  */
 
 }

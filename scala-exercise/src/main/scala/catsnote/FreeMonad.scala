@@ -7,6 +7,7 @@ import cats.implicits._
 import cats.{Monad, ~>}
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by ikhoon on 2016. 10. 4..
@@ -251,7 +252,9 @@ object kv {
 
     */
 
-  def result = program.foldMap(impureCompiler)
+
+    // TODO FIXME
+  //def result = program.foldMap(impureCompiler)
 
   /**
     foldMap의 중요한점은 stack-safety하다는 것이다.
@@ -264,7 +267,6 @@ object kv {
     *
     */
 
-  import cats.implicits._
   private val map: Int = List(1, 2, 3).foldMap(i => i)
 
   println(map)
