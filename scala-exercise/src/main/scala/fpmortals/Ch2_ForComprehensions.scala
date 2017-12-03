@@ -151,7 +151,7 @@ object Ch2_ForComprehensions {
 
 
 
-  val key = _
+  val key = "abc"
   // Fallback Logic
   // 어떤게 실패하면 다른걸 넣고 싶다.
   def getFromRedis(s: String): Option[String] = ???
