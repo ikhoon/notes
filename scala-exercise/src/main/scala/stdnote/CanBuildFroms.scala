@@ -15,7 +15,7 @@ object CanBuildFroms {
     * 여기에 나와있는 내용을 구현해봄
     */
 
-  def map[A, B, CC[A] <: Iterable[A]](collection: CC[A])(f: A => B)(
+  def map[A, B, CC[X] <: Iterable[X]](collection: CC[A])(f: A => B)(
     implicit cbf: CanBuildFrom[CC[B], B, CC[B]]): CC[B] = {
 
     val builder = cbf()
