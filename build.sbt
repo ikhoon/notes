@@ -1,7 +1,7 @@
 name := "the-notes"
 
 version := "1.0"
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.4"
 //scalaOrganization in ThisBuild := "org.typelevel"
 
 useJCenter := true
@@ -18,7 +18,7 @@ lazy val `macro-exercise` = (project in file("macro-exercise"))
   .settings(commonSettings)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.4",
 //  scalaOrganization in ThisBuild := "org.typelevel",
 //  scalacOptions += "-Xfatal-warnings",
   scalacOptions ++= Seq(
@@ -49,13 +49,13 @@ lazy val commonSettings = Seq(
     Resolver.jcenterRepo
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-core" % "1.0.0-RC1",
-    "org.typelevel" %% "cats-effect" % "0.4",
-    "io.monix" %% "monix" % "3.0.0-M1",
+    "org.typelevel" %% "cats-core" % "1.0.0",
+    "org.typelevel" %% "cats-effect" % "0.5",
+    "io.monix" %% "monix" % "3.0.0-M2",
 //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.tpolecat" %% "doobie-core" % "0.5.0-M9",
-    "org.tpolecat" %% "doobie-h2" % "0.5.0-M9",
+    "org.tpolecat" %% "doobie-core" % "0.5.0-M11",
+    "org.tpolecat" %% "doobie-h2" % "0.5.0-M11",
     "org.scalactic" %% "scalactic" % "3.0.1",
 
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
@@ -85,11 +85,14 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "junit" % "junit" % "4.12" % "test",
 
+    // scala meta
+    "org.scalameta" %% "scalameta" % "2.1.2",
+
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M9" cross CrossVersion.full)
+  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full)
 
 
 )
