@@ -1,6 +1,6 @@
 package catsnote
 
-import cats.Monad
+import cats.{Monad, Traverse}
 import org.scalatest.{Matchers, WordSpec}
 import cats.syntax.either._
 
@@ -139,10 +139,11 @@ class MonadSpec extends WordSpec with Matchers {
       import cats.instances.list._
       case class ListT[F[_], A](value: F[List[A]])
 
-      implicit def listTMonad[F[_]](implicit F: Monad[F]): Monad[ListT[F, ?]] = new Monad[ListT[F, ?]] {
+      /*
+      implicit def listTMonad[F[_]](implicit F: Monad[F], T: Traverse[F]): Monad[ListT[F, ?]] = new Monad[ListT[F, ?]] {
         override def flatMap[A, B](fa: ListT[F, A])(f: (A) => ListT[F, B]): ListT[F, B] =
           ListT(
-            F.flatMap(fa.value)(xs => F.map(F.sequence(xs.map(f(_).value)))(_.flatten))
+            F.flatMap(fa.value)(xs => F.map(T.sequence[F, A](xs.map(f(_).value)))(_.flatten))
           )
 
         override def pure[A](x: A): ListT[F, A] = ListT(F.pure(List(x)))
@@ -159,6 +160,7 @@ class MonadSpec extends WordSpec with Matchers {
       ListT(Option(List(1,2))).flatMap {
         case x: Int => ListT(Option(List(x, x * 10)))
       } shouldBe ListT(Option(List(1, 10, 2, 20)))
+      */
     }
 
 

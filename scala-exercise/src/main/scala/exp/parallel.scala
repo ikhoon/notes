@@ -223,7 +223,6 @@ object MonixTaskApiComponent extends AsyncApiComponent[Task] {
 object experiment {
 
   import monix.execution.Scheduler.Implicits.global
-  import monix.eval.Task.nondeterminism
   def main(args: Array[String]): Unit = {
     println("scala future monad with eager evaluation")
     awaitTime { getProduct(ScalaFutureApiComponent, 10) }

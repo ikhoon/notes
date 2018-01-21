@@ -50,12 +50,12 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % "1.0.0",
-    "org.typelevel" %% "cats-effect" % "0.5",
-    "io.monix" %% "monix" % "3.0.0-M2",
+    "org.typelevel" %% "cats-effect" % "0.8",
+    "io.monix" %% "monix" % "3.0.0-M3",
 //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.tpolecat" %% "doobie-core" % "0.5.0-M11",
-    "org.tpolecat" %% "doobie-h2" % "0.5.0-M11",
+    "org.tpolecat" %% "doobie-core" % "0.5.0-M13",
+    "org.tpolecat" %% "doobie-h2" % "0.5.0-M13",
     "org.scalactic" %% "scalactic" % "3.0.1",
 
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
@@ -63,10 +63,10 @@ lazy val commonSettings = Seq(
     "org.atnos" %% "eff" % "4.2.0",
 
     // freestyle
-    "io.frees" %% "frees-core" % "0.4.2",
+    "io.frees" %% "frees-core" % "0.6.2",
     // optional - effects and patterns
-    "io.frees" %% "frees-effects"      % "0.4.2",
-    "io.frees" %% "frees-tagless"      % "0.4.2",
+    "io.frees" %% "frees-effects"      % "0.6.2",
+//    "io.frees" %% "frees-tagless"      % "0.6.2",
 
     "com.twitter" %% "util-core" % "6.45.0",
 

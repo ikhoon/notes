@@ -1,6 +1,7 @@
 package macronote
 
 
+/*
 import scala.meta._
 
 
@@ -45,3 +46,4 @@ object CacheMacroImpl {
     ???
   }
 }
+*/

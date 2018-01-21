@@ -6,6 +6,7 @@ package macros
   */
 
 
+
 object NaiveImplementation {
   class CacheBackEnd[K, V] {
     private var map = Map.empty[K, V]     // ignore the fact it is not thread safe
@@ -45,6 +46,7 @@ object NaiveImplementation {
   }(cacheBackend)(i)
 }
 
+/*
 object MacroCache {
   trait SyncCache[K, V] {
     def get(k: K): Option[V]
@@ -58,3 +60,4 @@ object MacroCache {
 
   @cache(cacheBackEnd)
 }
+*/

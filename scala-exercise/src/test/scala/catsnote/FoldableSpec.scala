@@ -1,6 +1,6 @@
 package catsnote
 
-import cats.{Applicative, Apply, Eval, Foldable, Later, Now}
+import cats.{Applicative, Apply, Eval, Foldable, Later, Now, Traverse}
 import org.scalatest.{Matchers, WordSpec}
 import cats.syntax.either._
 
@@ -85,10 +85,10 @@ class FoldableSpec extends WordSpec with Matchers {
       import cats.instances.vector._
       import cats.instances.list._
       import cats.instances.option._
-      Applicative[Vector].traverse(Vector(1, 2, 3))(x => Vector(x)) shouldBe Vector(Vector(1, 2, 3))
-      Applicative[Vector].traverse(Option(1))((x: Int) => Vector(x)) shouldBe Vector(Option(1))
-      Applicative[Option].traverse(List(1, 2, 3))(x => Option(x * 10)) shouldBe Option(List(10, 20, 30))
-      Applicative[Option].traverse(List[Int => Int](_ * 10, _ + 10))(f => Option(f(10))) shouldBe Option(List(100, 20))
+      Traverse[Vector].traverse[Vector, Int, Int](Vector(1, 2, 3))(x => Vector(x)) shouldBe Vector(Vector(1, 2, 3))
+      Traverse[Option].traverse[Vector, Int, Int](Option(1))((x: Int) => Vector(x)) shouldBe Vector(Option(1))
+      Traverse[List].traverse[Option, Int, Int](List(1, 2, 3))(x => Option(x * 10)) shouldBe Option(List(10, 20, 30))
+      Traverse[List].traverse[Option, Int => Int, Int](List[Int => Int](_ * 10, _ + 10))(f => Option(f(10))) shouldBe Option(List(100, 20))
     }
 
     "traverse_ is useful when G[_] represent an action or effect " in {

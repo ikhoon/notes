@@ -9,6 +9,7 @@ package freestylenote
 // sequential 하거나 parallel하게 진행하수 있도록 한다.
 // 그리고 기계적으로 implicit이 필요한건 modular 프로그램화 하게 한다.
 
+/*
 import freestyle._
 import freestyle.implicits._
 
@@ -102,3 +103,4 @@ import scala.concurrent.Await
 // boilerplate free - 행사코드가 없는 application, library이다
 
 }
+*/

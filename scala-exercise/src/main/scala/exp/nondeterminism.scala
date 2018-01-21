@@ -110,7 +110,6 @@ object monixtask {
   // parallel
   def runWithNondeterminismAp() = {
     import monix.execution.Scheduler.Implicits.global
-    import monix.eval.Task.nondeterminism
     import cats.implicits._
     import monix.eval.Task
     withTS {
@@ -154,7 +153,7 @@ object catseffect {
   }
 
   def runMonixInstance(): Unit = {
-    implicit val a = monix.eval.instances.ApplicativeStrategy.Parallel
+//    implicit val a = monix.eval.instances.ParallelApplicative
     withTS {
       val tc = ta.map2(tb)(_ + _)
       tc.unsafeRunSync()

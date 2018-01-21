@@ -61,7 +61,7 @@ class TraverseSpec extends WordSpec with Matchers {
       // map
       val listFutureUser: List[Future[User]] = userIds.map(getUser)
       // sequence
-      val futureListUser: Future[List[User]] = Applicative[Future].sequence(listFutureUser)
+      val futureListUser = Traverse[List].sequence[Future, User](listFutureUser)
 
       Await.result(futureListUser, Duration.Inf) shouldBe expected
 
