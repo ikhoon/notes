@@ -7,6 +7,7 @@ import cats.implicits._
 /**
   * Created by Liam.M(엄익훈) on 02/01/2017.
   */
+/*
 class KleisliSpec extends WordSpec with Matchers{
 
   "kleisli" should {
@@ -75,7 +76,11 @@ class KleisliSpec extends WordSpec with Matchers{
       val run2: Option[Boolean] = cc.run(AccoutRepositoryImpl)
       println(run2)
 
+      Kleisli[Option, AccountRepository, Boolean] { ac =>
+        foo(1).run(ac)
+      }
     }
   }
 
 }
+*/

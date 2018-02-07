@@ -18,6 +18,9 @@ object BreakOut {
     // 하지만 이건 효율적이지 않다.
     // List 객체를 만들고 Map개체를 생성하기 때문에 중간 객체가 생기고 최적화 되지 않는다.
 
+
+
+
     // 성능도 잡고 타입도 바로 잡아주는 방법은 breakOut을 사용하면 된다.
     val xsWithSquares2 : Map[Int, Int] = xs.map(x => (x, x * x))(collection.breakOut)
     // 기본적인 CanBuildFrom에서 CanBuildFrom[-From, -Elem, +To] 3개의 타입을 가지고 implicit을 찾았다.

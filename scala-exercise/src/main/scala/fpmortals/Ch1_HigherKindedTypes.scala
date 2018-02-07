@@ -21,6 +21,10 @@ object Ch1_HigherKindedTypes {
   }
 
   // 그리고 타입 생성자가 여러개 있는 경우 type parameter hole을 생성한다.
+
+
+
+
   // Either[String, _]
 
   type EitherString[T] = Either[String, T]
