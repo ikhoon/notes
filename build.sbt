@@ -85,6 +85,9 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "junit" % "junit" % "4.12" % "test",
 
+    "com.github.julien-truffaut" %%  "monocle-core"  % "1.5.0-cats",
+    "com.github.julien-truffaut" %%  "monocle-macro" % "1.5.0-cats",
+    "com.github.julien-truffaut" %%  "monocle-law"   % "1.5.0-cats" % "test",
     // scala meta
     "org.scalameta" %% "scalameta" % "2.1.2",
 
