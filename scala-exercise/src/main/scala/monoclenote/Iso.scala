@@ -1,6 +1,6 @@
 package monoclenote
 
-import monocle.{Lens, PTraversal, Traversal}
+import monocle.{Lens, PLens, PTraversal, Traversal}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -68,13 +68,31 @@ object IsoExample extends App {
   println(values2)
 
 
-  // Future도 될라나?
-  // A => Future[A]를 만드는 Iso를 만들어 볼까나?
+  // Iso generation api에 대해서 한번 보자.
+  // case class와 tuple사이의 변환을 macro로 지원해준다.
 
+  case class MyString(s: String)
+  case class Foo()
+  case object Bar
+
+  import monocle.macros.GenIso
+
+  val a = GenIso[MyString, String].get(MyString("hello"))
+  println(a)
+
+  // GenIso.unit은 필드가 없는 object나 case class에서 사용될수 있다.
+  val fooUnit = GenIso.unit[Foo]
+  val foo: Foo = fooUnit.reverseGet(())
+  // 이게 언제 써먹을수 있을라나? 싶긴하다 아직
+
+  val tuples: (String, Int) = GenIso.fields[Person].get(Person("John", 42))
+  println(tuples)
 
 
 
 }
+
+
 
 
 
