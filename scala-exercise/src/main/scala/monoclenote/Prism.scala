@@ -1,6 +1,6 @@
 package monoclenote
 
-import monocle.PPrism
+import monocle.{PPrism, Prism}
 import monocle.macros.{GenIso, GenPrism}
 
 import scala.util.Try
@@ -12,13 +12,32 @@ object PrismExample extends App {
 
   // Prism은 Sum 타입을 위한 optic이다.
   // Prism은 S, A 두대의 타입 파라메터를 받고 있다.
-  // S는 Sum타입을 표현하고, A는 Sum타입의 일부이다.
+  // S는 Sum타입을 표현하고, A는 Sum 하위 타입의 일부이다.
 
   sealed trait Json
   case object JNull extends Json
   case class JStr(v: String) extends Json
   case class JNum(v: Double) extends Json
   case class JObj(v: Map[String, Json]) extends Json
+
+
+  // Json => JStr => String
+  // String => JStr => Json
+  val pJStr = Prism[Json, String] {
+    case JStr(v) => Some(v)
+    case _ => None
+  }(JStr)
+
+  val maybeString: Option[String] = pJStr.getOption(JStr("10"))
+  val json12: Json = pJStr.reverseGet("10")
+
+
+
+  // 10 => "10" => JStr("10")
+
+
+
+
 
   // Prism의 생성자는 두개의 함수를 인자로 받는다.
   // getOption: Json => Option[String]
@@ -28,7 +47,11 @@ object PrismExample extends App {
   val jStr: Prism[Json, String] = Prism[Json, String] {
     case JStr(v) => Some(v)
     case _ => None
-  }(JStr)
+  }(str => JStr(str))
+
+
+
+
   println(jStr.getOption(JStr("hello")))
   println(jStr.getOption(JNum(10)))
 
