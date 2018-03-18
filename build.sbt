@@ -49,8 +49,8 @@ lazy val commonSettings = Seq(
     Resolver.jcenterRepo
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-core" % "1.0.0",
-    "org.typelevel" %% "cats-effect" % "0.8",
+    "org.typelevel" %% "cats-core" % "1.1.0",
+    "org.typelevel" %% "cats-effect" % "0.10",
     "io.monix" %% "monix" % "3.0.0-M3",
 //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
