@@ -153,7 +153,7 @@ object comonad {
 
   case class Cowriter[W: Monoid, A](tell: W => A) {
     def map[B](f: A => B): Cowriter[W, B] = Cowriter(tell andThen f)
-     def extract: A = tell(Monoid[W].zero)
+    def extract: A = tell(Monoid[W].zero)
     def duplicate: Cowriter[W, Cowriter[W, A]] =
       Cowriter(w1 => Cowriter(w2 => tell(Monoid[W].append(w1, w2))))
     def extend[B](f: Cowriter[W, A] => B): Cowriter[W, B] =
@@ -193,9 +193,9 @@ object comonad {
   // 전통적인 `List`와는 달리 head값을 얻는것이 언제나 안전하다.
 
   // 하지만 `comonadic`한 duplicate 연산은 여기서 무언인가?
-  // 그것은 comonad의 연산을 준수하여 NEL[A]을 NEL[NEL[A]으로 가게 하는것을 허락한다.
+  // 그것은 comonad의 연산을 준수하여 NEL[A]을 NEL[NEL[A]]으로 가게 하는것을 허락한다.
   // nonempty list에 대해서, 하나의 구연히 이들의 규칙을 만족하는것으로 나온다
-  // `def tails: NEL[NEL[A]] = NEL(this, tail.map(_.tails))`
+  // `def tails: NEL[NEL[A]] = NEL  (this, tail.map(_.tails))`
 
   // tails 연산은 주어진 리스트의 부분 모든 suffix를 반환한다.
   // [1, 2, 3]의 tails연산은 [[1,2,3], [2,3], [3]]이 된다.
