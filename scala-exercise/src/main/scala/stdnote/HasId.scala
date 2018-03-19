@@ -44,6 +44,7 @@ object Test {
 // 1 번째 : 인터페이스 정의
 trait Functor[F[_]]  {
   def map[A, B](fa: F[A])(f: A => B): F[B]
+
 }
 
 // T U V
@@ -57,6 +58,7 @@ object Functor {
   def map[F[_], A, B](fa: F[A])(f: A => B)(implicit F: Functor[F]) = {
     F.map(fa)(f)
   }
+
   // 4 번째 : 문법 요소 만들기
   implicit class FunctorOps[F[_], A](fa: F[A]) {
     def map[B](f: A => B)(implicit F: Functor[F]): F[B] = F.map(fa)(f)
@@ -67,6 +69,7 @@ object Functor {
   implicit val barInstance = new Functor[Bar] {
     def map[A, B](fa: Bar[A])(f: A => B): Bar[B] = Bar(f(fa.x))
   }
+  import cats.implicits._
 
   val bar = Bar(10)
   bar map (_ + 10)

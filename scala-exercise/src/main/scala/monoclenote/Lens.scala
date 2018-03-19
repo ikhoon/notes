@@ -11,6 +11,14 @@ object LensExample extends App  {
   // Lens는 product type 즉 case class나 tuple, HList, Map 같은걸 들여다 볼수 있는 타입이다.
   case class Address1(streetNumber: Int, streetName: String)
 
+  // lens streetName
+
+
+
+
+
+
+
   //  get: Address1 => Int
   //  set: Int => Address1 => Address1
 
