@@ -2,21 +2,26 @@ package catseffectnote
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, ScheduledThreadPoolExecutor}
 
+import cats.Parallel
+import cats.effect.Effect
+
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 
 /**
   * Created by ikhoon on 19/03/2018.
   * 참조 : https://typelevel.org/cats-effect/datatypes/io.html
-  * cats.effect.IO 직접 쓸일을 없을것 같다. monix.eval.Task를 사용하면 되지 않을까 싶지만
+  * cats.effect.IO 직접 쓸일을 없을것 같다.
+  * monix.eval.Task 를 사용하면 되지 않을까 싶지만
   * 그래도 컨셉이나 api 설계에 대해서 알아보자.
   */
 object IOExample extends App {
 
   // Introduction
-  // IO[A] 타입은 평가될때 계산이 된다. A 타입이 반환될때 effect가 수행될수 있다.
+  // IO[A] 타입은 평가될때 계산이 된다.
+  // A 타입이 반환될때 effect가 수행될수 있다.
   // lazy하단 말씀
 
   // IO 값은 순수, 불변의 속성을 가지고 있음 fp할수 있게
@@ -29,7 +34,8 @@ object IOExample extends App {
 
   // Effect는 "end of the world"까지 평가하지 않는다.
   // 이말은 "unsafe" 함수가 사용될때 까지.
-  // 결과는 cache되지 않는다. 이말은 leak이나 memory overhead가 최소화 된다는 말이다.
+  // 결과는 cache 되지 않는다.
+  // 이말은 leak 이나 memory overhead 가 최소화 된다는 말이다.
   // reference transparent 참조 투명성이 보장이된다.
 
   import cats.effect.IO
@@ -39,6 +45,31 @@ object IOExample extends App {
       _ <- ioa
       _ <- ioa
     } yield ()
+
+  program.unsafeRunSync()
+
+  val program0: IO[Unit] =
+    for {
+      _ <- IO { println("hey!") }
+      _ <- IO { println("hey!") }
+    } yield ()
+
+  val foa = Future { println("hey!") }
+  val program1: Future[Unit] =
+    for {
+      _ <- foa
+      _ <- foa
+    } yield ()
+
+  val program2: Future[Unit] =
+    for {
+      _ <- Future { println("hey!") }
+      _ <- Future { println("hey!") }
+    } yield ()
+
+  import cats.effect.implicits._
+  import cats.implicits._
+  import cats.syntax.all._
 
   program.unsafeRunSync()
   // 두번 실행됨
@@ -52,6 +83,64 @@ object IOExample extends App {
 
   // Future와 IO는 비동기 처리 결과를 얻기에 적합하다.
   // 하지만 순수함과 느긋함 때문에 IO는 더 컨트롤 가능한 평가 모델이고 더 예측가능하다.
+
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  def asynchronous(x: Int)(f: Int => Unit): Unit =
+    f(x * 2)
+
+  val p = Promise[Int]()
+  asynchronous(10)(x => p.complete(Success(x)))
+  p.future
+
+  // IO.async
+  val x: IO[Int] = IO.async(cb => {
+    asynchronous(10)(x => cb(Right(x)))
+  })
+
+
+  asynchronous(10)(x => p.complete(Success(x)))
+
+  def synchronous(x: Int): Int = x * 2
+
+  Future[Int] { synchronous(10) }
+  
+  // IO.apply
+  IO[Int] { synchronous(10) }
+
+
+
+
+
+  IO.apply()
+
+  IO(1)
+  IO.async(cb => cb(Right(1)))
+
+
+  def fromFuture[A](f: Future[A]): IO[A] = ???
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // 이코드는 Future와 IO가 같은 결과를 가지지만
   def addToGauge(x: Int): IO[Unit] = IO { println(s"add to guage $x") }
@@ -162,7 +251,6 @@ object IOExample extends App {
   implicit val sc = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory())
   println("begin 5 seconds")
   val res = delayedTick(5 seconds) *> IO(println("after 5 seconds"))
-  res.ca
 
 
 
