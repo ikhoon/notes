@@ -29,6 +29,9 @@ object parallelExperiment {
     println("###### cats effect io map2")
     catseffect.runMap2()
 
+    println("###### cats effect io parMapN")
+    catseffect.runParMapN()
+
     println("###### cats effect io monix instance")
     catseffect.runMonixInstance()
   }
@@ -148,6 +151,14 @@ object catseffect {
   def runMap2(): Unit = {
     withTS {
       val tc = ta.map2(tb)(_ + _)
+      tc.unsafeRunSync()
+    }
+  }
+
+
+  def runParMapN(): Unit = {
+    withTS {
+      val tc = (ta, tb).parMapN(_ + _)
       tc.unsafeRunSync()
     }
   }
