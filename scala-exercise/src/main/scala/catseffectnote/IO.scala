@@ -162,7 +162,6 @@ object IOExample extends App {
   implicit val sc = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory())
   println("begin 5 seconds")
   val res = delayedTick(5 seconds) *> IO(println("after 5 seconds"))
-  res.ca
 
 
 
