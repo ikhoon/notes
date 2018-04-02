@@ -79,7 +79,6 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
    } yield option
 
 
-  /** Future[Option[Address]]를 갖고 싶다면 OptionT로 감싸라. */
   // 힘들것이다. 사용하기 어렵다. 짜증난다. 이게 뭐다냐. 쪼사뿔까.
   def optionFuture1: Future[Option[Address]] = {
     for {
@@ -91,16 +90,13 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
     } yield optionAddress
   }
 
-  //
   /** Future[Option[A]]있다면 OptionT로 감싸라. */
-  // QUIZ 이걸 OptionT를 이용해서 구현해보라.
   def optionFuture3: Future[Option[Address]] = {
-    val value1: OptionT[Future, Address] = for {
+    for {
       user: User <- OptionT(findUser(10)) // Future[Option[User]] => FutureOption[User] => User
       address <- OptionT(findAddress(user.id)) // Future[Option[Address]]
     } yield address
-    value1.value
-  }
+  }.value
 
 
 
