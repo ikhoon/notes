@@ -38,6 +38,7 @@ object IOExample extends App {
   // 이말은 leak 이나 memory overhead 가 최소화 된다는 말이다.
   // reference transparent 참조 투명성이 보장이된다.
 
+  import scala.concurrent.ExecutionContext.Implicits.global
   import cats.effect.IO
   val ioa = IO { println("hey!") }
   val program: IO[Unit] =
@@ -84,7 +85,6 @@ object IOExample extends App {
   // Future와 IO는 비동기 처리 결과를 얻기에 적합하다.
   // 하지만 순수함과 느긋함 때문에 IO는 더 컨트롤 가능한 평가 모델이고 더 예측가능하다.
 
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   def asynchronous(x: Int)(f: Int => Unit): Unit =
     f(x * 2)
@@ -112,10 +112,8 @@ object IOExample extends App {
 
 
 
-  IO.apply()
-
   IO(1)
-  IO.async(cb => cb(Right(1)))
+  IO.async[Int](cb => cb(Right(1)))
 
 
   def fromFuture[A](f: Future[A]): IO[A] = ???
@@ -221,7 +219,7 @@ object IOExample extends App {
   // Future -> IO 로 바꾸어 보자
   // 이미 내장된 하뭇 IO.fromFuture가 있지만 그냥 만들어본다.
 
-  def convert[A](fa: Future[A])(implicit ec: ExecutionContext): IO[A] =
+  def convert[A](fa: Future[A]): IO[A] =
     IO.async(cb =>
       fa.onComplete {
         case Success(v) => cb(Right(v))
@@ -250,7 +248,7 @@ object IOExample extends App {
   import cats.implicits._
   implicit val sc = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory())
   println("begin 5 seconds")
-  val res = delayedTick(5 seconds) *> IO(println("after 5 seconds"))
+//  val res = delayedTick(5 seconds) *> IO(println("after 5 seconds"))
 
 
 
