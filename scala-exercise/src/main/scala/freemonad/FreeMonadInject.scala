@@ -1,6 +1,6 @@
 package freemonad
 
-object free {
+object FreeExample {
   /**
     * Created by ikhoon on 09/07/2017.
     *
@@ -140,7 +140,7 @@ object free {
       f match {
         case Ask(prompt) =>
           println(prompt)
-          readLine
+          scala.io.StdIn.readLine
         case Tell(msg) =>
           println(msg)
       }

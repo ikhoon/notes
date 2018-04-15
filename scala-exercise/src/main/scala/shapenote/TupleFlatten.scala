@@ -1,13 +1,15 @@
 package shapenote
 
 import shapeless.{Lazy, Poly1}
-import shapeless.ops.tuple.{FlatMapper, Prepend}
+import shapeless.ops.tuple.{FlatMapper}
 
 
 /**
   * Created by Liam.M on 2017. 12. 28..
+  * codes in shapeless
+  * https://github.com/milessabin/shapeless/blob/master/examples/src/main/scala/shapeless/examples/flatten.scala#L70
   */
-/*
+
 object TupleFlatten {
 
   trait LowPriorityFlatten extends Poly1 {
@@ -30,6 +32,8 @@ object TupleFlatten {
   }
 }
 
+/*
+예전 버전
 import shapeless._
 
 trait Flatten[I, O <: HList] {
