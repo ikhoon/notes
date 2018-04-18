@@ -14,6 +14,36 @@ import scala.concurrent.duration.Duration
   */
 object KleisliExample extends App {
 
+  // 합성
+  val a : Int => String = ???
+  val b : String => Boolean = ???
+//  val c: Int => Boolean = a.andThen(b)
+
+  val a1: Int => Future[String] = x => (x.toString).pure[Future]
+  val a2: String => Future[Boolean] = x => (true).pure[Future]
+
+
+//  a1.andThen(a2)
+
+
+  /*
+  val i = 10
+  val a = for {
+    str <- a1(10)
+    bool <- a2(str)
+  } yield bool
+
+
+ val a3: Kleisli[Future, Int, Boolean] =  Kleisli(a1).andThen(a2)
+
+ val a4: Int => Future[Boolean] = a3.run
+
+
+  // 10 => a, b, c
+
+
+
+
   val foo: Int => Future[Int] = x => (x + 10).pure[Future]
   val bar: Int => IO[Int] = x => (x + 10).pure[IO]
 
@@ -41,5 +71,14 @@ object KleisliExample extends App {
   println(Await.result(value, Duration.Inf))
   val value1: IO[Int] = (Kleisli(bar), Kleisli(bar), Kleisli(bar)).parMapN{ _ + _ + _ }.run(10)
   println(value1.unsafeRunSync())
+
+
+  type Config = String
+  def abc(a: Int): Kleisli[Future, Config, Boolean] =
+    Kleisli[Future, Config, Boolean]((config: Config) =>
+      ???
+    )
+
+*/
 
 }

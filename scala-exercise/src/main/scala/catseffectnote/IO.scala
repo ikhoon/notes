@@ -54,22 +54,23 @@ object IOExample extends App {
       _ <- IO { println("hey!") }
     } yield ()
 
-  val foa = Future { println("hey!") }
-  val program1: Future[Unit] =
+  {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    val foa = Future { println("hey!") }
+    val program1: Future[Unit] =
     for {
       _ <- foa
       _ <- foa
     } yield ()
 
-  val program2: Future[Unit] =
-    for {
-      _ <- Future { println("hey!") }
-      _ <- Future { println("hey!") }
-    } yield ()
-
+    val program2: Future[Unit] =
+      for {
+        _ <- Future { println("hey!") }
+        _ <- Future { println("hey!") }
+      } yield ()
+  }
   import cats.effect.implicits._
   import cats.implicits._
-  import cats.syntax.all._
 
   program.unsafeRunSync()
   // 두번 실행됨
@@ -84,7 +85,6 @@ object IOExample extends App {
   // Future와 IO는 비동기 처리 결과를 얻기에 적합하다.
   // 하지만 순수함과 느긋함 때문에 IO는 더 컨트롤 가능한 평가 모델이고 더 예측가능하다.
 
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   def asynchronous(x: Int)(f: Int => Unit): Unit =
     f(x * 2)
@@ -103,8 +103,11 @@ object IOExample extends App {
 
   def synchronous(x: Int): Int = x * 2
 
-  Future[Int] { synchronous(10) }
-  
+  {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    Future[Int] { synchronous(10) }
+  }
+
   // IO.apply
   IO[Int] { synchronous(10) }
 
@@ -112,10 +115,9 @@ object IOExample extends App {
 
 
 
-  IO.apply()
 
   IO(1)
-  IO.async(cb => cb(Right(1)))
+  IO.async[Int](cb => cb(Right(1)))
 
 
   def fromFuture[A](f: Future[A]): IO[A] = ???
@@ -247,7 +249,8 @@ object IOExample extends App {
       IO(f.cancel(false))
     })
 
-  import cats.implicits._
+//  import cats.implicits._
+//  import cats.effect.implicits._
   implicit val sc = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory())
   println("begin 5 seconds")
   val res = delayedTick(5 seconds) *> IO(println("after 5 seconds"))
