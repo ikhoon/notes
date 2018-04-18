@@ -39,9 +39,10 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
   // 다양한 API가 존재한다.
   /** 1 : 1, CPU 연산만 변형하는 연산들 */
   def toUserDto(a: User): UserDto = UserDto(a.id)
+  def getPhoneNumber(a: User): Long = a.id
 
   /** 1 : 0..1, 파싱하는 로직같은 경우 */
-  def toUserId(userId: String): Option[Long] = Try { userId.toLong }.toOption
+  def parseUserId(userId: String): Option[Long] = Try { userId.toLong }.toOption
 
   /** 1 : N, 데이터를 N개 변환한다, 뭐가 있을려나? ids 파싱같은 경우 */
   def toIds (ids: String): List[Long] = ids.split(",").map(_.toLong)(collection.breakOut)
@@ -111,6 +112,17 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
 //    device
 //  }
 
+  /*
+    def findDeviceByUserId(userId: String): Future[Option[Device]] = {
+
+      val userId = parseUserId(userId) // Option[Long]
+      val user = findUser(userId)  // Future[Option[User]]
+      val phoneNumber = getPhoneNumber(user)  // UserDto
+      val device = findDevice(phoneNumber)  // Future[Device]
+      device
+    }
+    */
+
 
 
 
@@ -127,10 +139,10 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
 
   def findDeviceByUserId(userId: String): Future[Option[Device]] =
     (for {
-      userId <- OptionT.fromOption[Future](toUserId(userId)) // Option[Long] => Future[Option[Long]]
-      user <- OptionT(findUser(userId))  // Future[Option[User]]
-      userDto <- OptionT.pure[Future](toUserDto(user))  // UserDto => Future[Option[UserDto]]
-      device <- OptionT.liftF(findDevice(userDto.id)) // Future[Device] => Future[Option[Device]]
+      userId <- OptionT.fromOption[Future](parseUserId(userId)) // Option[Long] => Future[Option[Long]]
+      user <- OptionT(findUser(userId)) // Future[Option[User]]
+      phoneNumber <- OptionT.pure[Future](getPhoneNumber(user)) // UserDto => Future[Option[UserDto]]
+      device <- OptionT.liftF(findDevice(phoneNumber)) // Future[Device] => Future[Option[Device]]
     } yield device).value
 
 
@@ -217,6 +229,39 @@ class MonadTransformerSaveUs extends FunSuite with Matchers {
   }
 
 
+  val orderId = 1
+  val address = for {
+    orderOption <- findOrder(orderId)
+    userOption <- orderOption match {
+      case Some(order) => findUser(order.userId)
+      case None => Future.successful(None)
+    }
+    address <- userOption match {
+      case Some(user) => findAddress(user.id)
+      case None => Future.successful(None)
+    }
+  } yield address
 
+  val address1 = for {
+    order<- OptionT(findOrder(orderId))
+    user <- OptionT(findUser(order.userId))
+    addr <- OptionT(findAddress(user.id))
+  } yield addr
 
+  final case class MyOptionT[F[_], A](value: F[Option[A]]) {
+    def flatMap[B](f: A => OptionT[F, B])(implicit F: Monad[F]): MyOptionT[F, B] =
+      flatMapF(a => f(a).value)
+
+    def flatMapF[B](f: A => F[Option[B]])(implicit F: Monad[F]): MyOptionT[F, B] = {
+      def fn(fa: Option[A]): F[Option[B]] = fa match {
+        case Some(v) => f(v)
+        case None => F.pure[Option[B]](None)
+      }
+
+      MyOptionT(F.flatMap(value)(fn))
+
+      MyOptionT(F.flatMap(value)(_.fold(F.pure[Option[B]](None))(f)))
+    }
+
+  }
 }

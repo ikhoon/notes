@@ -54,13 +54,17 @@ lazy val commonSettings = Seq(
     "io.monix" %% "monix" % "3.0.0-M3",
 //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.tpolecat" %% "doobie-core" % "0.5.0-M13",
-    "org.tpolecat" %% "doobie-h2" % "0.5.0-M13",
+    "org.tpolecat" %% "doobie-core" % "0.5.2",
+    "org.tpolecat" %% "doobie-h2" % "0.5.2",
     "org.scalactic" %% "scalactic" % "3.0.1",
 
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
     "com.thoughtworks.each" %% "each" % "3.3.1",
     "org.atnos" %% "eff" % "4.2.0",
+
+    // fs2
+    "co.fs2" %% "fs2-core" % "0.10.3",
+    "co.fs2" %% "fs2-io" % "0.10.3",
 
     // freestyle
     "io.frees" %% "frees-core" % "0.6.2",

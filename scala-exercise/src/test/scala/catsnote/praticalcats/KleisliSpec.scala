@@ -1,13 +1,12 @@
-package catsnote
+package catsnote.praticalcats
 
 import cats.data.Kleisli
-import org.scalatest.{Matchers, WordSpec}
 import cats.implicits._
+import org.scalatest.{Matchers, WordSpec}
 
 /**
   * Created by Liam.M(엄익훈) on 02/01/2017.
   */
-/*
 class KleisliSpec extends WordSpec with Matchers{
 
   "kleisli" should {
@@ -68,19 +67,18 @@ class KleisliSpec extends WordSpec with Matchers{
       })
 
 
-      object AccoutRepositoryImpl extends AccountRepository {
+      object AccountRepositoryImpl extends AccountRepository {
         override def getId: Int = 10
       }
       
       val cc: Kleisli[Option, AccountRepository, Boolean] = foo(10).flatMap(bar)
-      val run2: Option[Boolean] = cc.run(AccoutRepositoryImpl)
+      val run2: Option[Boolean] = cc.run(AccountRepositoryImpl)
       println(run2)
 
-      Kleisli[Option, AccountRepository, Boolean] { ac =>
+      Kleisli[Option, AccountRepository, String] { ac =>
         foo(1).run(ac)
       }
     }
   }
 
 }
-*/
