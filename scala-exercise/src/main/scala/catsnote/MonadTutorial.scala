@@ -1,6 +1,5 @@
 package catsnote
 
-import cats.implicits._
 import cats.{Monad, Monoid, StackSafeMonad}
 
 import scala.concurrent.Future
@@ -22,7 +21,6 @@ object MonadTutorial extends App {
   case class Foo[A](a: A)
   case class Bar(a: Int)
   val foo = Foo(10)
-  foo.a
 
   implicit val fooMonadInstance = new Monad[Foo] with StackSafeMonad[Foo] {
     def pure[A](a: A): Foo[A] = Foo(a)
@@ -79,7 +77,6 @@ object MonadTutorial extends App {
 
   // 어떻게 사용해야 하나?
   import cats.implicits._
-  implicit val monadInstance =  ???
 
   // 왜 알아야 하나?
   // > 우리가 사용하는 코드의 패턴의 모음이다.

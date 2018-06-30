@@ -1,11 +1,11 @@
 package catsnote
 
 import cats.data.{EitherT, Nested, OptionT}
-import cats.{Applicative, Monad}
-import scalaz.ListT
+import cats.{Applicative}
 import cats.implicits._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Liam.M on 2018. 04. 12..
@@ -13,19 +13,23 @@ import scala.concurrent.Future
 object MonadTransformer extends App {
 
   val futureOption = Future.successful(Option(1))
+  /** 컴파일 안됨
   val fo2 = for {
     option <- futureOption
     x <- option
   } yield x + 1
+  */
 
   val xs = List(1, 2, 3)
   val maybe = Option(1)
 
   // DOTTY
+  /**
   for {
     x <- xs
     y <- maybe
   } yield x + y
+  */
 
   val eventual: Future[Option[Int]] =
     Applicative[Future]

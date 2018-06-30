@@ -7,7 +7,7 @@ import scala.concurrent.Future
 /**
   * Created by Liam.M on 2018. 03. 19..
   */
-object Parallel extends App {
+object ParallelApp extends App {
 
   import cats.implicits._
   import cats.effect.IO
