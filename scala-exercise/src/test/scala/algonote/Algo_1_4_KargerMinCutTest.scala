@@ -2,6 +2,8 @@ package algonote
 
 import org.scalatest.{FunSuite, Matchers}
 
+import scala.collection.immutable
+
 /**
   * Created by ikhoon on 15/07/2018.
   */
@@ -19,10 +21,10 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
         .split("\n")
 
 
-    val karger = Algo_1_4_KargerMinCut.build(matrix)
-    karger.graph.size shouldBe 4
-    karger.graph(1) shouldBe Set(2, 3)
-    karger.graph(3) shouldBe Set(1, 2, 4)
+    val graph = Algo_1_4_KargerMinCut.build(matrix)
+    graph.size shouldBe 4
+    graph(Set(1)) shouldBe Set(2, 3)
+    graph(Set(3)) shouldBe Set(1, 2, 4)
 
   }
 
@@ -32,7 +34,7 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
     *  | /   |
     *  3 --- 4
     */
-  test("find min") {
+  test("find min 1") {
     val matrix =
       """
         |1 2 3
@@ -43,11 +45,64 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
         .split("\n")
 
 
-    val karger = Algo_1_4_KargerMinCut.build(matrix)
+    val graph = Algo_1_4_KargerMinCut.build(matrix)
     (1 to 100).foreach { i =>
-      val cuts = karger.findMinCut()
+      val cuts = Algo_1_4_KargerMinCut.findMinCut(graph)
       println(s"$i cuts = ${cuts}")
     }
+  }
+
+  /**
+    * 1 --- 2 ---- 3 ---- 4
+    * | \  /|      | \  / |
+    * | /  \|      | /  \ |
+    * 5 --- 6      7 ---- 8
+    */
+
+  test("find min 2") {
+    val matrix =
+      """
+        |1 2 5 6
+        |2 1 3 5 6
+        |3 2 4 7 8
+        |4 3 7 8
+        |5 1 2 6
+        |6 1 2 5
+        |7 3 4 8
+        |8 3 4 7
+      """.stripMargin
+        .split("\n")
+
+    val graph = Algo_1_4_KargerMinCut.build(matrix)
+    val all: immutable.Seq[Graph] = (1 to 100).map { i =>
+      val cuts = Algo_1_4_KargerMinCut.findMinCut(graph)
+      println(s"$i cuts = ${cuts}")
+      cuts
+    }
+    val sorted = all.sortBy(graph => {
+      graph.head._2.size
+    })
+    println("sorted!!!")
+    sorted.foreach(println)
+  }
+
+
+  test("find mincut submit") {
+    val matrix = scala.io.Source.fromResource("karger_mincut_input.txt")
+      .getLines().toArray
+    val graph = Algo_1_4_KargerMinCut.build(matrix)
+
+    val all: immutable.Seq[Graph] = (1 to 100).map { i =>
+      Algo_1_4_KargerMinCut.findMinCut(graph)
+    }
+    val sorted = all.sortBy(graph => {
+      graph.head._2.size
+    })
+    println("sorted!!!")
+    sorted.foreach(println)
+    val minCutGraph: Graph = sorted.head
+    println(minCutGraph.head._2.size)
+
   }
 
   test("string split") {
