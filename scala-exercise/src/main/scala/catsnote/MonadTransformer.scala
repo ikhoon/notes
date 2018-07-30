@@ -1,8 +1,7 @@
 package catsnote
 
 import cats.data.{EitherT, Nested, OptionT}
-import cats.{Applicative, Monad}
-import scalaz.ListT
+import cats.{Applicative}
 import cats.implicits._
 
 import scala.concurrent.Future
@@ -25,10 +24,12 @@ object MonadTransformer extends App {
   val maybe = Option(1)
 
   // DOTTY
+  /**
   for {
     x <- xs
     y <- maybe
   } yield x + y
+  */
 
   val eventual: Future[Option[Int]] =
     Applicative[Future]
