@@ -6,6 +6,7 @@ import scalaz.ListT
 import cats.implicits._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Liam.M on 2018. 04. 12..
@@ -13,10 +14,12 @@ import scala.concurrent.Future
 object MonadTransformer extends App {
 
   val futureOption = Future.successful(Option(1))
+  /* 컴파일 안됨
   val fo2 = for {
     option <- futureOption
     x <- option
   } yield x + 1
+  */
 
   val xs = List(1, 2, 3)
   val maybe = Option(1)

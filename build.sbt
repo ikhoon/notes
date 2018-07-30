@@ -41,7 +41,9 @@ lazy val commonSettings = Seq(
     "-language:implicitConversions",
     "-language:experimental.macros",
     "-language:reflectiveCalls",
-    "-language:postfixOps"
+    "-language:postfixOps",
+    "-Xplugin-require:macroparadise"
+
   ),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
@@ -93,7 +95,8 @@ lazy val commonSettings = Seq(
     "com.github.julien-truffaut" %%  "monocle-macro" % "1.5.0-cats",
     "com.github.julien-truffaut" %%  "monocle-law"   % "1.5.0-cats" % "test",
     // scala meta
-    "org.scalameta" %% "scalameta" % "2.1.2",
+    "org.scalameta" %% "scalameta" % "3.7.2",
+    "org.scalameta" %% "contrib" % "3.7.2",
 
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
