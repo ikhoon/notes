@@ -88,4 +88,4 @@ crashlytics-build.properties
 .ensime_lucene/
 
 
-scala-exercise/src/test/resources/strong_connected_compoents.txt
+scala-exercise/src/test/resources/strong_connected_components.txt
