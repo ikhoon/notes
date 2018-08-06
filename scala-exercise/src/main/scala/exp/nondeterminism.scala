@@ -7,9 +7,7 @@ import parallelExperiment.withTS
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-
 object parallelExperiment {
-
 
   def main(args: Array[String]): Unit = {
     println("###### monix task ap - sequence")
@@ -30,12 +28,11 @@ object parallelExperiment {
     catseffect.runMap2()
 
     println("###### cats effect io parMapN")
-    catseffect.runParMapN()
+//    catseffect.runParMapN()
 
     println("###### cats effect io monix instance")
     catseffect.runMonixInstance()
   }
-
 
   def withTS(block: => Unit) = {
     println(s"# Start  - ${LocalDateTime.now()}")
@@ -97,7 +94,7 @@ object monixtask {
   // parallel
   def runWithZip() = {
     withTS {
-      val tc : Task[Int] = ta.zipMap(tb)(_ + _)
+      val tc: Task[Int] = ta.zipMap(tb)(_ + _)
       Await.result(tc.runAsync, 10 seconds)
     }
   }
@@ -105,7 +102,7 @@ object monixtask {
   // sequence
   def runWithAp() = {
     withTS {
-      val tc : Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
+      val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
       Await.result(tc.runAsync, 10 seconds)
     }
   }
@@ -116,7 +113,7 @@ object monixtask {
     import cats.implicits._
     import monix.eval.Task
     withTS {
-      val tc : Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
+      val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
       Await.result(tc.runAsync, 10 seconds)
     }
   }
@@ -125,7 +122,7 @@ object monixtask {
 object catseffect {
 
   import cats.effect.IO
-//  import cats.effect.implicits._
+  import cats.effect.implicits._
   import cats.implicits._
   import cats.Applicative
 
@@ -139,7 +136,6 @@ object catseffect {
     Thread.sleep(1000)
     cb(Right(2))
   }
-
 
   def runAp(): Unit = {
     withTS {
@@ -155,13 +151,12 @@ object catseffect {
     }
   }
 
-
-  def runParMapN(): Unit = {
-    withTS {
-      val tc = (ta, tb).parMapN(_ + _)
-      tc.unsafeRunSync()
-    }
-  }
+//  def runParMapN(): Unit = {
+//    withTS {
+//      val tc = (ta, tb).parMapN(_ + _)
+//      tc.unsafeRunSync()
+//    }
+//  }
 
   def runMonixInstance(): Unit = {
 //    implicit val a = monix.eval.instances.ParallelApplicative
@@ -172,4 +167,3 @@ object catseffect {
 
   }
 }
-
