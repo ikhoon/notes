@@ -6,3 +6,5 @@ resolvers ++= Seq(
 addSbtPlugin("org.tpolecat" % "tut-plugin" % "0.6.2")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.1")
+
+addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "18.8.0")
