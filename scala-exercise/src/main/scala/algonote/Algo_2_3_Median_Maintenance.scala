@@ -10,12 +10,15 @@ case class Heap[A](underlying: Vector[A] = Vector.empty, op: (A, A) => Boolean) 
       .bubbleUp(underlying.size)
   }
 
+  def isEmpty: Boolean = underlying.isEmpty
+
   def extract: Either[String, (A, Heap[A])] =
     if (underlying.isEmpty)
       Left("Empty Heap")
     else {
       val tail = underlying.tail
-      Right(underlying.head, Heap(tail.init ++ tail.init, op).bubbleDown(0))
+      val next = if (tail.isEmpty) tail else tail.last +: tail.init
+      Right(underlying.head, Heap(next, op).bubbleDown(0))
     }
 
   private def parentIndex(index: Int): Int = (index - 1) / 2
@@ -23,7 +26,7 @@ case class Heap[A](underlying: Vector[A] = Vector.empty, op: (A, A) => Boolean) 
   private def childIndex(index: Int): List[Int] = {
     val left = index * 2 + 1
     val right = index * 2 + 2
-    List(left, right).filter(_ <= underlying.size)
+    List(left, right).filter(_ < underlying.size)
   }
 
   private def swap(vector: Vector[A], x: Int, y: Int): Vector[A] = {
@@ -34,35 +37,47 @@ case class Heap[A](underlying: Vector[A] = Vector.empty, op: (A, A) => Boolean) 
       .updated(x, valueY)
   }
 
-  private def bubbleUp(index: Int): Heap[A] = {
+  def bubbleUp(index: Int): Heap[A] = {
     @tailrec
     def loop(vector: Vector[A], idx: Int): Vector[A] = {
       val parentIdx = parentIndex(idx)
       val current = vector(idx)
       val parent = vector(parentIdx)
       if (op(current, parent))
-        loop(swap(underlying, idx, parentIdx), parentIdx)
+        loop(swap(vector, idx, parentIdx), parentIdx)
       else
         vector
     }
     Heap(loop(underlying, index), op)
   }
 
-  private def bubbleDown(index: Int): Heap[A] = {
+  def bubbleDown(index: Int): Heap[A] = {
     @tailrec
     def loop(vector: Vector[A], idx: Int): Vector[A] = {
       val childIndices = childIndex(idx)
       if (childIndices.isEmpty) vector
       else {
+        val current = vector(idx)
         val childValues = childIndices.map(vector(_))
         val targetValue = childValues.sortWith(op).head
-        val childIndex = childValues.indexOf(targetValue)
-        loop(swap(vector, idx, childIndex), childIndex)
+        if (op(current, targetValue)) vector
+        else {
+          val childIndex = vector.indexOf(targetValue)
+          loop(swap(vector, idx, childIndex), childIndex)
+        }
       }
     }
     Heap(loop(underlying, index), op)
   }
 
+  def show: String = {
+    @tailrec
+    def loop(vector: Vector[A], n: Int, tree: List[String]): List[String] = {
+      if (vector.isEmpty) tree
+      else loop(vector.drop(n), n * 2, tree :+ vector.take(n).mkString(" "))
+    }
+    loop(underlying, 1, List.empty).mkString("\n")
+  }
 }
 
 object Heap {
