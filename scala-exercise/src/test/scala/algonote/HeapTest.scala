@@ -62,6 +62,16 @@ class HeapTest extends FunSuite with Matchers {
     }
     println(heap.show)
     extractAll(heap) shouldBe Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-
   }
+
+  test("median") {
+    val vector = Vector(5, 3, 2, 1)
+    MedianMaintenance.median(vector) shouldBe 2
+  }
+
+  test("median1") {
+    val vector = Vector(5, 3, 4, 2, 1)
+    MedianMaintenance.median(vector) shouldBe 3
+  }
+
 }

@@ -12,6 +12,10 @@ case class Heap[A](underlying: Vector[A] = Vector.empty, op: (A, A) => Boolean) 
 
   def isEmpty: Boolean = underlying.isEmpty
 
+  def size: Int = underlying.size
+
+  def headOption: Option[A] = underlying.headOption
+
   def extract: Either[String, (A, Heap[A])] =
     if (underlying.isEmpty)
       Left("Empty Heap")
@@ -82,4 +86,26 @@ case class Heap[A](underlying: Vector[A] = Vector.empty, op: (A, A) => Boolean) 
 
 object Heap {
   def empty[A: Ordering]: Heap[A] = Heap(Vector.empty, implicitly[Ordering[A]].lt)
+}
+
+object MedianMaintenance {
+  def median(vector: Vector[Int]): Int = {
+    val minHeap = Heap[Int](op = _ < _)
+    val maxHeap = Heap[Int](op = _ > _)
+    val (newMinHeap, newMaxHeap) = vector.foldLeft((minHeap, maxHeap)) {
+      case ((min, max), elem) =>
+        val Right((el, nextMin)) = min.insert(elem).extract
+        val nextMax = max.insert(el)
+        if (nextMax.size > nextMin.size) {
+          val Right((el2, nextNextMax)) = nextMax.extract
+          (nextMin.insert(el2), nextNextMax)
+        } else
+          (nextMin, nextMax)
+    }
+    if (newMinHeap.size == newMaxHeap.size)
+      newMaxHeap.extract.right.get._1
+    else
+      newMinHeap.extract.right.get._1
+
+  }
 }
