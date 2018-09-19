@@ -9,11 +9,13 @@ import scala.reflect.macros.blackbox
 object MemoryCache {
   var cache = Map.empty[String, Any]
   def getOrElse[V](key: String, value: => V): V = {
+    println(s"key = $key, cache = ${cache.get(key)}")
     cache.get(key) match {
       case Some(v) => v.asInstanceOf[V]
       case None =>
-        cache += key -> value
-        value
+        val eval = value
+        cache += key -> eval
+        eval
     }
   }
 }
@@ -40,7 +42,9 @@ class MacroCacheAutoKey(val c: blackbox.Context) {
     val methodNameTree = getMethodName(enclosingMethodSymbol)
     val methodParamssSymbols = c.internal.enclosingOwner.info.paramLists
     val methodParamssTree = paramListsToTree(methodParamssSymbols)
-    q"""_root_.macronote.MemoryCache.getOrElse(_root_.macronote.MethodNameToString.toString($classNameTree, $methodNameTree, $methodParamssTree), $f)
+    q"""_root_.macronote.MemoryCache.getOrElse(
+          _root_.macronote.MethodNameToString.toString($classNameTree, $methodNameTree, $methodParamssTree), $f
+        )
       """
   }
 

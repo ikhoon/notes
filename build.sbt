@@ -7,14 +7,14 @@ scalaVersion := "2.12.4"
 useJCenter := true
 
 lazy val `scala-notes` = (project in file("."))
-  .dependsOn(`scala-exercise`,  `macro-exercise`)
+  .dependsOn(`codes`,  `macros`)
 
-lazy val `scala-exercise` = (project in file("scala-exercise"))
+lazy val `codes` = (project in file("codes"))
   .settings(commonSettings)
   .enablePlugins(TutPlugin)
-  .dependsOn(`macro-exercise`)
+  .dependsOn(`macros`)
 
-lazy val `macro-exercise` = (project in file("macro-exercise"))
+lazy val `macros` = (project in file("macros"))
   .settings(commonSettings)
 
 lazy val commonSettings = Seq(
@@ -87,6 +87,12 @@ lazy val commonSettings = Seq(
     "org.scalaz" %% "scalaz-core" % "7.2.16",
     "org.scalaz" %% "scalaz-concurrent" % "7.2.16",
 
+    "io.circe" %% "circe-core" % "0.9.3",
+    "io.circe" %% "circe-generic" % "0.9.3",
+    "io.circe" %% "circe-parser" % "0.9.3",
+    "io.circe" %% "circe-shapes" % "0.9.3",
+    "io.circe" %% "circe-generic-extras" % "0.9.3",
+
 
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "junit" % "junit" % "4.12" % "test",
@@ -101,7 +107,7 @@ lazy val commonSettings = Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
-  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
   addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full)
 
 

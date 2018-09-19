@@ -16,7 +16,6 @@ object Foo2 {
   }
 }
 
-
 trait HasId[A] {
   def apply(a: A): Int
 }
