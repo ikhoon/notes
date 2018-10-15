@@ -101,6 +101,7 @@ object Algo_2_1_StrongConnectedComponents {
                          explored: Set[Int],
   ): Vector[Int] = {
 
+    Option
     def dfs0(graph: Graph,
              start: Int,
              node: Int,

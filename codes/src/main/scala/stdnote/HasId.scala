@@ -3,11 +3,10 @@ package stdnote
 /**
   * Created by Liam.M on 2018. 03. 06..
   */
-
 trait Base {
   def id: Int
 }
-case class Foo(id: Int) extends Base
+case class Foo1(id: Int) extends Base
 case class Foo2(id: Int)
 
 object Foo2 {
@@ -31,7 +30,6 @@ object Test {
   getId2(Foo2(10))(Foo2.fooInstance)
 }
 
-
 // 1 번째 : 인터페이스 정의
 // 2 번째 : 인스턴스 만들기
 // 3 번째 : 세상과의 통로 만들기 인터페이스 오브젝트
@@ -41,7 +39,7 @@ object Test {
 // List => Int => List[Int]
 //      => String => List[String]
 // 1 번째 : 인터페이스 정의
-trait Functor[F[_]]  {
+trait Functor[F[_]] {
   def map[A, B](fa: F[A])(f: A => B): F[B]
 
 }
@@ -71,26 +69,6 @@ object Functor {
   import cats.implicits._
 
   val bar = Bar(10)
-  bar map (_ + 10)
+  bar.map(_ + 10)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
