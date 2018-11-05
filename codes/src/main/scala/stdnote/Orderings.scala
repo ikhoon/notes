@@ -22,7 +22,7 @@ object Orderings {
 
     // 3. inject를 할 함수를 구현해준다.
     def max[A](xs: List[A])(implicit ord: MyOrdering[A]): A =
-      xs.reduceLeft((x, y) => { if(ord.compare(x, y) > 0) x else y })
+      xs.reduceLeft((x, y) => { if (ord.compare(x, y) > 0) x else y })
     // 타입에 대한 행위의 instance가 있을때만 실행된다.
     println(max(List(Foo(1), Foo(2), Foo(3))))
 
@@ -30,8 +30,6 @@ object Orderings {
     /// 2. companion object
     List(1, 2, 3).max
 //    List(Foo(1), Foo(2), Foo(3)).max
-
-
 
     // implicit의 용도
     // 1. 타입의 암묵적인 변경
@@ -49,11 +47,9 @@ object Orderings {
     def foo(implicit x: Int): Int = x
     implicit val int = 10
     foo
-    class Bar(implicit x: Int) { }
+    class Bar(implicit x: Int) {}
 
     case class Quz(x: Int)(implicit y: String)
-
-
     //
 //    def adder(x: Int, y: Int): Int = x + y
 //    //
@@ -61,7 +57,5 @@ object Orderings {
 //    //
 //    def adder[a](x: a, y: a)(implicit f: (a, a) => a): a = f(x, y)
     //
-
-
   }
 }
