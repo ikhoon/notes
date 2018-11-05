@@ -61,13 +61,6 @@ object Orderings {
 //    //
 //    def adder[a](x: a, y: a)(implicit f: (a, a) => a): a = f(x, y)
     //
-    implicit val fooMonoid = new Monoid[Foo] {
-      def empty: Foo = Foo(0)
-      def combine(x: Foo, y: Foo): Foo = Foo(x.x + y.x)
-    }
-    def adder[A](x: A, y: A)(implicit M: Monoid[A]): A =
-      M.combine(x, y)
-    adder(Foo(1), Foo(2))
 
 
   }

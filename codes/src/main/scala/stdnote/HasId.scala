@@ -7,7 +7,7 @@ package stdnote
 trait Base {
   def id: Int
 }
-case class Foo(id: Int) extends Base
+case class Foo1(id: Int) extends Base
 case class Foo2(id: Int)
 
 object Foo2 {
