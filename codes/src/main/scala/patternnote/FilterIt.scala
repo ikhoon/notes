@@ -1,4 +1,4 @@
-package stdnote
+package patternnote
 
 // scratch =>
 

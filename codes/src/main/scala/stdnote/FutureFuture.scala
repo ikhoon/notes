@@ -1,8 +1,5 @@
 package stdnote
 
-import scala.collection.immutable
-import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{Failure, Success, Try}
 //import scala.concurrent.ExecutionContext.Implicits.global
 
 /**

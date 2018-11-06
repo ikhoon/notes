@@ -4,14 +4,6 @@ package exp
   * Created by ikhoon on 26/08/2017.
   */
 
-object hmap {
-  trait Key { type Value }
-  trait HMap {
-    def get(key: Key): Option[key.Value]
-    def add(key: Key)(value: key.Value): HMap
-  }
-
-}
 trait Key { type Value }
 
 trait HMap { self =>

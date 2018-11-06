@@ -1,7 +1,7 @@
 name := "the-notes"
 
 version := "1.0"
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.7"
 //scalaOrganization in ThisBuild := "org.typelevel"
 
 useJCenter := true
@@ -18,7 +18,7 @@ lazy val `macros` = (project in file("macros"))
   .settings(commonSettings)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.7",
 //  scalaOrganization in ThisBuild := "org.typelevel",
 //  scalacOptions += "-Xfatal-warnings",
   scalacOptions ++= Seq(
@@ -108,7 +108,7 @@ lazy val commonSettings = Seq(
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
   addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full)
+//  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.full)
 
 
 )

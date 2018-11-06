@@ -7,7 +7,7 @@ package patternnote
   * data는 element로 로직은 visitor로 표현한다.
   */
 trait Element {
-  def accept(visitor: Visitor)
+  def accept(visitor: Visitor): Unit
 }
 
 class Tire extends Element {
