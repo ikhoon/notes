@@ -18,8 +18,6 @@ object ClassTags {
     }
   }
 
-  def bar[A]
-
   def main(args: Array[String]): Unit = {
     foo[AA]
     foo[BB]
