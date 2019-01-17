@@ -92,9 +92,11 @@ trait FunEval extends Functions {
 
 trait FunPrinting extends Functions {
   type Rep[T] = String
-  def fun[S, T](f: String => String): String => String = {
-    v => s"fun($v => ${f(v)})"
-  r
+//  def fun[S, T](f: String => String): String => String = {
+//    f
+////    s"fun($v => ${f(v)})"
+//    ???
+//  }
 }
 
 object Run {

@@ -2,12 +2,14 @@
 
 val ru = scala.reflect.runtime.universe
 
-val m = ru.runtimeMirror(getClass.getClassLoader)
+val m: ru.Mirror = ru.runtimeMirror(getClass.getClassLoader)
 
 // # InstanceMirror는 method나 field들을 호출하기위한
 // invoker를 생성하기 위해서 사용된다.
 
 class C { def x = 2 }
+val cc = new C
+
 // im(instance mirror)
 val im = m.reflect(new C)
 

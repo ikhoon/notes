@@ -18,11 +18,38 @@ object ClassTags {
     }
   }
 
-  def bar[A]
-
   def main(args: Array[String]): Unit = {
     foo[AA]
     foo[BB]
-
   }
+
+  trait Fruit
+  trait Apple extends Fruit
+  trait Orange extends Fruit
+
+  val ys: List[Fruit] = List(new Apple {}, new Orange {})
+  val zs: List[Apple] = List(new Apple {}, new Apple {})
+
+  def bar[A <: Fruit: ClassTag](xs: List[Fruit]): List[Fruit] = {
+    xs.filter {
+      case _: A => true
+      case _    => false
+    }
+  }
+
+  bar[Apple](ys)
+  def quz[A](xs: List[_]): String = {
+    xs match {
+      case _: List[Apple]  => "apple"
+      case _: List[Orange] => "orange"
+      case _ => "unknown"
+    }
+  }
+  def qux[A](xs: List[_]): String = {
+    xs match {
+      case _: List[A]  => "matched"
+      case _ => "unknown"
+    }
+  }
+
 }
