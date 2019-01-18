@@ -86,7 +86,7 @@ trait Functions {
 
 trait FunEval extends Functions {
   type Rep[T] = T
-  def fun[S, T](f: S => T): S => T = f
+  def fun[S, T](f: S => T) = f
   def app[S, T](f: S => T, v: S): T = f(v)
 }
 

@@ -51,8 +51,9 @@ lazy val commonSettings = Seq(
     Resolver.jcenterRepo
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "cats-core" % "1.2.0",
-    "org.typelevel" %% "cats-effect" % "1.0.0-RC2",
+    "org.typelevel" %% "cats-core" % "1.4.0",
+    "org.typelevel" %% "cats-effect" % "1.1.0",
+    "org.typelevel" %% "cats-mtl-core" % "0.4.0",
     "io.monix" %% "monix" % "3.0.0-M3",
 //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
@@ -107,8 +108,8 @@ lazy val commonSettings = Seq(
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
-  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-//  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.full)
+//  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.full)
 
 
 )
