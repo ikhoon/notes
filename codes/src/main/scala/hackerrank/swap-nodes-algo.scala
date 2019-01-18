@@ -4,15 +4,12 @@ object SwapNodes {
   /*
    * Complete the swapNodes function below.
    */
-  def swapNodes(indexes: Array[Array[Int]], queries: Array[Int]): List[List[Int]] = {
-    /*
-     * Write your code here.
-     */
+  def swapNodes(indexes: Array[Array[Int]], queries: Array[Int]): Array[Array[Int]] = {
     queries.map { k =>
       swapNode(indexes, k)
       println(indexes.deep)
-      dfs(indexes)
-    }.toList
+      dfs(indexes).toArray
+    }
   }
 
   private def swapNode(indexes: Array[Array[Int]], k: Int): Array[Array[Int]] = {
@@ -21,20 +18,21 @@ object SwapNodes {
   }
 
   private def swapNode0(indexes: Array[Array[Int]], k: Int, depth: Int, i: Int, j: Int): Array[Array[Int]] = {
+    if (depth % k == 0 && j == 0) {
+      val index = indexes(i - 1)
+      val l = index(0)
+      val r = index(1)
+      index(0) = r
+      index(1) = l
+    }
     val n = indexes(i - 1)(j)
     if (n == -1) indexes
     else {
-      if (depth % k == 0 && j == 0) {
-        val index = indexes(i - 1)
-        val l = index(0)
-        val r = index(1)
-        index(0) = r
-        index(1) = l
-      }
       swapNode0(indexes, k, depth + 1, n, 0)
       swapNode0(indexes, k, depth + 1, n, 1)
     }
   }
+
 
   def dfs(indexes: Array[Array[Int]]): List[Int] = {
     dfs0(indexes, 1, 0) ::: List(1) ::: dfs0(indexes, 1, 1)

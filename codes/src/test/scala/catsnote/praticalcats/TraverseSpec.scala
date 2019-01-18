@@ -2,7 +2,7 @@ package catsnote.praticalcats
 
 import java.time.{Instant, LocalDateTime}
 
-import cats.effect.{Effect, IO}
+import cats.effect.{ContextShift, Effect, IO}
 import monix.eval.Task
 import org.scalatest.{FunSuite, Matchers}
 
@@ -69,6 +69,8 @@ class TraverseExample extends FunSuite with Matchers {
     }
   }
 
+  import cats.effect.implicits._
+  implicit val ct: ContextShift[IO] = IO.contextShift(scala.concurrent.ExecutionContext.global)
   test("io + parTraverse") {
     withTS {
       val res = itemIds.parTraverse(findItemByIdEffect[IO](_))

@@ -14,7 +14,7 @@ package stdnote
 // Either[String, Int]
 // Either => String => Int => Either[String, Int]
 // * -> * -> *
-class Foo(a: Int) // a: Int => class constructor
+//class Foo(a: Int) // a: Int => class constructor
 
 // 내가 변하는게 아니라 내가 가지고 있는걸 변한다.
 // List(1, 2, 3).map(_.toString) => List("1", "2", "3")

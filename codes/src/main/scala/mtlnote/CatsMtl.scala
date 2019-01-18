@@ -145,7 +145,7 @@ object CatsMtl {
 
   // MonadAppError를 만들어서 program에 대한 제약으로 사용하자
   type MonadAppError[F[_]] = MonadError[F, AppError]
-  def program[F[_]: MonadError: ApplicativeConfig, LiftIO]: F[Result] = ???
+  def program[F[_]: MonadAppError: ApplicativeConfig, LiftIO]: F[Result] = ???
   //
 
   def readerProgram3[F[_]: MonadAppError: ApplicativeConfig: LiftIO]: F[Result] = for {
@@ -206,24 +206,25 @@ object CatsMtl {
     _ <- MonadState.modify[F, Env](s => updateEnv(res, s))
   } yield res
 
-  def stateProgram1[F[_]: ApplicativeConfig: MonadAppError: MonadStateEnv: LiftIO]: F[Results] = for {
-    config <- ApplicativeAsk[F, Config]
-        .ask
-        .ensure(InvalidConfig)(validConfig)
-    responses <- requests
-        .traverse(requestWithState[F](config, _))
-  } yield responses
-
-
-  val materializedStateProgram1 = stateProgram1[StateT[EitherT[ReaderT[IO, Config, ?], AppError, ?], Env, ?]]
-
-  def main6: IO[Either[AppError, (Env, Results)]] =
-    getConfig.flatMap { conf =>
-      materializedStateProgram1
-        .run(initializeEnv)
-        .value
-        .run(conf)
-    }
+  // TODO FIXME
+//  def stateProgram1[F[_]: ApplicativeConfig: MonadAppError: MonadStateEnv: LiftIO]: F[Results] = for {
+//    config <- ApplicativeAsk[F, Config]
+//        .ask
+//        .ensure(InvalidConfig)(validConfig)
+//    responses <- requests
+//        .traverse(requestWithState[F](config, _))
+//  } yield responses
+//
+//
+//  val materializedStateProgram1 = stateProgram1[StateT[EitherT[ReaderT[IO, Config, ?], AppError, ?], Env, ?]]
+//
+//  def main6: IO[Either[AppError, (Env, Results)]] =
+//    getConfig.flatMap { conf =>
+//      materializedStateProgram1
+//        .run(initializeEnv)
+//        .value
+//        .run(conf)
+//    }
 
 
 
