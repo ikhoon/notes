@@ -1,4 +1,5 @@
 package reflectnote
+import java.util.Objects
 
 /**
   * Created by Liam.M on 2018. 11. 05..
@@ -11,6 +12,8 @@ object ClassTags {
 
   val aa = classTag[AA]
   val bb = classTag[BB]
+
+  // type에 따라서 다르게 동작한다.
   def foo[A](implicit tag: ClassTag[A]): Unit = {
     tag match {
       case x if x == aa => println("aaa")

@@ -1,5 +1,6 @@
 package algonote
 
+/**
 import algonote.Algo_2_2_DijkstraShortestPath.Graph
 import Algo_2_2_DijkstraShortestPath.Node
 import org.scalatest.{FunSuite, Matchers}
@@ -94,3 +95,4 @@ class Algo_2_2_DijkstraShortestPathTest extends FunSuite with Matchers {
     // 3024,3684,2947,2660,2367,2399,3879,2442,2610,5130
   }
 }
+*/

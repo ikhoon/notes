@@ -1,13 +1,14 @@
 package algonote
 
-import algonote.Algo_2_2_DijkstraShortestPath.{Graph, Node}
-
-import scala.collection.immutable
-import scala.collection.immutable.Queue
+//import algonote.Algo_2_2_DijkstraShortestPath.{Graph, Node}
+//
+//import scala.collection.immutable
+//import scala.collection.immutable.Queue
 
 /**
   * Created by ikhoon on 06/08/2018.
   */
+/**
 class Algo_2_2_DijkstraShortestPath {
 
   def shortestPath(graph: Graph, start: Int): (Map[Int, Int], Map[Int, Vector[Int]]) = {
@@ -74,7 +75,7 @@ class Algo_2_2_DijkstraShortestPath {
 
   def transpose(graph: Graph): Graph =
     graph.foldLeft(Map.empty[Int, Vector[Node]]) {
-      case (rev, (vertex, adj: Vector[Node])) =>
+      case (rev, (vertex, adj)) =>
         adj.foldLeft(rev) {
           case (rev1, edge) =>
             modify[Int, Vector[Node]](rev1, edge.vertex, Vector.empty[Node], _ :+ Node(vertex, edge.weight))
@@ -107,3 +108,4 @@ object Algo_2_2_DijkstraShortestPath {
   case class Node(vertex: Int, weight: Int)
   type Graph = Map[Int, Vector[Node]]
 }
+*/
