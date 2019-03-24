@@ -3,6 +3,8 @@ package algonote
 /**
   * Created by ikhoon on 2019-02-25.
   */
+import java.util
+
 import scala.collection.mutable
 import scala.collection.mutable.Map
 
