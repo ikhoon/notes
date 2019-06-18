@@ -105,6 +105,9 @@ lazy val commonSettings = Seq(
     "org.scalameta" %% "scalameta" % "3.7.2",
     "org.scalameta" %% "contrib" % "3.7.2",
 
+    // assertj
+    "org.assertj" % "assertj-core" % "3.11.1" % "test",
+
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
