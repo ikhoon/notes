@@ -105,6 +105,9 @@ lazy val commonSettings = Seq(
     "org.scalameta" %% "scalameta" % "3.7.2",
     "org.scalameta" %% "contrib" % "3.7.2",
 
+    // netty
+    "io.netty" % "netty-all" % "4.0.36.Final",
+
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
