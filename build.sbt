@@ -107,6 +107,8 @@ lazy val commonSettings = Seq(
 
     // netty
     "io.netty" % "netty-all" % "4.0.36.Final",
+    // assertj
+    "org.assertj" % "assertj-core" % "3.11.1" % "test",
 
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
