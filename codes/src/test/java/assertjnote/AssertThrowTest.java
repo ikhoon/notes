@@ -3,7 +3,6 @@ package assertjnote;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.Test;
-import org.omg.SendingContext.RunTime;
 
 public class AssertThrowTest {
     @Test

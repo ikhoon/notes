@@ -7,7 +7,7 @@ scalaVersion := "2.12.7"
 useJCenter := true
 
 lazy val `scala-notes` = (project in file("."))
-  .dependsOn(`codes`,  `macros`)
+  .dependsOn(`codes`, `macros`)
 
 lazy val `codes` = (project in file("codes"))
   .settings(commonSettings)
@@ -19,8 +19,8 @@ lazy val `macros` = (project in file("macros"))
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.7",
-//  scalaOrganization in ThisBuild := "org.typelevel",
-//  scalacOptions += "-Xfatal-warnings",
+  //  scalaOrganization in ThisBuild := "org.typelevel",
+  //  scalacOptions += "-Xfatal-warnings",
   scalacOptions ++= Seq(
     // See other posts in the series for other helpful options
     "-target:jvm-1.8",
@@ -28,7 +28,7 @@ lazy val commonSettings = Seq(
     "-unchecked",
     "-deprecation",
     "-Xfuture",
-//    "-Xfatal-warnings",
+    //    "-Xfatal-warnings",
     //  "-Yno-adapted-args",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
@@ -55,7 +55,7 @@ lazy val commonSettings = Seq(
     "org.typelevel" %% "cats-effect" % "1.1.0",
     "org.typelevel" %% "cats-mtl-core" % "0.4.0",
     "io.monix" %% "monix" % "3.0.0-M3",
-//    "org.typelevel" %% "cats" % "0.9.0",
+    //    "org.typelevel" %% "cats" % "0.9.0",
     "com.chuusai" %% "shapeless" % "2.3.2",
     "org.tpolecat" %% "doobie-core" % "0.5.2",
     "org.tpolecat" %% "doobie-h2" % "0.5.2",
@@ -72,12 +72,12 @@ lazy val commonSettings = Seq(
     // freestyle
     "io.frees" %% "frees-core" % "0.6.2",
     // optional - effects and patterns
-    "io.frees" %% "frees-effects"      % "0.6.2",
-//    "io.frees" %% "frees-tagless"      % "0.6.2",
+    "io.frees" %% "frees-effects" % "0.6.2",
+    //    "io.frees" %% "frees-tagless"      % "0.6.2",
 
     "com.twitter" %% "util-core" % "6.45.0",
 
-    "eu.timepit" %% "refined"            % "0.8.2",
+    "eu.timepit" %% "refined" % "0.8.2",
 
     // rxjava
     "io.reactivex.rxjava2" % "rxjava" % "2.1.6",
@@ -98,22 +98,24 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "junit" % "junit" % "4.12" % "test",
 
-    "com.github.julien-truffaut" %%  "monocle-core"  % "1.5.0-cats",
-    "com.github.julien-truffaut" %%  "monocle-macro" % "1.5.0-cats",
-    "com.github.julien-truffaut" %%  "monocle-law"   % "1.5.0-cats" % "test",
+    "com.github.julien-truffaut" %% "monocle-core" % "1.5.0-cats",
+    "com.github.julien-truffaut" %% "monocle-macro" % "1.5.0-cats",
+    "com.github.julien-truffaut" %% "monocle-law" % "1.5.0-cats" % "test",
     // scala meta
     "org.scalameta" %% "scalameta" % "3.7.2",
     "org.scalameta" %% "contrib" % "3.7.2",
 
+    "com.twitter" %% "finagle-http" % "19.6.0",
     // netty
     "io.netty" % "netty-all" % "4.0.36.Final",
+    "com.linecorp.armeria" % "armeria" % "0.88.0",
     // assertj
     "org.assertj" % "assertj-core" % "3.11.1" % "test",
 
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
-//  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+  //  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
   addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.full)
 
 
