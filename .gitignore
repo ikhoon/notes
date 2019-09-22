@@ -15,6 +15,7 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+test-output/
 
 # Scala-IDE specific
 .scala_dependencies
@@ -88,4 +89,4 @@ crashlytics-build.properties
 .ensime_lucene/
 
 
-codes/src/test/resources/strong_connected_components.txt
+code/src/test/resources/strong_connected_components.txt

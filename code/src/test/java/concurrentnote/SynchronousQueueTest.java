@@ -1,10 +1,7 @@
 package concurrentnote;
 
 import org.junit.Test;
-import org.junit.experimental.theories.suppliers.TestedOn;
-import scalaz.Alpha;
 
-import java.util.Queue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
@@ -12,11 +9,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SynchronousQueueTest {
 
-    Executor executor = Executors.newSingleThreadExecutor();
-    SynchronousQueue<String> queue = new SynchronousQueue<>();
 
     @Test
     public void test() throws InterruptedException {
+        Executor executor = Executors.newSingleThreadExecutor();
+        SynchronousQueue<String> queue = new SynchronousQueue<>();
         AtomicInteger counter = new AtomicInteger(0);
         executor.execute(() -> {
             while (true) {
@@ -35,5 +32,21 @@ public class SynchronousQueueTest {
             }
         });
         Thread.sleep(10000);
+    }
+
+    @Test
+    public void testPut() throws InterruptedException {
+        final SynchronousQueue<Integer> queue = new SynchronousQueue<>();
+        for (int i = 0; i < 5; i++) {
+            queue.put(i);
+            System.out.println("put $i");
+        }
+    }
+
+    @Test
+    public void testTake() throws InterruptedException {
+        final SynchronousQueue<Integer> queue = new SynchronousQueue<>();
+        final Integer element = queue.take();
+        System.out.println(element);
     }
 }
