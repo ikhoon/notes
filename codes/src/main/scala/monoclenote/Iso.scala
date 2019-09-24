@@ -30,6 +30,8 @@ object IsoExample extends App {
   // reverseGet은 apply함수를 통해서도 호출할수 있다.
   personToTuple(("Zoe", 25))
 
+  personToTuple.mapping
+
 
   // 아직은 그닥 쓸모없어 보인다.
   // 김은미가 만든 Converter와 별만 차이가 없다. 단방향인거 빼고는

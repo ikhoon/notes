@@ -13,8 +13,5 @@ public class BlockingQueueTest {
     @Test
     public void test() {
         BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
-        executor.execute(() -> {
-            blockingQueue.put();
-        });
     }
 }
