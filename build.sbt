@@ -1,24 +1,25 @@
-name := "the-notes"
+name := "the-note"
 
 version := "1.0"
-scalaVersion := "2.12.7"
+scalaVersion := "2.12.10"
 //scalaOrganization in ThisBuild := "org.typelevel"
 
 useJCenter := true
 
-lazy val `scala-notes` = (project in file("."))
-  .dependsOn(`codes`, `macros`)
+lazy val `the-note` = (project in file("."))
+  .dependsOn(`code`, `macro`)
+  .aggregate(`code`, `macro`)
 
-lazy val `codes` = (project in file("codes"))
+lazy val `code` = (project in file("code"))
   .settings(commonSettings)
   .enablePlugins(TutPlugin)
-  .dependsOn(`macros`)
+  .dependsOn(`macro`)
 
-lazy val `macros` = (project in file("macros"))
+lazy val `macro` = (project in file("macro"))
   .settings(commonSettings)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.12.7",
+  scalaVersion := "2.12.10",
   //  scalaOrganization in ThisBuild := "org.typelevel",
   //  scalacOptions += "-Xfatal-warnings",
   scalacOptions ++= Seq(
@@ -26,14 +27,14 @@ lazy val commonSettings = Seq(
     "-target:jvm-1.8",
     "-encoding", "UTF-8",
     "-unchecked",
-    "-deprecation",
+//    "-deprecation",
     "-Xfuture",
     //    "-Xfatal-warnings",
     //  "-Yno-adapted-args",
-    "-Ywarn-dead-code",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard",
-    "-Ywarn-unused",
+//    "-Ywarn-dead-code",
+//    "-Ywarn-numeric-widen",
+//    "-Ywarn-value-discard",
+//    "-Ywarn-unused",
     "-Ypartial-unification",
     "-feature",
     "-language:existentials",
@@ -79,6 +80,9 @@ lazy val commonSettings = Seq(
 
     "eu.timepit" %% "refined" % "0.8.2",
 
+    // reative streams
+    "org.reactivestreams" % "reactive-streams" % "1.0.3",
+    "org.reactivestreams" % "reactive-streams-tck" % "1.0.3",
     // rxjava
     "io.reactivex.rxjava2" % "rxjava" % "2.1.6",
     "org.twitter4j" % "twitter4j-core" % "4.0.0",
@@ -100,6 +104,7 @@ lazy val commonSettings = Seq(
 
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "junit" % "junit" % "4.12" % "test",
+    "org.awaitility" % "awaitility" % "3.1.6" % "test",
 
     "com.github.julien-truffaut" %% "monocle-core" % "1.5.0-cats",
     "com.github.julien-truffaut" %% "monocle-macro" % "1.5.0-cats",
@@ -117,9 +122,9 @@ lazy val commonSettings = Seq(
 
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
-  addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3"),
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
   //  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-  addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M11" cross CrossVersion.full)
+  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 
 )

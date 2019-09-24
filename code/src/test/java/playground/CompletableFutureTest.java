@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.linecorp.armeria.internal.shaded.futures.CompletableFutures;
 import org.junit.Test;
 
 public class CompletableFutureTest {
@@ -32,7 +33,7 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
-        CompletableFuture<Integer> cf2 = CompletableFuture.failedFuture(new Exception("Bang!"));
+        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang!"));
 
         CompletableFuture<Integer> cf3 = CompletableFuture.supplyAsync(() -> {
             System.out.println("hello cf3");
@@ -66,8 +67,8 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
-        CompletableFuture<Integer> cf2 = CompletableFuture.failedFuture(new Exception("Bang2!"));
-        CompletableFuture<Integer> cf3 = CompletableFuture.failedFuture(new Exception("Bang3!"));
+        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang2!"));
+        CompletableFuture<Integer> cf3 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang3!"));
         Void join = CompletableFuture.allOf(cf1, cf2, cf3).join();
         System.out.println(join);
     }
@@ -78,7 +79,7 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
-        CompletableFuture<Integer> cf2 = CompletableFuture.failedFuture(new Exception("Bang2!"));
+        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang2!"));
 
         CompletableFuture<Integer> cf3 = CompletableFuture.supplyAsync(() -> {
             System.out.println("hello cf3");
