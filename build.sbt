@@ -116,7 +116,7 @@ lazy val commonSettings = Seq(
     "com.twitter" %% "finagle-http" % "19.6.0",
     // netty
     "io.netty" % "netty-all" % "4.0.36.Final",
-    "com.linecorp.armeria" % "armeria" % "0.91.1-SNAPSHOT",
+    "com.linecorp.armeria" % "armeria" % "0.93.0",
     // assertj
     "org.assertj" % "assertj-core" % "3.11.1" % "test",
 

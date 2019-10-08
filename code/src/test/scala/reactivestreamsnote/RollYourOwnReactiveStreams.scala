@@ -49,4 +49,8 @@ class RollYourOwnReactiveStreamsTest extends FunSuite with Matchers {
       }
     })
   }
+
+  test("example") {
+
+  }
 }
