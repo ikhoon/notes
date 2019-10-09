@@ -88,6 +88,9 @@ lazy val commonSettings = Seq(
     "org.twitter4j" % "twitter4j-core" % "4.0.0",
     "org.twitter4j" % "twitter4j-stream" % "4.0.0",
     "org.asynchttpclient" % "async-http-client" % "2.0.0",
+    // reactor
+    "io.projectreactor" % "reactor-core" % "3.2.12.RELEASE",
+
 
     // A reactive (or non-blocking, or asynchronous) JSON parser
     "de.undercouch" % "actson" % "1.2.0",
@@ -124,6 +127,7 @@ lazy val commonSettings = Seq(
     "com.twitter" %% "finagle-http" % "19.6.0",
     // netty
     "io.netty" % "netty-all" % "4.0.36.Final",
+
     // armeria
     "com.linecorp.armeria" % "armeria" % "0.94.0",
     "com.linecorp.armeria" % "armeria-grpc" % "0.94.0",
@@ -142,5 +146,6 @@ lazy val commonSettings = Seq(
 
 )
 
+resolvers += Resolver.mavenLocal
 
 
