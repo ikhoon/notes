@@ -89,6 +89,17 @@ lazy val commonSettings = Seq(
     "org.twitter4j" % "twitter4j-stream" % "4.0.0",
     "org.asynchttpclient" % "async-http-client" % "2.0.0",
 
+    // A reactive (or non-blocking, or asynchronous) JSON parser
+    "de.undercouch" % "actson" % "1.2.0",
+    // reactive mongo driver
+    "org.mongodb" % "mongodb-driver-reactivestreams" % "1.12.0",
+
+    // reactor core
+    "io.projectreactor" % "reactor-core" % "3.3.0.RELEASE",
+
+    // akka streams
+    "com.typesafe.akka" %% "akka-stream" % "2.5.25",
+
     "org.scalaz" %% "scalaz-core" % "7.2.16",
     "org.scalaz" %% "scalaz-concurrent" % "7.2.16",
 
@@ -113,7 +124,12 @@ lazy val commonSettings = Seq(
     "com.twitter" %% "finagle-http" % "19.6.0",
     // netty
     "io.netty" % "netty-all" % "4.0.36.Final",
-    "com.linecorp.armeria" % "armeria" % "0.88.0",
+    // armeria
+    "com.linecorp.armeria" % "armeria" % "0.94.0",
+    "com.linecorp.armeria" % "armeria-grpc" % "0.94.0",
+    "com.linecorp.armeria" % "armeria-rxjava" % "0.94.0",
+    "com.linecorp.armeria" % "armeria-thrift" % "0.94.0",
+
     // assertj
     "org.assertj" % "assertj-core" % "3.11.1" % "test",
 

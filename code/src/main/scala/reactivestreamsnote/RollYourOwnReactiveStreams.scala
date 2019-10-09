@@ -61,5 +61,4 @@ class ListPublisher[A](xs: => Stream[A]) extends Publisher[A] {
     private def terminate(): Boolean = terminationFlag.getAndSet(true)
 
   }
-
 }
