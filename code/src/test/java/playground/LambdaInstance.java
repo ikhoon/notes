@@ -1,13 +1,9 @@
 package playground;
 
-import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import org.junit.Test;
-import org.junit.experimental.theories.suppliers.TestedOn;
-
-import recursionschemenote.Json.Obj;
 
 public class LambdaInstance {
 
@@ -15,23 +11,21 @@ public class LambdaInstance {
         return "abc";
     }
 
-    String foo(Supplier<String> s) {
+    String foo(Supplier<LambdaInstance> s) {
         System.out.println(s);
         return "abc " + s.get();
     }
 
-    @Test
-    public void sample() {
-        IntStream.range(1, 10)
-                 .forEach(i -> foo(this::foo));
-    }
 
-    static String bar() {
-        return "abc";
+    static LambdaInstance instance = new LambdaInstance();
+    static LambdaInstance bar() {
+        return instance;
     }
 
     @Test
     public void lambdaStatic() {
+        final Supplier<LambdaInstance> a = LambdaInstance::bar;
+        System.out.println(a);
         IntStream.range(1, 10)
                  .forEach(i -> foo(LambdaInstance::bar));
     }
