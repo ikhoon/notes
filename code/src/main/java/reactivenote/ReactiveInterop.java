@@ -17,12 +17,12 @@ import static akka.stream.javadsl.AsPublisher.WITHOUT_FANOUT;
 public class ReactiveInterop {
     public static void main(String[] args) {
 
-        final ActorSystem system = ActorSystem.apply();
-        MongoClient mongoClient = MongoClients.create();
+        final var system = ActorSystem.apply();
+        var mongoClient = MongoClients.create();
 
-        MongoDatabase database = mongoClient.getDatabase("mydb");
-        MongoCollection<Document> collection = database.getCollection("test");
-        final FindPublisher<Document> mongoDBUsers = collection.find();
+        var database = mongoClient.getDatabase("mydb");
+        var collection = database.getCollection("test");
+        final var mongoDBUsers = collection.find();
         final Observable<Integer> rxJavaAges = Observable.fromPublisher(mongoDBUsers)
                 .map(document -> document.getInteger("age"));
         final Source<Integer, NotUsed> akkaAdult =

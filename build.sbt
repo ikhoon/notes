@@ -114,7 +114,9 @@ lazy val commonSettings = Seq(
 
 
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    // junit 4
     "junit" % "junit" % "4.12" % "test",
+    // junit 5
     "org.awaitility" % "awaitility" % "3.1.6" % "test",
 
     "com.github.julien-truffaut" %% "monocle-core" % "1.5.0-cats",
@@ -126,13 +128,14 @@ lazy val commonSettings = Seq(
 
     "com.twitter" %% "finagle-http" % "19.6.0",
     // netty
-    "io.netty" % "netty-all" % "4.0.36.Final",
+    "io.netty" % "netty-all" % "4.1.42.Final",
 
     // armeria
     "com.linecorp.armeria" % "armeria" % "0.94.0",
     "com.linecorp.armeria" % "armeria-grpc" % "0.94.0",
     "com.linecorp.armeria" % "armeria-rxjava" % "0.94.0",
     "com.linecorp.armeria" % "armeria-thrift" % "0.94.0",
+    "com.linecorp.armeria" % "armeria-brave" % "0.94.0",
 
     // assertj
     "org.assertj" % "assertj-core" % "3.11.1" % "test",

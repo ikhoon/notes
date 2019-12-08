@@ -16,10 +16,9 @@ object FutureFuture {
       Future { 10 }(ex)
     }
 
-
     def foo(): Future[Int] = {
       val promise = Promise[Int]()
-      nettyHttpGet(onComplete: () => {
+      nettyHttpGet(() => {
         promise.success(10)
       })
 
@@ -32,18 +31,8 @@ object FutureFuture {
       })
 
     }
-    */
-
-
-
-
+   */
 
   }
-
-
-
-
-
-
 
 }
