@@ -1,5 +1,6 @@
 package playground;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,4 +31,14 @@ public class StreamTest {
 
     }
 
+    @Test
+    public void streamEmpty() {
+        final Stream<String> concat = Stream.concat(Stream.empty(), Stream.of("a", "b"));
+        final List<String> list = concat.collect(Collectors.toList());
+        System.out.println(list);
+        final List<String> list1 = Arrays.asList(null, "10")
+                                         .stream().collect(Collectors.toList());
+        System.out.println(list1);
+
+    }
 }

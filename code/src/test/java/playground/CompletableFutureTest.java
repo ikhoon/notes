@@ -1,11 +1,18 @@
 package playground;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.linecorp.armeria.internal.shaded.futures.CompletableFutures;
+
 import org.junit.Test;
 
 public class CompletableFutureTest {
@@ -33,7 +40,8 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
-        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang!"));
+        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(
+                new Exception("Bang!"));
 
         CompletableFuture<Integer> cf3 = CompletableFuture.supplyAsync(() -> {
             System.out.println("hello cf3");
@@ -67,8 +75,10 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
-        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang2!"));
-        CompletableFuture<Integer> cf3 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang3!"));
+        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(
+                new Exception("Bang2!"));
+        CompletableFuture<Integer> cf3 = CompletableFutures.exceptionallyCompletedFuture(
+                new Exception("Bang3!"));
         Void join = CompletableFuture.allOf(cf1, cf2, cf3).join();
         System.out.println(join);
     }
@@ -79,7 +89,8 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
-        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(new Exception("Bang2!"));
+        CompletableFuture<Integer> cf2 = CompletableFutures.exceptionallyCompletedFuture(
+                new Exception("Bang2!"));
 
         CompletableFuture<Integer> cf3 = CompletableFuture.supplyAsync(() -> {
             System.out.println("hello cf3");
@@ -103,6 +114,60 @@ public class CompletableFutureTest {
             System.out.println("hello cf1");
             return 10;
         });
+    }
+
+    @Test
+    public void testHandleWorkerThread() {
+        CompletableFuture<Integer> cf1 = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("hello cf1: " + Thread.currentThread().getName());
+            return 10 / 0;
+        });
+
+        final CompletableFuture<Object> cf2 = cf1.handle((result, cause) -> {
+            System.out.println("handle cf1: " + Thread.currentThread().getName());
+            return null;
+        });
+        await().untilAsserted(() -> assertThat(cf2.isDone()).isTrue());
+        System.out.println("finish?");
+
+    }
+
+    @Test
+    public void testHandleMainThread() {
+        CompletableFuture<Integer> cf1 = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("hello cf1: " + Thread.currentThread().getName());
+            return 10 / 0;
+        });
+
+        await().untilAsserted(() -> assertThat(cf1.isCompletedExceptionally()).isTrue());
+        cf1.handle((result, cause) -> {
+            System.out.println("handle cf1: " + Thread.currentThread().getName());
+            return null;
+        });
+        System.out.println("finish?");
+    }
+
+    @Test
+    public void testCompletableFuturesSuccessfulAsList() {
+        final List<CompletableFuture<Void>> futures = new ArrayList<>();
+        final CompletableFuture<Object> handled = CompletableFutures
+                .successfulAsList(futures, unused -> null)
+                .handle((unused1, unused2) -> {
+                    System.out.println("call handle");
+                    return null;
+                });
+
+        handled.join();
     }
 
 }

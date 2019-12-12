@@ -1,5 +1,7 @@
 package fpinsnote
 
+import cats.data.{Nested, Validated, ValidatedNel}
+import cats.data.Validated.Valid
 import org.scalatest.{Matchers, WordSpec}
 
 /**
@@ -40,4 +42,9 @@ class ListSpec extends WordSpec with Matchers {
 //      val myIntList2 = new MyList[Any] {}
 //    }
 //  }
+  import cats.implicits._
+
+  private val value1: Nested[Option, ValidatedNel[Throwable, *], Int] = Nested(Some(Valid(123)))
+  value1.map(_ + 1)
 }
+
