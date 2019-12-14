@@ -89,4 +89,6 @@ crashlytics-build.properties
 .ensime_lucene/
 
 
-code/src/test/resources/strong_connected_components.txt
+strong_connected_components.txt
+
+.DS_Store
