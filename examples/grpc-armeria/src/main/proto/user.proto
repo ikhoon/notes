@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package users;
+option java_package = "users";
+
+service UserService {
+  rpc SaveUsers(stream User) returns (Result) {}
+  rpc GetAllUsers(UserRequest) returns (stream User) {}
+}
+
+message UserRequest {
+  int32 age = 1;
+}
+
+message User {
+  int32 id = 1;
+  string name = 2;
+  string payload = 3;
+}
+
+message Result {
+  int32 status = 1;
+}
+
+
+
