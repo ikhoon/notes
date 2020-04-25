@@ -1,6 +1,4 @@
 import com.google.protobuf.gradle.*
-import org.gradle.kotlin.dsl.provider.gradleKotlinDslOf
-
 
 buildscript {
     dependencies {
@@ -60,7 +58,7 @@ dependencies {
             "armeria-tomcat",
             "armeria-brave",
             "armeria-zookeeper").map {
-        api("com.linecorp.armeria:${it}:0.97.0")
+        api("com.linecorp.armeria:$it:0.97.0")
     }
 
     // Project reactor

@@ -11,22 +11,29 @@ allprojects {
     }
 }
 
-apply(from = "${rootDir}/gradle/scripts/build-flags.gradle")
+apply(from = "$rootDir/gradle/scripts/build-flags.gradle")
 
 dependencies {
     // kotlin
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
 
-    runtimeOnly("org.slf4j:slf4j-simple")
+    runtimeOnly("ch.qos.logback:logback-classic")
 
     // armeria
     implementation("com.linecorp.armeria:armeria")
 
     // test
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("test-junit"))
+    testImplementation("com.linecorp.armeria:armeria-testing-junit")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.platform:junit-platform-commons")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testImplementation("org.assertj:assertj-core")
 }
 
 val compileKotlin: KotlinCompile by tasks

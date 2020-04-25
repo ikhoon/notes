@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class LibraryTest {
     @Test
-    fun testLanguage(): Unit {
+    fun testLanguage() {
         assertEquals("Kotlin", Libary().kotlinLanguage().name)
     }
 }

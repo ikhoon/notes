@@ -9,4 +9,4 @@
 
 rootProject.name = "gradle-note"
 
-apply(from = "${rootDir}/scripts/task-copy.gradle.kts")
+apply(from = "$rootDir/scripts/task-copy.gradle.kts")
