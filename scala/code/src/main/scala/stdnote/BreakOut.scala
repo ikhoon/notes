@@ -22,7 +22,7 @@ object BreakOut {
 
 
     // 성능도 잡고 타입도 바로 잡아주는 방법은 breakOut을 사용하면 된다.
-    val xsWithSquares2 : Map[Int, Int] = xs.map(x => (x, x * x))(collection.breakOut)
+    val xsWithSquares2 : Map[Int, Int] = xs.view.map(x => (x, x * x)).to(Map)
     // 기본적인 CanBuildFrom에서 CanBuildFrom[-From, -Elem, +To] 3개의 타입을 가지고 implicit을 찾았다.
     // List => Map으로 갈수 있는 CanbuildFrom이 없었던걸로 추측
 

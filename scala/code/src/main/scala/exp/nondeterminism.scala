@@ -94,8 +94,8 @@ object monixtask {
   // parallel
   def runWithZip() = {
     withTS {
-      val tc: Task[Int] = ta.zipMap(tb)(_ + _)
-      Await.result(tc.runAsync, 10 seconds)
+      val tc: Task[Int] = Task.parMap2(ta, tb)(_ + _)
+      Await.result(tc.runToFuture, 10 seconds)
     }
   }
 
@@ -103,7 +103,7 @@ object monixtask {
   def runWithAp() = {
     withTS {
       val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
-      Await.result(tc.runAsync, 10 seconds)
+      Await.result(tc.runToFuture, 10 seconds)
     }
   }
 
@@ -114,7 +114,7 @@ object monixtask {
     import monix.eval.Task
     withTS {
       val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
-      Await.result(tc.runAsync, 10 seconds)
+      Await.result(tc.runToFuture, 10 seconds)
     }
   }
 }
@@ -139,7 +139,7 @@ object catseffect {
 
   def runAp(): Unit = {
     withTS {
-      val tc = (ta |@| tb).map(_ + _)
+      val tc = (ta, tb).mapN(_ + _)
       tc.unsafeRunSync()
     }
   }

@@ -1,15 +1,15 @@
 package armerianote;
 
-import com.linecorp.armeria.common.HttpResponse;
-import com.linecorp.armeria.server.Server;
-import com.linecorp.armeria.server.ServerBuilder;
+import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLException;
-import java.security.cert.CertificateException;
+
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.server.Server;
 
 public class HelloWorld {
     public static void main(String[] args) throws CertificateException, SSLException {
-        Server server = new ServerBuilder()
+        Server server = Server.builder()
                 .http(8080)
                 .https(8443)
                 .tlsSelfSigned()

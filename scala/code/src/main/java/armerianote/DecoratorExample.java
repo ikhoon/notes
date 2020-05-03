@@ -1,6 +1,7 @@
 package armerianote;
 
 import com.linecorp.armeria.client.HttpClient;
+import com.linecorp.armeria.client.WebClient;
 import com.linecorp.armeria.common.*;
 import com.linecorp.armeria.server.*;
 import com.linecorp.armeria.server.annotation.decorator.LoggingDecorators;
@@ -9,7 +10,7 @@ import com.linecorp.armeria.server.logging.LoggingService;
 public class DecoratorExample {
     public static void main(String[] args) {
         HttpService service = (ctx, req) -> HttpResponse.of(HttpStatus.OK);
-        final Service<HttpRequest, HttpResponse> decorate = service
+        final HttpService decorate = service
                 .decorate(AuthService::new)
                 .decorate(LoggingService.newDecorator());
         final Server server = Server.builder()
@@ -18,7 +19,7 @@ public class DecoratorExample {
 
         server.start().join();
 
-        HttpClient client = HttpClient.of("http://127.0.0.1:" + server.activeLocalPort());
+        WebClient client = WebClient.of("http://127.0.0.1:" + server.activeLocalPort());
         final AggregatedHttpResponse response = client.get("/web/hello").aggregate().join();
         System.out.println(response.status());
     }
@@ -33,7 +34,7 @@ public class DecoratorExample {
             return delegate().serve(ctx, req);
         }
 
-        AuthService(Service<HttpRequest, HttpResponse> delegate) {
+        AuthService(HttpService delegate) {
             super(delegate);
         }
     }

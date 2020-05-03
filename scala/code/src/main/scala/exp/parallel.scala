@@ -162,7 +162,7 @@ object MonixTaskApiComponent extends AsyncApiComponent[Task] {
   def itemCertificationRepository: ItemCertificationRepository = itemCertificationRepositoryMonixTask
 
   object itemRepositoryMonixTask extends ItemRepository {
-    def findById(id: Int): Task[Item] = Task { 
+    def findById(id: Int): Task[Item] = Task {
       Thread.sleep(1000)
       log(s"item-$id")
       Item(id, 1000, 100000)
@@ -178,7 +178,7 @@ object MonixTaskApiComponent extends AsyncApiComponent[Task] {
   }
 
   object brandRepositoryMonixTask extends BrandRepository {
-    def findById(id: Int): Task[Brand] = Task { 
+    def findById(id: Int): Task[Brand] = Task {
       Thread.sleep(1000)
       log(s"brand-$id")
       s"brand-$id"
@@ -230,7 +230,7 @@ object experiment {
 
     println
     println("monix task monad with lazy evaluation")
-    awaitTime { getProduct(MonixTaskApiComponent, 10).runAsync}
+    awaitTime { getProduct(MonixTaskApiComponent, 10).runToFuture}
 //    println(catsEffectResult)
 
     println
@@ -240,7 +240,7 @@ object experiment {
 
     println
     println("monix task applicative with lazy evaluation")
-    awaitTime { getProductAp(MonixTaskApiComponent, 10).runAsync}
+    awaitTime { getProductAp(MonixTaskApiComponent, 10).runToFuture}
     //    println(catsEffectResult)
   }
 

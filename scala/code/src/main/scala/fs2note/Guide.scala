@@ -1,6 +1,6 @@
 package fs2note
 
-import fs2.{Chunk, Pure, Segment, Stream}
+import fs2.{Chunk, Pure, Stream}
 import monix.reactive.Observable
 
 /**

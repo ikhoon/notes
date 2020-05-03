@@ -6,7 +6,7 @@ import scala.reflect.macros.whitebox
   * Created by ikhoon on 06/08/2017.
   */
 
-@macrocompat.bundle
+//@macrocompat.bundle
 class NatMacros(val c: whitebox.Context) {
   import c.universe._
   def materialize(i: Tree): Tree = {

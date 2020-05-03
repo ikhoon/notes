@@ -43,6 +43,6 @@ object LiveCodeMonad extends App {
     println(x + y)
   })
   println(s"wwww ${Instant.now}")
-  val y = x.runAsync
+  val y = x.runToFuture
   Await.result(y, Duration.Inf)
 }
