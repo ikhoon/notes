@@ -1,10 +1,10 @@
 package rxjava;
 
 
-import io.reactivex.Observable;
-import io.reactivex.Single;
 import org.junit.Test;
-import scalaz.Alpha;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;

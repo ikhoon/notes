@@ -1,9 +1,10 @@
 package concurrentnote;
 
-import io.reactivex.exceptions.Exceptions;
 import org.junit.Test;
 
 import java.util.concurrent.*;
+
+import io.reactivex.rxjava3.exceptions.Exceptions;
 
 public class BlockingQueueTest {
     Executor executor = Executors.newSingleThreadExecutor();

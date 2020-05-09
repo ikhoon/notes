@@ -35,7 +35,6 @@ class TraverseExample extends FunSuite with Matchers {
     Item(itemId, "$")
   }
 
-
   def findItemByIdEffect[F[_]](itemId: Int)(implicit F: Effect[F]): F[Item] = F.delay {
     Thread.sleep(1000)
     println("Find Item by ID 2 : " + Instant.now)
@@ -99,7 +98,7 @@ class TraverseExample extends FunSuite with Matchers {
     import monix.execution.Scheduler.Implicits.global
     withTS {
       val res = itemIds.parTraverse(findItemByIdEffect[Task])
-      val xs = res.runAsync
+      val xs = res.runToFuture
       println(Await.result(xs, Duration.Inf))
     }
   }
@@ -109,7 +108,7 @@ class TraverseExample extends FunSuite with Matchers {
     import monix.execution.Scheduler.Implicits.global
     withTS {
       val res = itemIds.parTraverse(findItemByIdTask)
-      val xs = res.runAsync
+      val xs = res.runToFuture
       println(Await.result(xs, Duration.Inf))
     }
   }
@@ -118,7 +117,7 @@ class TraverseExample extends FunSuite with Matchers {
     import monix.execution.Scheduler.Implicits.global
     withTS {
       val res = itemIds.traverse(findItemByIdEffect[Task])
-      val xs = res.runAsync
+      val xs = res.runToFuture
       println(Await.result(xs, Duration.Inf))
     }
   }
@@ -127,7 +126,7 @@ class TraverseExample extends FunSuite with Matchers {
     import monix.execution.Scheduler.Implicits.global
     withTS {
       val res = itemIds.traverse(findItemByIdTask)
-      val xs = res.runAsync
+      val xs = res.runToFuture
       println(Await.result(xs, Duration.Inf))
     }
   }

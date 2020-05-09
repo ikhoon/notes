@@ -9,7 +9,6 @@ import com.linecorp.armeria.common.HttpResponse;
 
 import akka.NotUsed;
 import akka.actor.ActorSystem;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import io.reactivex.rxjava3.core.BackpressureStrategy;

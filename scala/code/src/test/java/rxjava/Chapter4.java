@@ -1,15 +1,17 @@
 package rxjava;
 
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import scala.collection.immutable.ListSet;
+import static io.reactivex.rxjava3.core.Observable.defer;
+import static io.reactivex.rxjava3.core.Observable.error;
+import static io.reactivex.rxjava3.core.Observable.fromIterable;
+import static io.reactivex.rxjava3.core.Observable.just;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.reactivex.Observable.*;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
+import twitternote.AsyncStreamSpec;
 
 /**
  * Created by ikhoon on 16/07/2017.
@@ -47,7 +49,7 @@ public class Chapter4 {
 
 
     Observable<Person> listPeople3() {
-        List<Person> people = query("SELECT * FROM people");
+        final List<Person> people = query("SELECT * FROM people");
         return fromIterable(people);
     }
 
@@ -110,7 +112,7 @@ public class Chapter4 {
 
 
     public List<Person> toBlockingList1(Observable<Person> peopleStream)  {
-        Single<List<Person>> listSingle = peopleStream.toList();
+        final Single<List<Person>> listSingle = peopleStream.toList();
         return listSingle.blockingGet();
     }
 
@@ -190,10 +192,10 @@ public class Chapter4 {
     // 이코드를 보고 놀랐다
     // 아주 선언적이며 직관적이다.
     void bestBestFor2(Person person) {
-        Observable<Book> recommend = recommend2(person);
-        Observable<Book> bestSeller = bestSeller2();
-        Observable<Book> book = recommend.onErrorResumeNext(bestSeller);
-        Observable<String> title = book.map(b -> b.title);
+        final Observable<Book> recommend = recommend2(person);
+        final Observable<Book> bestSeller = bestSeller2();
+        final Observable<Book> book = recommend.onErrorResumeWith(bestSeller);
+        final Observable<String> title = book.map(b -> b.title);
         title.subscribe(this::display);
     }
 
@@ -202,7 +204,7 @@ public class Chapter4 {
     // 에러일때만 best seller 호출한다. lazy하지 않으면 best seller는 에러건 아니건 일단 무조건 호출될것이다.
     void bestBestFor3(Person person) {
         recommend2(person)
-        .onErrorResumeNext(bestSeller2())
+        .onErrorResumeWith(bestSeller2())
         .map(b -> b.title)
         .subscribe(this::display);
     }
@@ -232,11 +234,11 @@ public class Chapter4 {
     // 하지만 정형화 되어 있지 않다.
     // Source.scala
     List<Person> getFriends() {
-       List<Person> friends = listPeoplePage(0);
-       List<Person> agedFriends = friends.stream().filter(friend -> friend.age > 20).collect(Collectors.toList());
+       final List<Person> friends = listPeoplePage(0);
+       final List<Person> agedFriends = friends.stream().filter(friend -> friend.age > 20).collect(Collectors.toList());
        if(agedFriends.size() < 10) {
-           List<Person> friends2 = listPeoplePage(1);
-           List<Person> agedFriends2 = friends.stream().filter(friend -> friend.age > 20).collect(Collectors.toList());
+           final List<Person> friends2 = listPeoplePage(1);
+           final List<Person> agedFriends2 = friends.stream().filter(friend -> friend.age > 20).collect(Collectors.toList());
            agedFriends.addAll(agedFriends2);
            // 10명이 만족할때가지 추가 행위를 할수도 있음
        }
@@ -266,7 +268,7 @@ public class Chapter4 {
     // Rx Observable과 비슷하게 finagle, finatra에서 사용할수 있는건 AsyncStream이라고 있다.
     // 이건 아래 AsyncStreamSpec 예를 참고하자.
     /**
-     * @see twitternote.AsyncStreamSpec
+     * @see AsyncStreamSpec
      */
 
 

@@ -8,3 +8,7 @@ resolvers ++= Seq(
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.1")
 
 addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "20.4.1")
+
+addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.28")
+
+libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.10.1"

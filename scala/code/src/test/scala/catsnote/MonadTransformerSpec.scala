@@ -13,9 +13,9 @@ class MonadTransformerSpec extends WordSpec with Matchers {
   import scalaz._, Scalaz._
   "map list" should {
     "list concat" in {
-      val a = Future.successful(List(1, 2))
-      val b = Future.successful(List(3, 4))
-      val run1: Future[List[Int]] = (ListT(a) ++ ListT(b)).run
+      val a = Future.successful(IList(1, 2))
+      val b = Future.successful(IList(3, 4))
+      val run1: Future[IList[Int]] = (ListT(a) ++ ListT(b)).run
       println(Await.result(run1, Duration.Inf))
     }
   }

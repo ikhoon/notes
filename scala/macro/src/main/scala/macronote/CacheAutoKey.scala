@@ -1,11 +1,11 @@
 package macronote
 
+import scala.collection.mutable.ArrayBuffer
 import scala.reflect.macros.blackbox
 
 /**
   * Created by Liam.M on 2018. 07. 27..
   */
-
 object MemoryCache {
   var cache = Map.empty[String, Any]
   def getOrElse[V](key: String, value: => V): V = {
@@ -20,7 +20,7 @@ object MemoryCache {
   }
 }
 object MethodNameToString {
-  def toString(fullClassName: String, methodName: String, params: IndexedSeq[IndexedSeq[Any]]) = {
+  def toString(fullClassName: String, methodName: String, params: ArrayBuffer[ArrayBuffer[Int]]) = {
     val paramStr = params.map(_.mkString(",")).mkString(",")
     s"$fullClassName+$methodName+$paramStr"
   }
@@ -82,6 +82,7 @@ class MacroCacheAutoKey(val c: blackbox.Context) {
 
     getMethodSymbolRecursively(c.internal.enclosingOwner)
   }
+
   /**
     * Convert the given class symbol to a tree representing the fully qualified class name.
     *
@@ -103,10 +104,12 @@ class MacroCacheAutoKey(val c: blackbox.Context) {
   }
 
   private def paramListsToTree(symbolss: List[List[c.Symbol]]): c.Tree = {
-    val identss: List[List[Ident]] = symbolss.map(ss =>
-      ss.collect {
-        case s => Ident(s.name)
-      })
+    val identss: List[List[Ident]] = symbolss.map(
+      ss =>
+        ss.collect {
+          case s => Ident(s.name)
+      }
+    )
     listToTree(identss.map(is => listToTree(is)))
   }
 

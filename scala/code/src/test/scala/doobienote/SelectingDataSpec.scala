@@ -9,7 +9,7 @@ import scalaz._, Scalaz._
   */
 class SelectingDataSpec extends WordSpec with Matchers {
 
-  import doobie.imports._
+  import doobie.implicits._
 
   /*
   "select data" should {
@@ -65,6 +65,6 @@ class SelectingDataSpec extends WordSpec with Matchers {
     }
 
   }
-  */
+ */
 
 }

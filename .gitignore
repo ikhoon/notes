@@ -99,3 +99,7 @@ strong_connected_components.txt
 build/
 out/
 
+
+.bloop
+.metals
+.vscode

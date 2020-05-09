@@ -1,12 +1,23 @@
 package reactivenode;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.linecorp.armeria.client.ClientOptions;
-import com.linecorp.armeria.client.HttpClient;
-import com.linecorp.armeria.common.*;
+import com.linecorp.armeria.client.WebClient;
+import com.linecorp.armeria.common.HttpData;
+import com.linecorp.armeria.common.HttpHeaders;
+import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.sse.ServerSentEvent;
 import com.linecorp.armeria.server.Server;
 import com.linecorp.armeria.server.annotation.Get;
@@ -15,27 +26,17 @@ import com.linecorp.armeria.server.annotation.Post;
 import com.linecorp.armeria.server.annotation.ProducesJsonSequences;
 import com.linecorp.armeria.server.streaming.JsonTextSequences;
 import com.linecorp.armeria.server.streaming.ServerSentEvents;
-import io.micrometer.core.instrument.util.JsonUtils;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.theories.suppliers.TestedOn;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import reactor.core.publisher.Flux;
 
 public class JsonStreamDemoTest {
     static Server userServer;
     static Server pushServer;
-    static HttpClient userClient;
-    static HttpClient pushClient;
+    static WebClient userClient;
+    static WebClient pushClient;
     static Random random = new Random();
     static ObjectMapper mapper = new ObjectMapper();
 
@@ -81,9 +82,9 @@ public class JsonStreamDemoTest {
             return Observable.zip(
                     Observable.interval(1000, TimeUnit.MILLISECONDS).take(Integer.MAX_VALUE - 1),
                     Observable.range(1, Integer.MAX_VALUE)
-                            .map(idx -> new User(idx, "User" + idx, random.nextInt(100))),
+                              .map(idx -> new User(idx, "User" + idx, random.nextInt(100))),
                     (aLong, integer) -> integer)
-                    .doOnNext(user -> System.out.println("### Server: " + Instant.now() + ' ' + user));
+                             .doOnNext(user -> System.out.println("### Server: " + Instant.now() + ' ' + user));
         }
     }
 
@@ -137,23 +138,27 @@ public class JsonStreamDemoTest {
                 .service("/api-sse", (ctx, req) -> {
                     ctx.setRequestTimeout(Duration.ZERO);
                     final Observable<String> observable = Observable.interval(100, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.newThread())
-                            .map(id -> new User(id, "User" + id, random.nextInt(100)))
-                            .map(mapper::writeValueAsString)
-                            .take(1005);
-                    return ServerSentEvents.fromPublisher(observable.toFlowable(BackpressureStrategy.BUFFER), ServerSentEvent::ofData);
+                                                                    .subscribeOn(Schedulers.newThread())
+                                                                    .map(id -> new User(id, "User" + id,
+                                                                                        random.nextInt(100)))
+                                                                    .map(mapper::writeValueAsString)
+                                                                    .take(1005);
+                    return ServerSentEvents.fromPublisher(observable.toFlowable(BackpressureStrategy.BUFFER),
+                                                          ServerSentEvent::ofData);
                 })
-                .build();
+                           .build();
         userServer.start().join();
 
-        userClient = HttpClient.of("http://127.0.0.1:" + userServer.activeLocalPort(), ClientOptions.of());
+        userClient = WebClient.builder("http://127.0.0.1:" + userServer.activeLocalPort())
+                              .options(ClientOptions.of())
+                              .build();
 
         // subscribe & produce json data stream
         pushServer = Server.builder()
-                .service("/push", (ctx, req) -> HttpResponse.of(200))
-                .build();
+                           .service("/push", (ctx, req) -> HttpResponse.of(200))
+                           .build();
         pushServer.start().join();
-        pushClient = HttpClient.of("http://127.0.0.1:" + pushServer.activeLocalPort());
+        pushClient = WebClient.of("http://127.0.0.1:" + pushServer.activeLocalPort());
     }
 
     @Test

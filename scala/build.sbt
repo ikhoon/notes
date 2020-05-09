@@ -61,18 +61,12 @@ lazy val commonSettings = Seq(
     "org.scalactic" %% "scalactic" % "3.1.1",
 
     "com.github.mpilquist" %% "simulacrum" % "0.19.0",
-//    "com.thoughtworks.each" %% "each" % "3.3.1",
     "org.atnos" %% "eff" % "5.8.0",
 
     // fs2
     "co.fs2" %% "fs2-core" % "2.3.0",
     "co.fs2" %% "fs2-io" % "2.3.0",
 
-    // freestyle
-//    "io.frees" %% "frees-core" % "0.6.2",
-//    // optional - effects and patterns
-//    "io.frees" %% "frees-effects" % "0.6.2",
-    //    "io.frees" %% "frees-tagless"      % "0.6.2",
 
     "com.twitter" %% "util-core" % "20.4.1",
 
@@ -88,7 +82,6 @@ lazy val commonSettings = Seq(
     "org.asynchttpclient" % "async-http-client" % "2.12.1",
     // reactor
     "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE",
-
 
     // A reactive (or non-blocking, or asynchronous) JSON parser
     "de.undercouch" % "actson" % "1.2.0",
@@ -107,8 +100,10 @@ lazy val commonSettings = Seq(
     "io.circe" %% "circe-shapes" % "0.13.0",
     "io.circe" %% "circe-generic-extras" % "0.13.0",
 
-
     "org.scalatest" %% "scalatest" % "3.1.1" % "test",
+    "org.scalatestplus" %% "testng-6-7" % "3.1.1.0" % "test",
+    "org.scalatestplus" %% "scalacheck-1-14" % "3.1.0.0" % "test",
+
     // junit 4
     "junit" % "junit" % "4.13" % "test",
     // junit 5
@@ -117,9 +112,9 @@ lazy val commonSettings = Seq(
     "com.github.julien-truffaut" %% "monocle-core" % "2.0.3",
     "com.github.julien-truffaut" %% "monocle-macro" % "2.0.3",
     "com.github.julien-truffaut" %% "monocle-law" % "2.0.3" % "test",
+
     // scala meta
     "org.scalameta" %% "scalameta" % "4.3.10",
-//    "org.scalameta" %% "contrib" % "4.3.10",
 
     "com.twitter" %% "finagle-http" % "20.4.1",
     // netty
@@ -132,16 +127,24 @@ lazy val commonSettings = Seq(
     "com.linecorp.armeria" % "armeria-thrift" % "0.99.4",
     "com.linecorp.armeria" % "armeria-brave" % "0.99.4",
 
+    // logback
+    "ch.qos.logback" % "logback-classic" % "0.9.28" % Test,
+
+    // grpc
+    "io.grpc" % "grpc-netty" % scalapb.compiler.Version.grpcJavaVersion,
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
+    "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
+
     // assertj
     "org.assertj" % "assertj-core" % "3.15.0" % "test",
 
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
-  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
-  //  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-//  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
-
-
+  addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full),
+  PB.targets in Compile := Seq(
+    scalapb.gen() -> (sourceManaged in Compile).value
+  ),
+  PB.protoSources in Compile += baseDirectory.value / "src/main/proto",
 )
 
 resolvers += Resolver.mavenLocal

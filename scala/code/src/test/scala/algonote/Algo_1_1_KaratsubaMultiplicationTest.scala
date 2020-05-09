@@ -1,13 +1,14 @@
 package algonote
 
 import algonote.Algo_1_1_KaratsubaMultiplication.{divide, karatsuba, split}
-import org.scalatest.{FunSuite, Matchers}
-import org.scalatest.prop.Checkers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.Checkers
 
 /**
   * Created by ikhoon on 30/06/2018.
   */
-class Algo_1_1_KaratsubaMultiplicationTest extends FunSuite with Matchers with Checkers {
+class Algo_1_1_KaratsubaMultiplicationTest extends AnyFunSuite with Matchers with Checkers {
 
   test("split a number using given n") {
     val x = 12159
@@ -24,7 +25,7 @@ class Algo_1_1_KaratsubaMultiplicationTest extends FunSuite with Matchers with C
     val x = 123456
     val y = 987654
 
-    val kara =divide(x, y)
+    val kara = divide(x, y)
     kara.a shouldBe 123
     kara.b shouldBe 456
     kara.c shouldBe 987
@@ -35,7 +36,7 @@ class Algo_1_1_KaratsubaMultiplicationTest extends FunSuite with Matchers with C
     val x = 12345
     val y = 987654
 
-    val kara =divide(x, y)
+    val kara = divide(x, y)
     kara.a shouldBe 123
     kara.b shouldBe 45
     kara.c shouldBe 9876
@@ -64,6 +65,5 @@ class Algo_1_1_KaratsubaMultiplicationTest extends FunSuite with Matchers with C
     val z1 = x * y
     println(z1)
   }
-
 
 }
