@@ -36,3 +36,4 @@
 * [Class](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/stdnote/ClassSpec.scala)
 * [Option](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/stdnote/OptionSpec.scala)
 * [Object](https://github.com/ikhoon/scala-exercise-note/blob/master/src/test/scala/stdnote/ObjectsSpec.scala)
+
