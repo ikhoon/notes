@@ -1,18 +1,19 @@
 package reactivenote;
 
+import static akka.stream.javadsl.AsPublisher.WITHOUT_FANOUT;
+
+import com.mongodb.reactivestreams.client.MongoClients;
+
+import com.linecorp.armeria.common.HttpData;
+import com.linecorp.armeria.common.HttpResponse;
+
 import akka.NotUsed;
 import akka.actor.ActorSystem;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import com.linecorp.armeria.common.HttpData;
-import com.linecorp.armeria.common.HttpResponse;
-import com.mongodb.reactivestreams.client.*;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
-import org.bson.Document;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Observable;
 import reactor.core.publisher.Flux;
-
-import static akka.stream.javadsl.AsPublisher.WITHOUT_FANOUT;
 
 public class ReactiveInterop {
     public static void main(String[] args) {
@@ -28,7 +29,7 @@ public class ReactiveInterop {
         final Source<Integer, NotUsed> akkaAdult =
                 Source.fromPublisher(rxJavaAges.toFlowable(BackpressureStrategy.DROP))
                         .filter(age -> age > 19);
-        final Flux<HttpData> rectorFlux = Flux.from(akkaAdult.runWith(Sink.asPublisher(WITHOUT_FANOUT), null))
+        final Flux<HttpData> rectorFlux = Flux.from(akkaAdult.runWith(Sink.asPublisher(WITHOUT_FANOUT), system))
                 .map(age -> HttpData.ofAscii(age.toString()));
         HttpResponse.of(rectorFlux);
 

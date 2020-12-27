@@ -1,8 +1,5 @@
 package algonote
 
-import pprint.Tree.Ctx
-
-import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**

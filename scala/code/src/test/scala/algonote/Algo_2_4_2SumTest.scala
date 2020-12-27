@@ -22,17 +22,16 @@ class Algo_2_4_2SumTest extends FunSuite with Matchers {
     val TARGETS = (MIN to MAX).toList
     val results = mutable.Set.empty[Long]
     val res = inputs
-//      .take(100)
-    .par.foreach{ x =>
-      if (x % 100 == 0) println(s"x = $x")
-      var t = MIN
-      while(t <= MAX) {
-        val y: Long = t - x
-        if (sets.contains(y))
-          results += t
-        t += 1
+      .foreach { x =>
+        if (x % 100 == 0) println(s"x = $x")
+        var t = MIN
+        while (t <= MAX) {
+          val y: Long = t - x
+          if (sets.contains(y))
+            results += t
+          t += 1
+        }
       }
-    }
     println(results.size)
   }
 }

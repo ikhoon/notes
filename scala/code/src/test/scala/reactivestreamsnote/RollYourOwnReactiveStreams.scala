@@ -2,7 +2,7 @@ package reactivestreamsnote
 
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import org.reactivestreams.tck.{PublisherVerification, TestEnvironment}
-import org.scalatest.testng.TestNGSuiteLike
+import org.scalatestplus.testng.TestNGSuiteLike
 import org.scalatest.{FunSuite, Matchers}
 
 class ListPublisherTest(env: TestEnvironment, publisherShutdownTimout: Long)
@@ -50,7 +50,5 @@ class RollYourOwnReactiveStreamsTest extends FunSuite with Matchers {
     })
   }
 
-  test("example") {
-
-  }
+  test("example") {}
 }

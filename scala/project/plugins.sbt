@@ -5,7 +5,7 @@ resolvers ++= Seq(
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.1")
 
-addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "18.8.0")
+addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "20.4.1")
 
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.0-RC4")
 

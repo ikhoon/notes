@@ -7,7 +7,7 @@ object SwapNodes {
   def swapNodes(indexes: Array[Array[Int]], queries: Array[Int]): Array[Array[Int]] = {
     queries.map { k =>
       swapNode(indexes, k)
-      println(indexes.deep)
+      println(indexes)
       dfs(indexes).toArray
     }
   }

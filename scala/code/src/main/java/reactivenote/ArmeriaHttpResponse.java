@@ -1,8 +1,13 @@
 package reactivenote;
 
-import com.linecorp.armeria.common.*;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Observable;
+import com.linecorp.armeria.common.HttpData;
+import com.linecorp.armeria.common.HttpObject;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.common.HttpStatus;
+import com.linecorp.armeria.common.ResponseHeaders;
+
+import io.reactivex.rxjava3.core.BackpressureStrategy;
+import io.reactivex.rxjava3.core.Observable;
 
 public class ArmeriaHttpResponse {
     public static void main(String[] args) {

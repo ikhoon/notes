@@ -37,6 +37,6 @@ object ParallelTest extends App {
 //  val result1: Future[List[String]] = xs.parTraverse(toStr1)
 //  Await.result(result1, Duration.Inf)
     val result2: Task[List[String]] = xs.parTraverse(toStr2)
-    Await.result(result2.runAsync, Duration.Inf)
+    Await.result(result2.runToFuture, Duration.Inf)
 
 }

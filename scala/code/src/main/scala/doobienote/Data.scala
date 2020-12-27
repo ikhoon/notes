@@ -10,7 +10,7 @@ import scalaz.concurrent.Task
 object Data {
 
   import scalaz._, Scalaz._
-  import doobie.imports._
+  import doobie.implicits._
   import shapeless._
 
   type CountryHListType = String :: Int :: Option[Double] :: HNil

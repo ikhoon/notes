@@ -1,15 +1,14 @@
 package rxjava;
 
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Scanner;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * Created by ikhoon on 20/06/2017.

@@ -45,7 +45,7 @@ class ApplicativeFutureSpec extends WordSpec with Matchers {
       val b = Future { List(2, 3) }
       val c = Future { List(4, 5, 6) }
 
-      val abc = (a |@| b |@| c) map { _ ++ _ ++ _ }
+      val abc = (a, b, c).mapN { _ ++ _ ++ _ }
 
       Await.result(abc, Duration.Inf) shouldBe List(1, 2, 3, 4, 5, 6)
 

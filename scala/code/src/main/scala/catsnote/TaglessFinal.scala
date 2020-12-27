@@ -38,12 +38,12 @@ object KVStore {
 
 
   def program2[M[_]: Monad, F[_]: Applicative]
-    (kv: KVStore[M, Int])(implicit P: Parallel[M, F]): M[Int] = {
+    (kv: KVStore[M, Int])(implicit P: Parallel[M]): M[Int] = {
     (kv.put("a", 10), kv.put("b", 11), kv.get("c")).parMapN((_, _, c) => c)
   }
 
   def program3[M[_]: Monad]
-  (kv: KVStore[M, Int])(implicit P: Parallel[M, M]): M[Int] = {
+  (kv: KVStore[M, Int])(implicit P: Parallel[M]): M[Int] = {
     (kv.put("a", 10), kv.put("b", 11), kv.get("c")).parMapN((_, _, c) => c)
   }
 }

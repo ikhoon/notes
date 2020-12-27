@@ -92,3 +92,14 @@ crashlytics-build.properties
 strong_connected_components.txt
 
 .DS_Store
+
+
+#####=== Gradle ===#####
+.gradle/
+build/
+out/
+
+
+.bloop
+.metals
+.vscode
