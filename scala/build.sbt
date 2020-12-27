@@ -1,3 +1,5 @@
+import sbt.Fork.scala
+
 name := "the-note"
 
 version := "1.0"
@@ -12,7 +14,6 @@ lazy val `the-note` = (project in file("."))
 
 lazy val `code` = (project in file("code"))
   .settings(commonSettings)
-  .enablePlugins(TutPlugin)
   .dependsOn(`macro`)
 
 lazy val `macro` = (project in file("macro"))
@@ -25,7 +26,8 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     // See other posts in the series for other helpful options
     "-target:jvm-1.8",
-    "-encoding", "UTF-8",
+    "-encoding",
+    "UTF-8",
     "-unchecked",
 //    "-deprecation",
     "-Xfuture",
@@ -44,7 +46,6 @@ lazy val commonSettings = Seq(
     "-language:reflectiveCalls",
     "-language:postfixOps",
     "-Xplugin-require:macroparadise"
-
   ),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
@@ -61,25 +62,19 @@ lazy val commonSettings = Seq(
     "org.tpolecat" %% "doobie-core" % "0.5.2",
     "org.tpolecat" %% "doobie-h2" % "0.5.2",
     "org.scalactic" %% "scalactic" % "3.0.1",
-
     "com.github.mpilquist" %% "simulacrum" % "0.10.0",
     "com.thoughtworks.each" %% "each" % "3.3.1",
     "org.atnos" %% "eff" % "4.2.0",
-
     // fs2
     "co.fs2" %% "fs2-core" % "1.0.0-M3",
     "co.fs2" %% "fs2-io" % "1.0.0-M3",
-
     // freestyle
     "io.frees" %% "frees-core" % "0.6.2",
     // optional - effects and patterns
     "io.frees" %% "frees-effects" % "0.6.2",
     //    "io.frees" %% "frees-tagless"      % "0.6.2",
-
     "com.twitter" %% "util-core" % "6.45.0",
-
     "eu.timepit" %% "refined" % "0.8.2",
-
     // reative streams
     "org.reactivestreams" % "reactive-streams" % "1.0.3",
     "org.reactivestreams" % "reactive-streams-tck" % "1.0.3",
@@ -90,65 +85,53 @@ lazy val commonSettings = Seq(
     "org.asynchttpclient" % "async-http-client" % "2.0.0",
     // reactor
     "io.projectreactor" % "reactor-core" % "3.2.12.RELEASE",
-
-
     // A reactive (or non-blocking, or asynchronous) JSON parser
     "de.undercouch" % "actson" % "1.2.0",
     // reactive mongo driver
     "org.mongodb" % "mongodb-driver-reactivestreams" % "1.12.0",
-
     // reactor core
     "io.projectreactor" % "reactor-core" % "3.3.0.RELEASE",
-
     // akka streams
     "com.typesafe.akka" %% "akka-stream" % "2.5.25",
-
     "org.scalaz" %% "scalaz-core" % "7.2.16",
     "org.scalaz" %% "scalaz-concurrent" % "7.2.16",
-
     "io.circe" %% "circe-core" % "0.9.3",
     "io.circe" %% "circe-generic" % "0.9.3",
     "io.circe" %% "circe-parser" % "0.9.3",
     "io.circe" %% "circe-shapes" % "0.9.3",
     "io.circe" %% "circe-generic-extras" % "0.9.3",
-
-
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     // junit 4
     "junit" % "junit" % "4.12" % "test",
     // junit 5
     "org.awaitility" % "awaitility" % "3.1.6" % "test",
-
     "com.github.julien-truffaut" %% "monocle-core" % "1.5.0-cats",
     "com.github.julien-truffaut" %% "monocle-macro" % "1.5.0-cats",
     "com.github.julien-truffaut" %% "monocle-law" % "1.5.0-cats" % "test",
     // scala meta
     "org.scalameta" %% "scalameta" % "3.7.2",
     "org.scalameta" %% "contrib" % "3.7.2",
-
     "com.twitter" %% "finagle-http" % "19.6.0",
     // netty
     "io.netty" % "netty-all" % "4.1.42.Final",
-
     // armeria
-    "com.linecorp.armeria" % "armeria" % "0.94.0",
-    "com.linecorp.armeria" % "armeria-grpc" % "0.94.0",
-    "com.linecorp.armeria" % "armeria-rxjava" % "0.94.0",
-    "com.linecorp.armeria" % "armeria-thrift" % "0.94.0",
-    "com.linecorp.armeria" % "armeria-brave" % "0.94.0",
-
+    "com.linecorp.armeria" % "armeria" % "1.3.0",
+    "com.linecorp.armeria" % "armeria-grpc" % "1.3.0",
+    "com.linecorp.armeria" % "armeria-rxjava3" % "1.3.0",
+    "com.linecorp.armeria" % "armeria-brave" % "1.3.0",
+    "com.linecorp.armeria" %% "armeria-scalapb" % "1.3.0",
+    // Reactor Scala extension
+    "io.projectreactor" %% "reactor-scala-extensions" % "0.8.0",
     // assertj
     "org.assertj" % "assertj-core" % "3.11.1" % "test",
-
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   ),
   addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
   //  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-  addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
-
-
+  addCompilerPlugin(("org.scalamacros" % "paradise" % "2.1.0").cross(CrossVersion.full)),
+  PB.targets in Compile := Seq(
+    scalapb.gen() -> (sourceManaged in Compile).value / "scalapb"
+  )
 )
 
 resolvers += Resolver.mavenLocal
-
-
