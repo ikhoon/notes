@@ -31,7 +31,7 @@ public class DecoratorExample {
             if (!authenticate(req)) {
                 return HttpResponse.of(HttpStatus.UNAUTHORIZED);
             }
-            return delegate().serve(ctx, req);
+            return unwrap().serve(ctx, req);
         }
 
         AuthService(HttpService delegate) {
