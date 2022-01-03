@@ -1,6 +1,7 @@
 package freemonad
 
 object FreeExample {
+
   /**
     * Created by ikhoon on 09/07/2017.
     *
@@ -12,7 +13,6 @@ object FreeExample {
     * 코드는 발표자 Runar Oli Bjarnason의 gist를 참조했다.
     * https://gist.github.com/runarorama/a8fab38e473fafa0921d
     */
-
   //  먼저 ADT, algebra를 완성해보자
   // 여기서 A는 결과타입이 담긴다고 생각하면 된다.
   sealed trait Interact[A]
@@ -38,7 +38,7 @@ object FreeExample {
   // 아래와 같이 선언하면
   // Monad[Option] 이런식으로 하면 monad instance를 가져올수 있다.
   object Monad {
-    def apply[F[_] : Monad]: Monad[F] = implicitly[Monad[F]]
+    def apply[F[_]: Monad]: Monad[F] = implicitly[Monad[F]]
   }
 
   // 이번엔 natural transformation 이다.
@@ -64,22 +64,21 @@ object FreeExample {
     // 그리고 반환타입을 눈여겨 봐야한다.
     // `F ~> G` 와 `H ~> G`를 합친 `F or H ~> G`가 되었다.
     // type lambda가 들어 있어서 조금 복잡해 보이지만 의미는 `F or H`이다.
-    // kind projector style로 하면 Coproduct[F, H, ?] 이다.
+    // kind projector style로 하면 Coproduct[F, H, *] 이다.
 
     // 합쳐진 natural transformation은
     // Either에 대한 pattern matching을 통한 함수의 실행이 될수있도록
     // 기존에 natural transformation 의 함수를 다시 감싼다.
-    def or[H[_]](f: H ~> G): ({type l[x] = Coproduct[F, H, x]})#l ~> G = {
-      new (({type l[x] = Coproduct[F, H, x]})#l ~> G) {
+    def or[H[_]](f: H ~> G): ({ type l[x] = Coproduct[F, H, x] })#l ~> G = {
+      new (({ type l[x] = Coproduct[F, H, x] })#l ~> G) {
         def apply[A](fa: Coproduct[F, H, A]): G[A] = fa.run match {
-          case Left(l) => self(l)
+          case Left(l)  => self(l)
           case Right(r) => f(r)
         }
       }
     }
 
   }
-
 
   // 이번엔 free monad를 만들어 보자
   // free monad 안에는 3가지의 연산자가 있다.
@@ -91,8 +90,8 @@ object FreeExample {
   sealed trait Free[F[_], A] {
     def flatMap[B](f: A => Free[F, B]): Free[F, B] =
       this match {
-        case Return(a) => f(a)
-        case Bind(a, g) => Bind(a, g andThen(_ flatMap f))
+        case Return(a)  => f(a)
+        case Bind(a, g) => Bind(a, g.andThen(_.flatMap(f)))
       }
 
     def map[B](f: A => B): Free[F, B] =
@@ -102,9 +101,10 @@ object FreeExample {
     def foldMap[G[_]: Monad](f: F ~> G): G[A] =
       this match {
         case Return(a) => Monad[G].pure(a)
-        case Bind(a, g) => Monad[G].flatMap(f(a)) { i =>
-          g(i).foldMap(f)
-        }
+        case Bind(a, g) =>
+          Monad[G].flatMap(f(a)) { i =>
+            g(i).foldMap(f)
+          }
       }
   }
 
@@ -125,7 +125,6 @@ object FreeExample {
   // 그렇기 때문에 foldMap에서 `[G[_]: Monad]`를 통해서 G에 대한 Monad instance를 요구를 한다.
   // 여기서 I는 왜 I라고 부르는 지는 잘 모르겠다. 뭔가 심볼에 의미가 있을것 같은데
   case class Bind[F[_], I, A](a: F[I], f: I => Free[F, A]) extends Free[F, A]
-
 
   // 이제 interpreter를 구현해보자.
   type Id[A] = A
@@ -153,8 +152,12 @@ object FreeExample {
   object TestConsole extends (Interact ~> Tester) {
     override def apply[A](f: Interact[A]): Tester[A] = {
       f match {
-        case Ask(prompt) => m => (List(), m(prompt))
-        case Tell(msg) => _ => (List(msg), ())
+        case Ask(prompt) =>
+          m =>
+            (List(), m(prompt))
+        case Tell(msg) =>
+          _ =>
+            (List(msg), ())
       }
     }
   }
@@ -169,8 +172,8 @@ object FreeExample {
   implicit val testerMonad = new Monad[Tester] {
     def pure[A](a: A): Tester[A] = _ => (List(), a)
 
-    def flatMap[A, B](ma: Tester[A])(f: (A) => Tester[B]): Tester[B] = {
-      m => {
+    def flatMap[A, B](ma: Tester[A])(f: (A) => Tester[B]): Tester[B] = { m =>
+      {
         val (l1, a1) = ma(m)
         val (l2, a2) = f(a1)(m)
         (l1 ++ l2, a2)
@@ -225,8 +228,8 @@ object FreeExample {
 
     // 이번엔 왼쪽이다.
     // Coproduct(F[A], G[A]) 이런 모양이 형성된다.
-    implicit def injLeft[F[_], G[_]]: Inject[F, ({type L[x]=Coproduct[F, G, x]})#L] =
-      new Inject[F, ({type L[x]=Coproduct[F, G, x]})#L] {
+    implicit def injLeft[F[_], G[_]]: Inject[F, ({ type L[x] = Coproduct[F, G, x] })#L] =
+      new Inject[F, ({ type L[x] = Coproduct[F, G, x] })#L] {
         def inj[A](sub: F[A]): Coproduct[F, G, A] =
           Coproduct(Left(sub))
 
@@ -240,17 +243,19 @@ object FreeExample {
     // 여기서 G는 Coproduct가 된다.
     // Coproduct(H[A], Coproduct(F[A], G[A]))
     // 대충 이런 모양이 되는것 같다.
-    implicit def injRight[F[_], G[_], H[_]](implicit I: Inject[F, G]): Inject[F, ({type L[x]=Coproduct[H, G, x]})#L] =
-      new Inject[F, ({type L[x]=Coproduct[H, G, x]})#L] {
+    implicit def injRight[F[_], G[_], H[_]](
+      implicit I: Inject[F, G]
+    ): Inject[F, ({ type L[x] = Coproduct[H, G, x] })#L] =
+      new Inject[F, ({ type L[x] = Coproduct[H, G, x] })#L] {
         def inj[A](sub: F[A]): Coproduct[H, G, A] =
           Coproduct(Right(I.inj(sub)))
 
         def prj[A](sup: Coproduct[H, G, A]): Option[F[A]] =
-          sup.run match  {
-            case Left(_) => None
+          sup.run match {
+            case Left(_)  => None
             case Right(a) => I.prj(a)
           }
-    }
+      }
 
     // 아 그래도 여전히 헷갈리는구나
   }
@@ -282,7 +287,6 @@ object FreeExample {
     implicit def auth[F[_]](implicit I: Inject[Auth, F]): Auths[F] = new Auths
   }
 
-
   val KnowSecret = "KnowSecret"
 
   def prg[F[_]](implicit I: Interacts[F], A: Auths[F]): Free[F, Unit] = {
@@ -293,25 +297,23 @@ object FreeExample {
       pwd <- ask("Password Please.")
       u <- login(uid, pwd)
       b <- u.map(hasPermission(_, KnowSecret)).getOrElse(Return(false))
-      _ <- if(b) tell("UUDDLRLRBA") else tell("Go away!")
+      _ <- if (b) tell("UUDDLRLRBA") else tell("Go away!")
     } yield ()
   }
-
 
   // ADT를 Coproduct를 이용해서 합친다.
   type App[A] = Coproduct[Auth, Interact, A]
 
-
   // ADT를 만들어서 넘겨주면 Inject가 implicit resolution을 하면서 Coproduct의 모양에 맞게
   // algebra를 lift해서 program을 만들어 준다.
-  // 즉 Free[Coproduct[Auth, Interact, ?], Unit]의 모양으로 lift한다.
+  // 즉 Free[Coproduct[Auth, Interact, *], Unit]의 모양으로 lift한다.
   val app = prg[App]
 
   val TestAuth: Auth ~> Id = new (Auth ~> Id) {
     def apply[A](f: Auth[A]): Id[A] = {
       f match {
         case Login(uid, pwd) =>
-          if(uid == "john.show" && pwd == "Ghost")
+          if (uid == "john.show" && pwd == "Ghost")
             Some(User("john.show"))
           else None
         case HasPermission(u, _) =>
@@ -323,7 +325,7 @@ object FreeExample {
   // 앞에 interpreter를 coproduct를 이용해서 합치는 로직은
   // or를 이용해서 구현했었다.
   // 그래서 마지막으로 interpreter를 합하고 이를 주입하면 된다
-  def runApp = app.foldMap(TestAuth or Console)
+  def runApp = app.foldMap(TestAuth.or(Console))
 
   // 아래 코드는 안된다.
   // 역시나 Coproduct의 순서는 중하다.

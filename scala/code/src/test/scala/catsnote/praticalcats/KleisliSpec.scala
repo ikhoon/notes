@@ -2,17 +2,18 @@ package catsnote.praticalcats
 
 import cats.data.Kleisli
 import cats.implicits._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by Liam.M(엄익훈) on 02/01/2017.
   */
-class KleisliSpec extends WordSpec with Matchers{
+class KleisliSpec extends AnyWordSpec with Matchers {
 
   "kleisli" should {
     "compose" in {
-      val f : Int => String = x => (x * 10).toString
-      val g : String => Boolean = x => x.length % 2 == 0
+      val f: Int => String = x => (x * 10).toString
+      val g: String => Boolean = x => x.length % 2 == 0
 
       println(g(f(10)))
       println(g(f(100)))
@@ -22,8 +23,8 @@ class KleisliSpec extends WordSpec with Matchers{
     }
 
     "compose with effect" in {
-      val f : Int => Option[String] = x => Some((x * 10).toString)
-      val g : String => Option[Boolean] = x => Some(x.length % 2 == 0)
+      val f: Int => Option[String] = x => Some((x * 10).toString)
+      val g: String => Option[Boolean] = x => Some(x.length % 2 == 0)
 
 //      f.andThen(g)
 
@@ -39,8 +40,8 @@ class KleisliSpec extends WordSpec with Matchers{
         def compose[Z](k: Kleisli[F, Z, A])(implicit F: FlatMap[F]): Kleisli[F, Z, B] =
           Kleisli[F, Z, B](z => k.run(z).flatMap(run))
       }
-      */
-        //                               String     ==>     Boolean
+        */
+      //                               String     ==>     Boolean
       val kleisli: Kleisli[Option, Int, Boolean] = Kleisli[Option, Int, String](f).andThen(g)
       println(kleisli.run(10))
       println(kleisli.run(100))
@@ -56,21 +57,22 @@ class KleisliSpec extends WordSpec with Matchers{
       **/
       // Int => Option[String]
       // config
-      def foo(a: Int) : Kleisli[Option, AccountRepository, String] = Kleisli(accountRepository => {
-        println(Some(accountRepository + " " + a.toString))
-        Some(accountRepository + " " + a.toString)
-      })
+      def foo(a: Int): Kleisli[Option, AccountRepository, String] =
+        Kleisli(accountRepository => {
+          println(Some(accountRepository + " " + a.toString))
+          Some(accountRepository + " " + a.toString)
+        })
 
-      def bar(b: String) : Kleisli[Option, AccountRepository, Boolean] = Kleisli(accountRepository=> {
-        println(Some((accountRepository + " " + b)))
-        Some((accountRepository + " " + b).length % 2 == 0)
-      })
-
+      def bar(b: String): Kleisli[Option, AccountRepository, Boolean] =
+        Kleisli(accountRepository => {
+          println(Some((accountRepository + " " + b)))
+          Some((accountRepository + " " + b).length % 2 == 0)
+        })
 
       object AccountRepositoryImpl extends AccountRepository {
         override def getId: Int = 10
       }
-      
+
       val cc: Kleisli[Option, AccountRepository, Boolean] = foo(10).flatMap(bar)
       val run2: Option[Boolean] = cc.run(AccountRepositoryImpl)
       println(run2)

@@ -4,6 +4,7 @@ import cats.Monad
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
   * Created by Liam.M on 2018. 03. 20..
   */
@@ -28,9 +29,8 @@ object MonadExample extends App {
   b.leftFlatMap(g _)
   1.some
 
-
   // Either monad instance
-  implicit def eitherInstance[L]: Monad[({type Lambd[A] = Either[L, A]})#Lambd] = new Monad[Either[L, ?]] {
+  implicit def eitherInstance[L]: Monad[({ type Lambd[A] = Either[L, A] })#Lambd] = new Monad[Either[L, *]] {
     def pure[A](x: A): Either[L, A] = ???
 
     def flatMap[A, B](fa: Either[L, A])(f: A => Either[L, B]): Either[L, B] = ???
@@ -39,23 +39,7 @@ object MonadExample extends App {
 
   }
 
-
-
-
-
-
   // foo monad instance
   case class Foo[A](a: A)
-
-
-
-
-
-
-
-
-
-
-
 
 }

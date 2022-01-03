@@ -1,12 +1,12 @@
 package algonote
-import org.scalatest.{FunSuite, Matchers}
-
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import scala.collection.mutable
 
 /**
   * Created by ikhoon on 2018-09-26.
   */
-class Algo_2_4_2SumTest extends FunSuite with Matchers {
+class Algo_2_4_2SumTest extends AnyFunSuite with Matchers {
 
   test("2sum") {
     val inputs = scala.io.Source

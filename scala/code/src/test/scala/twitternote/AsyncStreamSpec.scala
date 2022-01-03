@@ -1,13 +1,15 @@
 package twitternote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import com.twitter.util.{Await, Future}
 import com.twitter.concurrent.AsyncStream
+
 /**
   * Created by ikhoon on 16/07/2017.
   * 참조 : https://finagle.github.io/blog/2016/02/15/asyncstream/
   */
-class AsyncStreamSpec extends WordSpec with Matchers {
+class AsyncStreamSpec extends AnyWordSpec with Matchers {
 
   "twitter async stream" should {
     "from future to stream" in {
@@ -58,11 +60,11 @@ class AsyncStreamSpec extends WordSpec with Matchers {
 
     "no paging yes stream with filter" in {
       val evenHundrend = getStream(0)
-       // .filter(_ % 2 == 0)
-        .take(100).toSeq()
+      // .filter(_ % 2 == 0)
+        .take(100)
+        .toSeq()
       Await.result(evenHundrend) shouldBe Range(0, 100, 1)
     }
-
 
   }
 

@@ -18,7 +18,6 @@ object PracticalCats {
 
   // https://virtuslab.com/blog/cats-library/
 
-
   // cats가 왜필요한가?
   // category theory가 왜 필요한가?
 
@@ -58,8 +57,10 @@ object PracticalCats {
       Monoid.empty[A]
   }
 
-  def getCacheOrDB[A](cache: => Future[Option[A]], db: Future[Option[A]])(implicit F: SemigroupK[OptionT[Future, ?]]): Future[Option[A]] = {
-    val value = SemigroupK[OptionT[Future, ?]].combineK(OptionT(cache), OptionT(db))
+  def getCacheOrDB[A](cache: => Future[Option[A]], db: Future[Option[A]])(
+    implicit F: SemigroupK[OptionT[Future, *]]
+  ): Future[Option[A]] = {
+    val value = SemigroupK[OptionT[Future, *]].combineK(OptionT(cache), OptionT(db))
     value.value
   }
 
@@ -121,20 +122,13 @@ object PracticalCats {
   // 모나드 트랜스 포머 언제 필요한가?
   // 3. 당신의 코드에 map(map(map))) 있다면
   // functor compose를 고민해보라
-
-
   // 제너럴한 fold를 하고 싶다면 semigroup을 활용하라.
   // foldLeft
-
-
-
   // 모나드 transformer를 만들때는 return 타입에 집중하라.
   // 리턴타입에 맞추어서 lift하라
 
   // 7. dependency injection 이 필요하면 kleisli나 reader를 고려해보라
 
   //
-
-
 
 }

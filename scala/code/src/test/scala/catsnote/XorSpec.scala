@@ -1,14 +1,16 @@
 package catsnote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import cats._
 import cats.implicits._
 
 import cats.syntax.either._
+
 /**
   * Created by ikhoon on 2016. 8. 1..
   */
-class XorSpec extends WordSpec with Matchers {
+class XorSpec extends AnyWordSpec with Matchers {
 
   /*
   "xor" should {
@@ -177,6 +179,6 @@ class XorSpec extends WordSpec with Matchers {
 
     }
   }
-  */
+ */
 
 }

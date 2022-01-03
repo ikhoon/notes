@@ -1,13 +1,9 @@
 package exp
 
 import java.text.SimpleDateFormat
-import java.time.{Instant, LocalDateTime}
-import java.time.format.DateTimeFormatter
 import java.util.Date
 
 import cats.Monad
-import cats.effect._
-import cats.effect.implicits._
 import util.log
 
 import scala.concurrent.{Await, Awaitable, Future}
@@ -15,13 +11,10 @@ import scala.concurrent.duration._
 import model._
 import cats.implicits._
 import cats._
-import monix.eval.Task
 
 /**
   * Created by ikhoon on 19/08/2017.
   */
-
-
 object util {
   val formatter = new SimpleDateFormat("HH:mm:ss")
   def log(str: => String): Unit =
@@ -38,7 +31,7 @@ object model {
   type Certification = String
 }
 
-sealed trait AsyncApiComponent[AsyncIO[+_]] {
+sealed trait AsyncApiComponent[AsyncIO[+ _]] {
 
   import model._
 
@@ -49,7 +42,6 @@ sealed trait AsyncApiComponent[AsyncIO[+_]] {
   def categoryRepository: CategoryRepository
   def itemDetailRepository: ItemDetailRepository
   def itemCertificationRepository: ItemCertificationRepository
-
 
   trait ItemRepository {
     def findById(id: Int): AsyncIO[Item]
@@ -147,102 +139,99 @@ object ScalaFutureApiComponent extends AsyncApiComponent[Future] {
     }
   }
 
-
 }
 
-
-object MonixTaskApiComponent extends AsyncApiComponent[Task] {
-
-  def itemRepository: ItemRepository = itemRepositoryMonixTask
-  def catalogRepository: CatalogRepository = catalogRepositoryMonixTask
-  def brandRepository: BrandRepository = brandRepositoryMonixTask
-  def itemWishCountRepository: ItemWishCountRepository = itemWishCountRepositoryMonixTask
-  def categoryRepository: CategoryRepository = categoryRepositoryMonixTask
-  def itemDetailRepository: ItemDetailRepository = itemDetailRepositoryMonixTask
-  def itemCertificationRepository: ItemCertificationRepository = itemCertificationRepositoryMonixTask
-
-  object itemRepositoryMonixTask extends ItemRepository {
-    def findById(id: Int): Task[Item] = Task {
-      Thread.sleep(1000)
-      log(s"item-$id")
-      Item(id, 1000, 100000)
-    }
-  }
-
-  object catalogRepositoryMonixTask extends CatalogRepository {
-    def findById(id: Int): Task[Catalog] = Task {
-      Thread.sleep(1000)
-      log(s"catalog-$id")
-      s"catalog-$id"
-    }
-  }
-
-  object brandRepositoryMonixTask extends BrandRepository {
-    def findById(id: Int): Task[Brand] = Task {
-      Thread.sleep(1000)
-      log(s"brand-$id")
-      s"brand-$id"
-    }
-  }
-
-  object itemWishCountRepositoryMonixTask extends ItemWishCountRepository {
-    def findByItemId(id: Int): Task[Wish] = Task {
-      Thread.sleep(1000)
-      log(s"wish-$id")
-      s"wish-$id"
-    }
-  }
-
-  object categoryRepositoryMonixTask extends CategoryRepository {
-    def findOneByBrandId(id: Int): Task[Category] = Task {
-      Thread.sleep(1000)
-      log(s"category-$id")
-      s"category-$id"
-    }
-  }
-
-  object itemDetailRepositoryMonixTask extends ItemDetailRepository {
-    def findByItemId(id: Int): Task[Detail] = Task {
-      Thread.sleep(1000)
-      log(s"detail-$id")
-      s"detail-$id"
-    }
-  }
-
-  object itemCertificationRepositoryMonixTask extends ItemCertificationRepository {
-    def findByItemId(id: Int): Task[Certification] = Task {
-      Thread.sleep(1000)
-      log(s"certificatTaskn-$id")
-      s"certificatTaskn-$id"
-    }
-  }
-
-}
-
+//object MonixTaskApiComponent extends AsyncApiComponent[Task] {
+//
+//  def itemRepository: ItemRepository = itemRepositoryMonixTask
+//  def catalogRepository: CatalogRepository = catalogRepositoryMonixTask
+//  def brandRepository: BrandRepository = brandRepositoryMonixTask
+//  def itemWishCountRepository: ItemWishCountRepository = itemWishCountRepositoryMonixTask
+//  def categoryRepository: CategoryRepository = categoryRepositoryMonixTask
+//  def itemDetailRepository: ItemDetailRepository = itemDetailRepositoryMonixTask
+//  def itemCertificationRepository: ItemCertificationRepository = itemCertificationRepositoryMonixTask
+//
+//  object itemRepositoryMonixTask extends ItemRepository {
+//    def findById(id: Int): Task[Item] = Task {
+//      Thread.sleep(1000)
+//      log(s"item-$id")
+//      Item(id, 1000, 100000)
+//    }
+//  }
+//
+//  object catalogRepositoryMonixTask extends CatalogRepository {
+//    def findById(id: Int): Task[Catalog] = Task {
+//      Thread.sleep(1000)
+//      log(s"catalog-$id")
+//      s"catalog-$id"
+//    }
+//  }
+//
+//  object brandRepositoryMonixTask extends BrandRepository {
+//    def findById(id: Int): Task[Brand] = Task {
+//      Thread.sleep(1000)
+//      log(s"brand-$id")
+//      s"brand-$id"
+//    }
+//  }
+//
+//  object itemWishCountRepositoryMonixTask extends ItemWishCountRepository {
+//    def findByItemId(id: Int): Task[Wish] = Task {
+//      Thread.sleep(1000)
+//      log(s"wish-$id")
+//      s"wish-$id"
+//    }
+//  }
+//
+//  object categoryRepositoryMonixTask extends CategoryRepository {
+//    def findOneByBrandId(id: Int): Task[Category] = Task {
+//      Thread.sleep(1000)
+//      log(s"category-$id")
+//      s"category-$id"
+//    }
+//  }
+//
+//  object itemDetailRepositoryMonixTask extends ItemDetailRepository {
+//    def findByItemId(id: Int): Task[Detail] = Task {
+//      Thread.sleep(1000)
+//      log(s"detail-$id")
+//      s"detail-$id"
+//    }
+//  }
+//
+//  object itemCertificationRepositoryMonixTask extends ItemCertificationRepository {
+//    def findByItemId(id: Int): Task[Certification] = Task {
+//      Thread.sleep(1000)
+//      log(s"certificatTaskn-$id")
+//      s"certificatTaskn-$id"
+//    }
+//  }
+//
+//}
 
 object experiment {
 
-  import monix.execution.Scheduler.Implicits.global
-  def main(args: Array[String]): Unit = {
-    println("scala future monad with eager evaluation")
-    awaitTime { getProduct(ScalaFutureApiComponent, 10) }
-//    println(scalaFutureResult)
-
-    println
-    println("monix task monad with lazy evaluation")
-    awaitTime { getProduct(MonixTaskApiComponent, 10).runToFuture}
-//    println(catsEffectResult)
-
-    println
-    println("scala future applicative with eager evaluation")
-    awaitTime { getProductAp(ScalaFutureApiComponent, 10) }
-    //    println(scalaFutureResult)
-
-    println
-    println("monix task applicative with lazy evaluation")
-    awaitTime { getProductAp(MonixTaskApiComponent, 10).runToFuture}
-    //    println(catsEffectResult)
-  }
+//  import monix.execution.Scheduler.Implicits.global
+//  def main(args: Array[String]): Unit = {
+//    println("scala future monad with eager evaluation")
+//    awaitTime { getProduct(ScalaFutureApiComponent, 10) }
+////    println(scalaFutureResult)
+//
+//    println
+//    println("monix task monad with lazy evaluation")
+//    awaitTime { getProduct(MonixTaskApiComponent, 10).runToFuture}
+////    println(catsEffectResult)
+//
+//    println
+//    println("scala future applicative with eager evaluation")
+//    awaitTime { getProductAp(ScalaFutureApiComponent, 10) }
+//    //    println(scalaFutureResult)
+//
+//    println
+//    println("monix task applicative with lazy evaluation")
+//    awaitTime { getProductAp(MonixTaskApiComponent, 10).runToFuture}
+//    //    println(catsEffectResult)
+//  }
 
   def awaitTime[R](block: => Awaitable[R]): R = {
     val start = System.nanoTime()
@@ -251,12 +240,12 @@ object experiment {
     println("elapsed : " + elapsed / (1000 * 1000 * 1000.0) + " sec")
     result
   }
-  def getProduct[F[+_]: Monad](api: AsyncApiComponent[F], itemId: Int): F[List[String]] = {
+  def getProduct[F[+ _]: Monad](api: AsyncApiComponent[F], itemId: Int): F[List[String]] = {
     import api._
     val itemFuture = itemRepository.findById(itemId)
-    itemFuture.flatMap{ item =>
+    itemFuture.flatMap { item =>
       val catalogFuture = catalogRepository.findById(item.catalogId)
-      val brandFuture =  brandRepository.findById(item.brandId)
+      val brandFuture = brandRepository.findById(item.brandId)
       val wishFuture = itemWishCountRepository.findByItemId(item.id)
       val categoryFuture = categoryRepository.findOneByBrandId(item.brandId)
       val itemDetailFuture = itemDetailRepository.findByItemId(item.id)
@@ -268,12 +257,11 @@ object experiment {
         category <- categoryFuture
         detail <- itemDetailFuture
         certifications <- itemCertificationFuture
-      } yield
-        List(brand, catalog, wishCount, category, detail, certifications)
+      } yield List(brand, catalog, wishCount, category, detail, certifications)
     }
   }
 
-  def getProductAp[F[+_]: Monad : Applicative](api: AsyncApiComponent[F], itemId: Int): F[List[String]] = {
+  def getProductAp[F[+ _]: Monad: Applicative](api: AsyncApiComponent[F], itemId: Int): F[List[String]] = {
     import api._
     itemRepository.findById(itemId).flatMap { item =>
       (
@@ -283,10 +271,10 @@ object experiment {
         categoryRepository.findOneByBrandId(item.brandId),
         itemDetailRepository.findByItemId(item.id),
         itemCertificationRepository.findByItemId(item.id)
-      ).mapN { case (catalog, brand, wish, category, detail, cert) =>
-        List(brand, catalog, wish, category, detail, cert)
+      ).mapN {
+        case (catalog, brand, wish, category, detail, cert) =>
+          List(brand, catalog, wish, category, detail, cert)
       }
     }
   }
 }
-

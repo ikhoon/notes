@@ -1,12 +1,13 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.{Generic, HNil, LabelledGeneric}
 
 /**
   * Created by ikhoon on 2016. 8. 16..
   */
-class GenericSpec extends WordSpec with Matchers {
+class GenericSpec extends AnyWordSpec with Matchers {
 
   "Generic representation of case classes" should {
 
@@ -30,7 +31,7 @@ class GenericSpec extends WordSpec with Matchers {
       case class Leaf[T](t: T) extends Tree[T]
       case class Node[T](left: Tree[T], right: Tree[T]) extends Tree[T]
 
-      object inc extends -> ((i: Int) => i + 1)
+      object inc extends ->((i: Int) => i + 1)
 
       val tree: Tree[Int] =
         Node(

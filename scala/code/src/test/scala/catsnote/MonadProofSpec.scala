@@ -1,13 +1,14 @@
 package catsnote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.util.Try
 
 /**
   * Created by ikhoon on 13/12/2016.
   */
-class MonadProofSpec extends WordSpec with Matchers{
+class MonadProofSpec extends AnyWordSpec with Matchers {
 
   "Monad as a Monoid in Category of Endofunctors" should {
     // 원문 - http://w.pitula.me/2016/monad-proof/
@@ -36,11 +37,10 @@ class MonadProofSpec extends WordSpec with Matchers{
     // 하지만 CategoryOfSets 를 정의하면 좀더 명확해진다.
 
     trait CategoryOfSets extends MonoidalCategory {
-      type Morphism[F, G] = F => G  // 그냥 함수
-      type MonoidalProduct[F, G] = (F, G)  //  두개의 요소를 합침
-      type IdentifyObject = Unit  // (F, Unit) = F, 그러니께 Unit 이 항등원이 된다.
+      type Morphism[F, G] = F => G // 그냥 함수
+      type MonoidalProduct[F, G] = (F, G) //  두개의 요소를 합침
+      type IdentifyObject = Unit // (F, Unit) = F, 그러니께 Unit 이 항등원이 된다.
     }
-
 
     // category랑 category of set을 이용해서 monoid를 정의해보자.
 
@@ -63,7 +63,6 @@ class MonadProofSpec extends WordSpec with Matchers{
       def combine: ((Int, Int)) => Int = (t: (Int, Int)) => t._1 + t._2
     }
     // 그렇게 이상하진 않다.
-
 
     // Functor에 대해 이야기 해보자.
 
@@ -111,7 +110,6 @@ class MonadProofSpec extends WordSpec with Matchers{
       type Out[T] = F[G[T]]
     }
 
-
     // 간단한 예는
     object TryToOption extends NaturalTransformation[Try, Option] {
       def apply[A](t: Try[A]): Option[A] = t.toOption
@@ -128,7 +126,6 @@ class MonadProofSpec extends WordSpec with Matchers{
       type MonoidalProduct[F[_], G[_]] = Compose[F, G]
       type IdentifyObject[A] = Id[A]
     }
-
 
   }
 }

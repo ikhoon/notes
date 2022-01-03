@@ -1,11 +1,11 @@
 package macronote
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
   * Created by Liam.M on 2018. 07. 31..
   */
-class AutoCacheKeyGenTest extends FunSuite {
+class AutoCacheKeyGenTest extends AnyFunSuite {
 
   import AutoCacheKeyGen._
   def foo(x: Int) = memoize {

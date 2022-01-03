@@ -1,13 +1,14 @@
 package fpinsnote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.annotation.tailrec
 
 /**
   * Created by ikhoon on 08/12/2016.
   */
-class Chapter2Spec extends WordSpec with Matchers {
+class Chapter2Spec extends AnyWordSpec with Matchers {
 
   "chapter2" should {
 
@@ -39,7 +40,8 @@ class Chapter2Spec extends WordSpec with Matchers {
         @tailrec
         def loop(xs: Array[A]): Boolean =
           if (xs.length < 2) true
-          else if (ordered(xs(0), xs(1))) loop(xs.tail) else false
+          else if (ordered(xs(0), xs(1))) loop(xs.tail)
+          else false
 
         loop(as)
       }
@@ -50,17 +52,17 @@ class Chapter2Spec extends WordSpec with Matchers {
       def predicate1(a: Int, b: Int): Boolean = a < b
 
       // function
-      val predicate2 : (Int, Int) => Boolean = (a: Int, b: Int) => a < b
+      val predicate2: (Int, Int) => Boolean = (a: Int, b: Int) => a < b
 
       val predicate3 = (_: Int) < (_: Int)
 
       // Function2 trait
-      val predicate4 : Function2[Int, Int, Boolean] =
+      val predicate4: Function2[Int, Int, Boolean] =
         new Function2[Int, Int, Boolean] {
-        override def apply(v1: Int, v2: Int): Boolean = v1 < v2
-      }
+          override def apply(v1: Int, v2: Int): Boolean = v1 < v2
+        }
 
-      val predicate5 : Function2[Int, Int, Boolean] = (_: Int) < (_: Int)
+      val predicate5: Function2[Int, Int, Boolean] = (_: Int) < (_: Int)
 
       isSorted(sorted.toArray, predicate3) shouldBe true
 
@@ -74,7 +76,6 @@ class Chapter2Spec extends WordSpec with Matchers {
     // (A => (B => (C => D)))
     // A => B => C => D
 
-
     "2.3 curring" in {
 
       def curry[A, B, C, D, E](f: (A, B, C, D) => E): A => B => C => D => E =
@@ -83,17 +84,16 @@ class Chapter2Spec extends WordSpec with Matchers {
       def uncurry[A, B, C](f: A => B => C): (A, B) => C =
         (a, b) => f(a)(b)
 
-
-      def foo1(a:Int, b: Int) = a + b
+      def foo1(a: Int, b: Int) = a + b
       foo1(1, 2) shouldBe 3
 
-      def foo2(a:Int)(b: Int) = a + b
+      def foo2(a: Int)(b: Int) = a + b
       val addWithOne: (Int) => Int = foo2(1)
       addWithOne(10) == 11
-      val addWithTwo : (Int) => Int = foo2(2)
+      val addWithTwo: (Int) => Int = foo2(2)
       addWithTwo(10) == 12
 
-      def foo3(a:Int): Int => Int = b => a + b
+      def foo3(a: Int): Int => Int = b => a + b
 
     }
     "2.5 compose" in {
@@ -106,14 +106,12 @@ class Chapter2Spec extends WordSpec with Matchers {
       def barComposedWithFoo(a: Int): Long = bar(foo(a))
 
       // f . g = f(g(x)
-      def compose[A,B,C](f: B => C, g: A => B): A => C = x => f(g(x))
+      def compose[A, B, C](f: B => C, g: A => B): A => C = x => f(g(x))
 
       // 함수의 합성의 일반화
       compose(bar, foo)
 
-
       barComposedWithFoo(100) shouldBe compose(bar, foo)(100)
-
 
     }
 
@@ -128,13 +126,13 @@ class Chapter2Spec extends WordSpec with Matchers {
       */
 
     /**
-      *
-      * []
-      * val list = List()
-      * val list1 = list :: 10
-      * val list2 = list1 :: 20
-      * val list3 = list2 :: 30
-      */
+    *
+    * []
+    * val list = List()
+    * val list1 = list :: 10
+    * val list2 = list1 :: 20
+    * val list3 = list2 :: 30
+    */
 
   }
 

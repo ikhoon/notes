@@ -1,11 +1,12 @@
 package catsnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2017. 4. 4..
   */
-class Introduction extends FunSuite with Matchers {
+class Introduction extends AnyFunSuite with Matchers {
 
   test("cats") {
     // category theory
@@ -17,7 +18,6 @@ class Introduction extends FunSuite with Matchers {
     // type class, 타입에 대한 액션의 정의 <=> 구현, def,
     // instance
     // syntax
-
 
     trait Foo[A] {
       def bar: A
@@ -36,7 +36,6 @@ class Introduction extends FunSuite with Matchers {
       override def bar: Long = 1000L
     }
 
-
     // 타입은 컴파일러가 아주 유용하게 쓰는 정보
     def foo[B](implicit b: Foo[B]): B = b.bar
 
@@ -51,8 +50,6 @@ class Introduction extends FunSuite with Matchers {
     implicit val intInc = new Increment[Int] {
       def inc(a: Int) = a + 1
     }
-
-
 
   }
 }

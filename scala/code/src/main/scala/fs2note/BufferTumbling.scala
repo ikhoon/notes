@@ -2,9 +2,9 @@ package fs2note
 
 import cats.Eval
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import fs2._
 import cats.implicits._
-
 import scala.concurrent.duration._
 
 /**

@@ -1,8 +1,6 @@
 package catsnote
 
 import cats.data.OptionT
-import org.scalatest.{AsyncFunSuite, FunSuite, Matchers}
-
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.util.Try
@@ -10,8 +8,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import cats._
 import cats.implicits._
 import cats.syntax._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import scalaz.IList
-
 import scala.collection.immutable
 
 /**
@@ -22,7 +21,7 @@ import scala.collection.immutable
   * 여기있는 공식만 외우면 여러분은 마틴오더스키가 될것입니다.
   *
   */
-class MonadTransformerSaveUs extends FunSuite with Matchers {
+class MonadTransformerSaveUs extends AnyFunSuite with Matchers {
 
   case class UserDto(id: Long)
   case class User(id: Long)

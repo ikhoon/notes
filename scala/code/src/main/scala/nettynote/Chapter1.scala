@@ -1,18 +1,19 @@
 package nettynote
 
-
-import java.nio.charset.Charset
-
-import cats.implicits._
-import cats.effect.implicits._
-import cats.effect.{Bracket, IO}
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import io.netty.bootstrap.{Bootstrap, ServerBootstrap}
 import io.netty.buffer.{ByteBuf, Unpooled}
-import io.netty.channel.{ChannelHandlerContext, ChannelInboundHandlerAdapter, ChannelInitializer, SimpleChannelInboundHandler}
-import io.netty.channel.nio.{NioEventLoop, NioEventLoopGroup}
+import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.{NioServerSocketChannel, NioSocketChannel}
-
+import io.netty.channel.{
+  ChannelHandlerContext,
+  ChannelInboundHandlerAdapter,
+  ChannelInitializer,
+  SimpleChannelInboundHandler
+}
+import java.nio.charset.Charset
 import scala.concurrent.duration._
 
 object DiscardServer {
@@ -34,11 +35,12 @@ object DiscardServer {
           val f = b.bind(8888).sync()
           f.channel().closeFuture().sync()
         }
-    } { case (bossGroup, workerGroup) =>
-      IO {
-        bossGroup.shutdownGracefully()
-        workerGroup.shutdownGracefully()
-      }
+    } {
+      case (bossGroup, workerGroup) =>
+        IO {
+          bossGroup.shutdownGracefully()
+          workerGroup.shutdownGracefully()
+        }
 
     }
     server.unsafeRunSync()
@@ -57,10 +59,9 @@ object DiscardServer {
   }
 }
 
-
 object EchoServer {
   def main(args: Array[String]): Unit = {
-    val server =IO((new NioEventLoopGroup(1), new NioEventLoopGroup())).bracket {
+    val server = IO((new NioEventLoopGroup(1), new NioEventLoopGroup())).bracket {
       case (bossGroup, workerGroup) =>
         IO {
           val b = new ServerBootstrap()
@@ -81,7 +82,8 @@ object EchoServer {
           val f = b.bind(8888).sync()
           f.channel().closeFuture().sync()
         }
-    } {  case (bossGroup, workerGroup) =>
+    } {
+      case (bossGroup, workerGroup) =>
         IO {
           println("release resources")
           bossGroup.shutdownGracefully()

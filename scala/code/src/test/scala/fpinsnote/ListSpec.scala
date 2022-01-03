@@ -2,16 +2,15 @@ package fpinsnote
 
 import cats.data.{Nested, Validated, ValidatedNel}
 import cats.data.Validated.Valid
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2017. 1. 24..
   */
-
 sealed trait MyList[+A]
 case object MyNil extends MyList[Nothing]
 case class Cons[A](head: A, tail: MyList[A]) extends MyList[A]
-
 
 trait A
 trait B extends A
@@ -20,7 +19,7 @@ trait Covariant[+A]
 trait Invariant[A]
 trait Contravariant[-A]
 
-class ListSpec extends WordSpec with Matchers {
+class ListSpec extends AnyWordSpec with Matchers {
 
   // Any >> Nothing
 
@@ -47,4 +46,3 @@ class ListSpec extends WordSpec with Matchers {
   private val value1: Nested[Option, ValidatedNel[Throwable, *], Int] = Nested(Some(Valid(123)))
   value1.map(_ + 1)
 }
-

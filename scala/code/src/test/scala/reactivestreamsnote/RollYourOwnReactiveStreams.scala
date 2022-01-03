@@ -3,7 +3,8 @@ package reactivestreamsnote
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import org.reactivestreams.tck.{PublisherVerification, TestEnvironment}
 import org.scalatestplus.testng.TestNGSuiteLike
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 class ListPublisherTest(env: TestEnvironment, publisherShutdownTimout: Long)
     extends PublisherVerification[Long](env, publisherShutdownTimout)
@@ -23,7 +24,7 @@ class ListPublisherTest(env: TestEnvironment, publisherShutdownTimout: Long)
   }
 }
 
-class RollYourOwnReactiveStreamsTest extends FunSuite with Matchers {
+class RollYourOwnReactiveStreamsTest extends AnyFunSuite with Matchers {
 
   test("subscription") {
     val publisher = new ListPublisher[Int]((1 to 3).toStream)

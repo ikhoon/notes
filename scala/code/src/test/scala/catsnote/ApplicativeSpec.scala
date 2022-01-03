@@ -1,12 +1,13 @@
 package catsnote
 
 import cats._
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
- * Created by ikhoon on 2016. 7. 20..
- */
-class ApplicativeSpec extends WordSpec with Matchers {
+  * Created by ikhoon on 2016. 7. 20..
+  */
+class ApplicativeSpec extends AnyWordSpec with Matchers {
 
   "Applicative extends Apply and added `pure`" should {
 
@@ -19,7 +20,7 @@ class ApplicativeSpec extends WordSpec with Matchers {
     }
 
     "compose" in {
-      (Applicative[List] compose Applicative[Option]).pure(1) shouldBe List(Option(1))
+      Applicative[List].compose(Applicative[Option]).pure(1) shouldBe List(Option(1))
     }
 
     "applicative is generalization of monad" in {
@@ -35,15 +36,14 @@ class ApplicativeSpec extends WordSpec with Matchers {
 
       /////
 
-      val toStr3: Int => Option[String] = {
-        (a: Int) =>
-          {
-            if (a < 10) {
-              Some(a.toString)
-            } else {
-              None
-            }
+      val toStr3: Int => Option[String] = { (a: Int) =>
+        {
+          if (a < 10) {
+            Some(a.toString)
+          } else {
+            None
           }
+        }
       }
 
       /*
@@ -91,7 +91,7 @@ class ApplicativeSpec extends WordSpec with Matchers {
       import cats.syntax.apply._
 
       Foo((x: String) => x.toUpperCase).ap(foo2) shouldBe Foo("A")
-      */
+     */
     }
 
   }

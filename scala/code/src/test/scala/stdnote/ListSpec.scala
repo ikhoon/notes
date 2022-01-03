@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/10/16.
- */
-class ListSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/10/16.
+  */
+class ListSpec extends AnyFunSuite with Matchers {
 
   test("list") {
 
@@ -19,7 +20,6 @@ class ListSpec extends FunSuite with Matchers {
 
     //
 
-
     // 불변성, 가변성
 
     // [immutable], <mutable>
@@ -31,7 +31,6 @@ class ListSpec extends FunSuite with Matchers {
     // list.add(2)  [1, 2]
     // list.add(3)
     // list.add(4)
-
 
     val nil = Nil // List()
     val nil2 = List()
@@ -47,16 +46,14 @@ class ListSpec extends FunSuite with Matchers {
     list shouldBe list4
     val list5 = list ::: List(5)
     list.::(5)
-    list :: 5 :: Nil// Nil.::(5).::(list)
+    list :: 5 :: Nil // Nil.::(5).::(list)
 
     // list (1, 2, 3, 4)
     // list5 (1, 2, 3, 4 ,5)
 
-
     // list 하나의 데이터를 추가
     // list.add(5)
     5 :: list
-
 
     // list.addAll(list2)
     println(list5 :: list)
@@ -71,13 +68,13 @@ class ListSpec extends FunSuite with Matchers {
     // (1) :: (2 :: 3 :: 4 :: Nil)
     list6 match {
       case a :: b :: c :: d :: Nil => println(a, b, c, d)
-      case a :: cheese => println(s"1개 이상 있나? $a, ($cheese)")
-      case a :: b :: c :: Nil => println(s"3나 있나? $a, $b, $c")
-      case x => println(s"그냥 받는거 ? ($x)")
-      case a :: b :: d :: Nil => println(s"3나2 있나? $a, $b, $d")
-      case a :: b :: Nil => println(s"2나 있나? $a, $b")
-      case a :: Nil => println(s"하나 있나? $a")
-      case Nil => println("암것도 없음")
+      case a :: cheese             => println(s"1개 이상 있나? $a, ($cheese)")
+      case a :: b :: c :: Nil      => println(s"3나 있나? $a, $b, $c")
+      case x                       => println(s"그냥 받는거 ? ($x)")
+      case a :: b :: d :: Nil      => println(s"3나2 있나? $a, $b, $d")
+      case a :: b :: Nil           => println(s"2나 있나? $a, $b")
+      case a :: Nil                => println(s"하나 있나? $a")
+      case Nil                     => println("암것도 없음")
     }
 
     // switch => break;

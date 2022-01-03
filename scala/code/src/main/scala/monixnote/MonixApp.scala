@@ -1,10 +1,7 @@
 package monixnote
 
-import monix.reactive.Observable
-
+import io.reactivex.rxjava3.core.Observable
 import scala.concurrent.duration._
-import monix.execution.Scheduler.Implicits.global
-
 import scala.concurrent.Await
 
 /**
@@ -12,11 +9,11 @@ import scala.concurrent.Await
   */
 object MonixApp {
   def main(args: Array[String]): Unit = {
-    val unit = Observable
-      .interval(100.millis)
-      .bufferTumbling(10)
-      .foreach(println)
-    Await.result(unit, Duration.Inf)
-
+//    val unit = Observable
+//      .interval(100.millis)
+//      .bufferTumbling(10)
+//      .foreach(println)
+//    Await.result(unit, Duration.Inf)
+//
   }
 }

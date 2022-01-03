@@ -1,8 +1,7 @@
 package reactivestreamsnote
 
-import monix.execution.atomic.{AtomicBoolean, AtomicInt, AtomicLong}
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
-
 import scala.util.control.NonFatal
 
 class ListPublisher[A](xs: => Stream[A]) extends Publisher[A] {
@@ -27,8 +26,8 @@ class ListPublisher[A](xs: => Stream[A]) extends Publisher[A] {
           Iterator.empty
       }
 
-    private val terminationFlag: AtomicBoolean = AtomicBoolean(false)
-    private val demand: AtomicLong = AtomicLong(0)
+    private val terminationFlag: AtomicBoolean = new AtomicBoolean(false)
+    private val demand: AtomicLong = new AtomicLong(0)
 
     def doOnSubscribed(): Unit = {
       error.foreach(ex => if (!terminate()) subscriber.onError(ex))
@@ -42,7 +41,7 @@ class ListPublisher[A](xs: => Stream[A]) extends Publisher[A] {
           while (demand.get > 0 && iterator.hasNext && !isTerminated) {
             try {
               subscriber.onNext(iterator.next())
-              demand.decrement()
+              demand.getAndDecrement()
             } catch {
               case NonFatal(ex) => if (!terminate()) subscriber.onError(ex)
             }

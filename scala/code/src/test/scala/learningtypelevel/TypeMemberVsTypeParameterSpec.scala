@@ -1,23 +1,23 @@
 package learningtypelevel
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.reflect.runtime.universe._
-
 
 /**
   * Created by ikhoon on 2016. 8. 28..
   */
-class TypeMemberVsTypeParameterSpec extends WordSpec with Matchers {
+class TypeMemberVsTypeParameterSpec extends AnyWordSpec with Matchers {
 
   "type member vs type parameter" should {
 
-    def show[T : WeakTypeTag](any: T): Unit = println(s"${weakTypeOf[T]} : $any")
+    def show[T: WeakTypeTag](any: T): Unit = println(s"${weakTypeOf[T]} : $any")
 
     "type member in tail" in {
       import MList._
 
-      val nums = MCons(2, MCons(3, MNil())) : MCons { type T = Int }
+      val nums = MCons(2, MCons(3, MNil())): MCons { type T = Int }
       show(nums.head) // nums.T : 2
 
       val hd = nums.head
@@ -32,7 +32,7 @@ class TypeMemberVsTypeParameterSpec extends WordSpec with Matchers {
 
     "remove type member in tail" in {
       import MList2._
-      val nums = MCons2(2, MCons2(3, MNil2())) : MCons2 { type T = Int }
+      val nums = MCons2(2, MCons2(3, MNil2())): MCons2 { type T = Int }
       show(nums.head) // nums.T : 2
 
       val hd = nums.head
@@ -42,8 +42,7 @@ class TypeMemberVsTypeParameterSpec extends WordSpec with Matchers {
       show(thd) // Option[Int] : Some(3)
 
       // MCons의 버전과는 달리 MCons2의 버전은 컴파일 되지 않는다. tail에서 head를 읽어올때 { type T = Int }의 타입정보를 잃어버렸다.
-      assertDoesNotCompile(
-        """
+      assertDoesNotCompile("""
           | show(thd.map(_ - 2))
         """.stripMargin) // Error:(44, 22) value - is not a member of nums.tail.T
     }
@@ -51,7 +50,7 @@ class TypeMemberVsTypeParameterSpec extends WordSpec with Matchers {
     "existential method" in {
       import Existential._
       import MList2._
-      val mnums = MCons2(2, MCons2(3, MNil2())) : MCons2 { type T = Int }
+      val mnums = MCons2(2, MCons2(3, MNil2())): MCons2 { type T = Int }
       mlength(mnums) shouldBe 2
 
       val pnums = PCons(1, PCons(2, PCons(3, PNil())))

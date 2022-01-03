@@ -1,10 +1,12 @@
 package algonote
-import org.scalatest.{FunSuite, Matchers}
+
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 29/08/2018.
   */
-class HeapTest extends FunSuite with Matchers {
+class HeapTest extends AnyFunSuite with Matchers {
 
   test("bubble up1") {
     val heap = Heap[Int](Vector(0, 1, 5, 3, 4, 2), _ < _)

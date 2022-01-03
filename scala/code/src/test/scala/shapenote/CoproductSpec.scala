@@ -1,12 +1,13 @@
 package shapenote
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.{:+:, CNil, Coproduct}
 import shapenote.coproduct.ISB
 
 /**
   * Created by ikhoon on 2016. 8. 15..
   */
-class CoproductSpec extends WordSpec with Matchers {
+class CoproductSpec extends AnyWordSpec with Matchers {
 
   "Coproduct" should {
     val isb = Coproduct[ISB]("foo")
@@ -16,7 +17,7 @@ class CoproductSpec extends WordSpec with Matchers {
     }
 
     "Coproduct supports mapping given a polymorphic function" in {
-      val m = isb map sizeM
+      val m = isb.map(sizeM)
       m.select[(String, Int)] shouldBe Option("foo", 3)
     }
 

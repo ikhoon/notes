@@ -1,11 +1,12 @@
 package fpinsnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 9/19/16.
- */
-class RecursionSpec extends FunSuite with Matchers{
+  * Created by Liam.M(엄익훈) on 9/19/16.
+  */
+class RecursionSpec extends AnyFunSuite with Matchers {
 
   test("factorial") {
     // 4! == 24

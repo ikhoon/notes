@@ -1,9 +1,10 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.HNil
 
-class HListSpec extends WordSpec with Matchers {
+class HListSpec extends AnyWordSpec with Matchers {
   "hlist" should {
     "trait" in {
       trait Foo[A] {

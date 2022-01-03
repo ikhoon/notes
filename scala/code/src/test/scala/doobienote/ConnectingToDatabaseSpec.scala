@@ -1,11 +1,12 @@
 package doobienote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2016. 9. 11..
   */
-class ConnectingToDatabaseSpec extends WordSpec with Matchers {
+class ConnectingToDatabaseSpec extends AnyWordSpec with Matchers {
 
   "First programs" should {
 
@@ -49,7 +50,7 @@ class ConnectingToDatabaseSpec extends WordSpec with Matchers {
       val anotherProgram = sql"select power(5, 2)".query[Int].unique
       (oneProgram |@| anotherProgram) { _ + _ }.transact(xa).unsafePerformSync shouldBe 67
     }
-  */
+   */
   }
 
 }

@@ -1,11 +1,12 @@
 package simulacrumnote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 21/12/2016.
   */
-class TypeclassSpec extends WordSpec with Matchers {
+class TypeclassSpec extends AnyWordSpec with Matchers {
 
   "typeclass" should {
 
@@ -58,7 +59,6 @@ class TypeclassSpec extends WordSpec with Matchers {
       Bar(1, 2).map(_ * 10) shouldBe Bar(10, 20)
     }
 
-
     "monad" in {
       implicit val monadFoo = new Monad[Bar] {
         def pure[A](a: A): Bar[A] = Bar(a, a)
@@ -67,7 +67,9 @@ class TypeclassSpec extends WordSpec with Matchers {
       }
       import Monad.ops.toAllMonadOps
 
-      Bar(1, 3) flatMap { i => Bar(i * 10, i * 20) }  shouldBe Bar(10, 20)
+      Bar(1, 3).flatMap { i =>
+        Bar(i * 10, i * 20)
+      } shouldBe Bar(10, 20)
     }
 
     "all" in {
@@ -83,7 +85,9 @@ class TypeclassSpec extends WordSpec with Matchers {
       }
 
       1 |+| 2 shouldBe 3
-      Bar(1, 3) flatMap { i => Bar(i * 10, i * 20) }  shouldBe Bar(10, 20)
+      Bar(1, 3).flatMap { i =>
+        Bar(i * 10, i * 20)
+      } shouldBe Bar(10, 20)
     }
   }
 }

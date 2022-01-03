@@ -1,10 +1,8 @@
 package dependentnote
 
-import org.scalatest.FunSuite
-
+import org.scalatest.funsuite.AnyFunSuite
 import scala.concurrent.Future
 import scala.reflect.ClassTag
-
 
 trait ABC {
   type DEF
@@ -13,10 +11,11 @@ trait ABC {
 object ABC {
   type Aux[DEF0] = ABC { type DEF = DEF0 }
 }
+
 /**
   * Created by ikhoon on 2017. 4. 18..
   */
-class DependentTypeIntroSpec extends FunSuite {
+class DependentTypeIntroSpec extends AnyFunSuite {
 
   test("java vs scala") {
     // nested class
@@ -40,12 +39,12 @@ class DependentTypeIntroSpec extends FunSuite {
     // 의존 타입을 왜쓸까유?
     // 값, 타입, A 타입이고 a1은 값, 값을 타입처럼 쓰고싶다
 
-    val b1 : a1.B = new a1.B {}
-    val b2 : a2.B = new a2.B {}
+    val b1: a1.B = new a1.B {}
+    val b2: a2.B = new a2.B {}
 
-    val b4 : A#B = new a1.B {}
-    val b5 : A#B = new a2.B {}
-    val b6 : A#B = new a2.B {}
+    val b4: A#B = new a1.B {}
+    val b5: A#B = new a2.B {}
+    val b6: A#B = new a2.B {}
 //
     // implicit 찾는 기준?
     // Int, 10, type level programming
@@ -53,8 +52,6 @@ class DependentTypeIntroSpec extends FunSuite {
       trait D
       val d = new D {}
     }
-
-
     // c
     // d
     // BOOLEAN

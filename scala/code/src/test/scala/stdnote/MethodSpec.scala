@@ -1,13 +1,14 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.collection.immutable.Seq
 
 /**
   * Created by ikhoon on 2017. 3. 3..
   */
-class MethodSpec extends FunSuite with Matchers{
+class MethodSpec extends AnyFunSuite with Matchers {
 
   test("max") {
     // 함수를 만들어보자
@@ -22,12 +23,12 @@ class MethodSpec extends FunSuite with Matchers{
       input.toString
     }
 
-    def max(x:Int, y:Int) : Int = {
-      if (x>y) x else y
+    def max(x: Int, y: Int): Int = {
+      if (x > y) x else y
     }
 
-    def max1(x:Int, y:Int) : Int =
-      if (x>y)
+    def max1(x: Int, y: Int): Int =
+      if (x > y)
         x
       else
         y
@@ -52,15 +53,15 @@ class MethodSpec extends FunSuite with Matchers{
     // return 키워드를 쓸때는
     // 로컬 타입추론
     def factorial(n: Int): Int =
-      if(n <= 0) 1
+      if (n <= 0) 1
       else n * factorial(n - 1)
 
-    def whichIsGreater (a : Int , b: Int) {
-      if(a>b) a else b
+    def whichIsGreater(a: Int, b: Int) {
+      if (a > b) a else b
     }
 
-    def whichIsGreater1 (a : Int , b: Int) = {
-      if(a>b) a else b
+    def whichIsGreater1(a: Int, b: Int) = {
+      if (a > b) a else b
     }
     val bb: Int = whichIsGreater1(1, 20)
 
@@ -84,37 +85,33 @@ class MethodSpec extends FunSuite with Matchers{
       b = b - 10
     }
 
-
-
-    def whichIsGreaterA (a : Int , b: Int): Int = if (a>b) a else b
+    def whichIsGreaterA(a: Int, b: Int): Int = if (a > b) a else b
 
     // 타샤 : Int
     // 에디나 : Unit
 
     val list: Seq[Any] = List(1, "10", 2L)
 
-    def whichIsGreaterB (a : Int , b: Int): Any = {
+    def whichIsGreaterB(a: Int, b: Int): Any = {
 
-      if (a>b) a else "a is lesser"
+      if (a > b) a else "a is lesser"
 
     }
-
 
     // 이거 eager
     //
-    def multiply(x : Int, y: Int) : Int ={
+    def multiply(x: Int, y: Int): Int = {
       println("xyxyxyxyxyxyxy")
       x * y
     }
-    def multiply1(x: => Int, y: => Int) : Int ={
+    def multiply1(x: => Int, y: => Int): Int = {
       println("xyxyxyxyxyxyxy")
       x * y
     }
-    def multiply2(x: => Int, y: Int) : Int ={
+    def multiply2(x: => Int, y: Int): Int = {
       println("xyxyxyxyxyxyxy")
       x * y
     }
-
 
     def x: Int = {
       println("xxxxx")
@@ -135,7 +132,7 @@ class MethodSpec extends FunSuite with Matchers{
   }
 
   def isAllowedURl(url: String = "default"): String = {
-    if(url.equals("default"))
+    if (url.equals("default"))
       "No URL provided"
     else
       "Access allowed"
@@ -145,6 +142,5 @@ class MethodSpec extends FunSuite with Matchers{
   isAllowedURl("aAAAAAAAA")
 
   def asaaa = ???
-
 
 }

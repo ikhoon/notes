@@ -1,7 +1,8 @@
 package catsnote
 
 import cats.Apply
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Await, Future}
 import cats.syntax._
@@ -13,7 +14,7 @@ import scala.concurrent.duration.Duration
 /**
   * Created by ikhoon on 12/12/2016.
   */
-class ApplicativeFutureSpec extends WordSpec with Matchers {
+class ApplicativeFutureSpec extends AnyWordSpec with Matchers {
 
   "applicative future" should {
 

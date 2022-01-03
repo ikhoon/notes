@@ -1,7 +1,7 @@
 package fs2note
 
+import cats.effect.unsafe.implicits.global
 import fs2.{Chunk, Pure, Stream}
-import monix.reactive.Observable
 
 /**
   * Created by ikhoon on 16/04/2018.
@@ -112,7 +112,7 @@ object FS2Example extends App {
 
   //
   val s1c: Stream[Pure, Double] =
-    Stream.chunk(Chunk.doubles(Array(1.0, 2.0, 3.0)))
+    Stream.chunk(Chunk.array(Array(1.0, 2.0, 3.0)))
 
   // 1............100
   // 1, 2, 3

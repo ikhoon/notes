@@ -1,20 +1,20 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 07/04/2018.
   */
-class OrderedSpec extends FunSuite with Matchers {
+class OrderedSpec extends AnyFunSuite with Matchers {
 
   // 값을 비교하고 싶다.
 
-
   case class Version(major: Int, minor: Int, patch: Int) extends Ordered[Version] {
     def compare(that: Version): Int =
-      if(major > that.major) 1
-      else if (major == that.major && minor >  that.minor) 1
-      else if (major == that.major && minor == that.minor && patch >  that.patch) 1
+      if (major > that.major) 1
+      else if (major == that.major && minor > that.minor) 1
+      else if (major == that.major && minor == that.minor && patch > that.patch) 1
       else if (major == that.major && minor == that.minor && patch == that.patch) 0
       else -1
   }

@@ -1,14 +1,11 @@
 package catseffectnote
 
+import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import java.util.concurrent.{Executors, ScheduledExecutorService, ScheduledThreadPoolExecutor}
-
-import cats.Parallel
-import cats.effect.Effect
-
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
-import scala.concurrent.duration._
 
 /**
   * Created by ikhoon on 19/03/2018.
@@ -38,8 +35,6 @@ object IOExample extends App {
   // 이말은 leak 이나 memory overhead 가 최소화 된다는 말이다.
   // reference transparent 참조 투명성이 보장이된다.
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import cats.effect.IO
   val ioa = IO { println("hey!") }
   val program: IO[Unit] =
     for {
@@ -59,10 +54,10 @@ object IOExample extends App {
     import scala.concurrent.ExecutionContext.Implicits.global
     val foa = Future { println("hey!") }
     val program1: Future[Unit] =
-    for {
-      _ <- foa
-      _ <- foa
-    } yield ()
+      for {
+        _ <- foa
+        _ <- foa
+      } yield ()
 
     val program2: Future[Unit] =
       for {
@@ -70,8 +65,6 @@ object IOExample extends App {
         _ <- Future { println("hey!") }
       } yield ()
   }
-  import cats.effect.implicits._
-  import cats.implicits._
 
   program.unsafeRunSync()
   // 두번 실행됨
@@ -86,7 +79,6 @@ object IOExample extends App {
   // Future와 IO는 비동기 처리 결과를 얻기에 적합하다.
   // 하지만 순수함과 느긋함 때문에 IO는 더 컨트롤 가능한 평가 모델이고 더 예측가능하다.
 
-
   def asynchronous(x: Int)(f: Int => Unit): Unit =
     f(x * 2)
 
@@ -95,10 +87,9 @@ object IOExample extends App {
   p.future
 
   // IO.async
-  val x: IO[Int] = IO.async(cb => {
+  val x: IO[Int] = IO.async_(cb => {
     asynchronous(10)(x => cb(Right(x)))
   })
-
 
   asynchronous(10)(x => p.complete(Success(x)))
 
@@ -112,37 +103,10 @@ object IOExample extends App {
   // IO.apply
   IO[Int] { synchronous(10) }
 
-
-
-
-
   IO(1)
-  IO.async[Int](cb => cb(Right(1)))
-
+  IO.async_[Int](cb => cb(Right(1)))
 
   def fromFuture[A](f: Future[A]): IO[A] = ???
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   // 이코드는 Future와 IO가 같은 결과를 가지지만
   def addToGauge(x: Int): IO[Unit] = IO { println(s"add to guage $x") }
@@ -160,17 +124,16 @@ object IOExample extends App {
     _ <- task
   } yield ()
 
-
-
   // Stack safety
   // IO는 flatMap구현은 trampoline으로 구현되어 있다.
   // 그렇기 때문에 flatMap의 함수 호출은 stack safety하다.
   def fib(n: Int, a: Long = 0, b: Long = 1): IO[Long] =
-    IO(a + b).flatMap(c =>
-      if(n > 0)
-        fib(n - 1, b, c)
-      else
-        IO.pure(c)
+    IO(a + b).flatMap(
+      c =>
+        if (n > 0)
+          fib(n - 1, b, c)
+        else
+          IO.pure(c)
     )
 
   println(fib(100000).unsafeRunSync())
@@ -186,7 +149,6 @@ object IOExample extends App {
 
   // 그래서 이렇게 하면 안된다.
   IO.pure(println("THIS IS WRONG!"))
-
 
   // Synchronous Effects — IO.apply
   // 이함수는 가장 많이 사용되는 builder일것이다. Sync[IO].delay와 같다.
@@ -207,7 +169,6 @@ object IOExample extends App {
     _ <- putStrLn(s"Hello $n")
   } yield ()
 
-
   // Asynchronous Effects — IO.async & IO.cancelable
   // IO는 IO.async, IO.cancelable을 통해서 비동기 연산도 표현할수 있다.
   // IO.async는 Async#async의 laws와 함계 컴파일된다.
@@ -224,13 +185,15 @@ object IOExample extends App {
   // 이미 내장된 하뭇 IO.fromFuture가 있지만 그냥 만들어본다.
 
   def convert[A](fa: Future[A]): IO[A] =
-    IO.async(cb =>
-      fa.onComplete {
-        case Success(v) => cb(Right(v))
-        case Failure(ex) => cb(Left(ex))
+    IO.async_(
+      cb => {
+        import scala.concurrent.ExecutionContext.Implicits.global
+        fa.onComplete {
+          case Success(v)  => cb(Right(v))
+          case Failure(ex) => cb(Left(ex))
+        }
       }
     )
-
 
   // Cancelable Processes
   // 취소할수 있는 IO task를 만들기 위해서는 IO.cancelable을 사용해서 만들면 된다.
@@ -243,10 +206,10 @@ object IOExample extends App {
   // 획득했던 리소를를 릴리즈하는게 가능하고 이는 leak을 방지하는데 유용하다.
 
   def delayedTick(d: FiniteDuration)(implicit sc: ScheduledExecutorService): IO[Unit] =
-    IO.cancelable(cb => {
+    IO.async(cb => {
       val r = new Runnable { def run() = cb(Right(())) }
       val f = sc.schedule(r, d.length, d.unit)
-      IO(f.cancel(false))
+      IO(Some(IO(f.cancel(false))))
     })
 
 //  import cats.implicits._
@@ -254,7 +217,5 @@ object IOExample extends App {
   implicit val sc = new ScheduledThreadPoolExecutor(1, Executors.defaultThreadFactory())
   println("begin 5 seconds")
 //  val res = delayedTick(5 seconds) *> IO(println("after 5 seconds"))
-
-
 
 }

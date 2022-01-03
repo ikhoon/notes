@@ -1,11 +1,12 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/20/16.
- */
-class TypeclassDerivationSpec extends WordSpec with Matchers {
+  * Created by Liam.M(엄익훈) on 8/20/16.
+  */
+class TypeclassDerivationSpec extends AnyWordSpec with Matchers {
 
   "Auto Typeclass Derivation" should {
     "monoid for case class" in {
@@ -19,7 +20,6 @@ class TypeclassDerivationSpec extends WordSpec with Matchers {
 
       val barCombined = Bar(true, "foo", 2.0) |+| Bar(false, "bar", 3.0)
       barCombined shouldBe Bar(true, "foobar", 5.0)
-
 
     }
   }

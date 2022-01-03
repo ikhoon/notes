@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FlatSpec, FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2016. 7. 28..
   */
-class ClassSpec extends FunSuite with Matchers {
+class ClassSpec extends AnyFunSuite with Matchers {
 
   /**
     * 1. `val`의 의미는 무엇인가?
@@ -16,7 +17,6 @@ class ClassSpec extends FunSuite with Matchers {
     val classWithVal = new ClassWithVal("술디나")
     classWithVal.name shouldBe "술디나"
   }
-
 
   /**
     * `var`는 쓰지 말자 필요없다.

@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by Liam.M(엄익훈) on 11/14/16.
   */
-class TraitSpec extends FunSuite with Matchers {
+class TraitSpec extends AnyFunSuite with Matchers {
 
   test("trait!!") {
     // java interface 유사하다.
@@ -29,7 +30,6 @@ class TraitSpec extends FunSuite with Matchers {
       override def bar: String = "barbarbar"
       override def toInt(int: Int): String = int.toString + "!!"
     }
-
 
     //
 
@@ -58,7 +58,6 @@ class TraitSpec extends FunSuite with Matchers {
     }
 
     // 네번째 특징 : 생성자가 없다.
-
 
     // 퀴즈
     // 두개의 trait을 만들어봅니다.
@@ -89,7 +88,6 @@ class TraitSpec extends FunSuite with Matchers {
       override def a: String = super.a
     }
     println((new ABC).a)
-
 
   }
 }

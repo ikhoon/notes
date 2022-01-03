@@ -1,11 +1,11 @@
 package macronote
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
   * Created by Liam.M on 2018. 07. 31..
   */
-class EasyLoggingTest extends FunSuite {
+class EasyLoggingTest extends AnyFunSuite {
 
   test("log with prepend") {
     EasyLogging.log("good")

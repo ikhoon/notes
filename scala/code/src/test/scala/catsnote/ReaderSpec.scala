@@ -2,7 +2,8 @@ package catsnote
 
 import cats.Id
 import cats.data.{Kleisli, Reader}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,7 +12,7 @@ import cats.implicits._
 /**
   * Created by ikhoon on 20/12/2016.
   */
-class ReaderSpec extends WordSpec with Matchers {
+class ReaderSpec extends AnyWordSpec with Matchers {
 
   "reader" should {
 
@@ -19,12 +20,9 @@ class ReaderSpec extends WordSpec with Matchers {
 
     // DI
 
-
 //    case class Reader[Action](run: Action)
 
     //
-
-
 
     "config" in {
 
@@ -64,7 +62,7 @@ class ReaderSpec extends WordSpec with Matchers {
 
       trait ItemService {
         def getItem(id: Int): Kleisli[Future, ItemRepository, Item] =
-          Kleisli(x => Future(x.findById(id)) )
+          Kleisli(x => Future(x.findById(id)))
 
         def getItemsByName(name: String): Kleisli[Future, ItemRepository, List[Item]] =
           Kleisli(x => Future(x.findByName(name)))
@@ -88,7 +86,13 @@ class ReaderSpec extends WordSpec with Matchers {
         .getSameNameItemsById(10)
         .run(ItemRepositoryImpl)
 
-      items shouldBe List(Item(1, "10-name"), Item(2, "10-name"), Item(3, "10-name"), Item(4, "10-name"), Item(5, "10-name"))
+      items shouldBe List(
+        Item(1, "10-name"),
+        Item(2, "10-name"),
+        Item(3, "10-name"),
+        Item(4, "10-name"),
+        Item(5, "10-name")
+      )
 
     }
 

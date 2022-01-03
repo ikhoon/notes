@@ -1,6 +1,7 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.ops.tuple.FlatMapper
 import shapeless.poly.~>
 import shapeless.{HNil, Id, Poly1}
@@ -8,7 +9,7 @@ import shapeless.{HNil, Id, Poly1}
 /**
   * Created by ikhoon on 2016. 8. 10..
   */
-class TupleSpec extends WordSpec with Matchers {
+class TupleSpec extends AnyWordSpec with Matchers {
 
   "hlist style operation on scala standard tuples" should {
     import shapeless.syntax.std.tuple._
@@ -34,36 +35,35 @@ class TupleSpec extends WordSpec with Matchers {
 
     "prepend" in {
       val l = 23 +: ("foo", true)
-      l.shouldBe (23, "foo", true)
+      l.shouldBe(23, "foo", true)
     }
 
     "append" in {
       val l = (2, "foo") :+ true
-      l.shouldBe (2, "foo", true)
+      l.shouldBe(2, "foo", true)
     }
 
     "concatenate" in {
       val l = (2, "foo") ++ (true, 2.0)
-      l.shouldBe (2, "foo", true, 2.0)
+      l.shouldBe(2, "foo", true, 2.0)
     }
 
     "map" in {
       object option extends (Id ~> Option) {
         override def apply[T](f: T): Option[T] = Option(f)
       }
-      val l = (23, "foo", true) map option
+      val l = (23, "foo", true).map(option)
       l shouldBe (Some(23), Some("foo"), Some(true))
     }
 
-
     "flatMap" in {
       import shapeless.poly.identity
-      val l = ((22, "foo"), (), (true, 2.0)) flatMap identity
+      val l = ((22, "foo"), (), (true, 2.0)).flatMap(identity)
       l shouldBe (22, "foo", true, 2.0)
     }
 
     "fold" in {
-       (23, "foo", (13, "wibble")).foldLeft(0)(addSize) shouldBe 11
+      (23, "foo", (13, "wibble")).foldLeft(0)(addSize) shouldBe 11
     }
 
     "to hlist" in {

@@ -1,23 +1,21 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.collection.immutable.Seq
 
 /**
   * Created by Liam.M(엄익훈) on 12/16/16.
   */
-class InfixPostfixPrefixSpec extends FunSuite with Matchers {
+class InfixPostfixPrefixSpec extends AnyFunSuite with Matchers {
 
   test("single parameter") {
     val num = 4
     num + 1 shouldBe num.+(1)
   }
 
-  test("two param") {
-
-  }
-
+  test("two param") {}
 
   test("postfix") {
     val g: Int = 31
@@ -87,6 +85,5 @@ class InfixPostfixPrefixSpec extends FunSuite with Matchers {
       }
     }
   }
-
 
 }

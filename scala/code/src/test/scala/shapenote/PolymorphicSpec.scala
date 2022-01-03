@@ -1,27 +1,28 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.{HNil, Poly1}
 import shapeless.PolyDefns.~>
 
 /**
   * Created by ikhoon on 2016. 7. 28..
   */
-class PolymorphicSpec extends WordSpec with Matchers {
+class PolymorphicSpec extends AnyWordSpec with Matchers {
 
   "Function level polymorphism" should {
     "it is ok." in {
-      def choose[T](s: Set[T]) :Option[T] = s.headOption
-      List(Set(1), Set(2), Set(3)) map choose shouldBe List(Option(1), Option(2), Option(3))
+      def choose[T](s: Set[T]): Option[T] = s.headOption
+      List(Set(1), Set(2), Set(3)).map(choose) shouldBe List(Option(1), Option(2), Option(3))
     }
     "it is ok too?" in {
-      def choose[T](s: Set[T]) :Option[T] = s.headOption
+      def choose[T](s: Set[T]): Option[T] = s.headOption
       val chooseFn = choose _
 //      List(Set(1), Set(2), Set(3)) map chooseFn shouldBe List(Option(1), Option(2), Option(3))
     }
 
     "it is not ok too." in {
-      def choose[T](s: Set[T]) :Option[T] = s.headOption
+      def choose[T](s: Set[T]): Option[T] = s.headOption
       val hlist = Set(1) :: Set("2") :: Set(3L) :: HNil
 //      hlist.map(choose) shouldBe Option(1) :: Option("2") :: Option(3L) :: HNil
     }
@@ -34,7 +35,7 @@ class PolymorphicSpec extends WordSpec with Matchers {
       import poly._
       choose(Set(1, 2, 3)) shouldBe Option(1)
 
-      List(Set(1), Set(2), Set(3)) map choose shouldBe List(Option(1), Option(2), Option(3))
+      List(Set(1), Set(2), Set(3)).map(choose) shouldBe List(Option(1), Option(2), Option(3))
 
     }
 

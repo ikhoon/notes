@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2017. 3. 13..
   */
-class Class2Spec extends FunSuite with Matchers {
+class Class2Spec extends AnyFunSuite with Matchers {
 
   test("class style") {
     //Typical java style class
@@ -38,9 +39,9 @@ class Class2Spec extends FunSuite with Matchers {
     // getter, setter, 기본값
     // 왜 public 이 기본일까?
     class Person2 private (
-                   var name: String = "Noname",
-                   var age: Int = -1
-                 )
+      var name: String = "Noname",
+      var age: Int = -1
+    )
     object Person2 {
       val p2 = new Person2
     }
@@ -53,8 +54,8 @@ class Class2Spec extends FunSuite with Matchers {
     // val = getter
     // var = getter & setter
 
-    class Person3 (val name: String, var age: Int = 10)
-    class Person6 (val name: String, var age: Int = 10) {
+    class Person3(val name: String, var age: Int = 10)
+    class Person6(val name: String, var age: Int = 10) {
       def value: String = s"name = $name, age = $age"
       private def value2: String = s"name = $name, age = $age"
     }
@@ -64,14 +65,12 @@ class Class2Spec extends FunSuite with Matchers {
     val p3 = new Person3(name = "abc")
     println(p3.name) // 컴파일 안됨요
     p3.age = 10
-    case class Person4 (name: String = "Noname", age: Int = -1)
+    case class Person4(name: String = "Noname", age: Int = -1)
     val p4 = Person4()
     p4.name
 
-    class Person5(val name: String, var age: Int)
-                 (implicit val key: Int, val key2: String)
+    class Person5(val name: String, var age: Int)(implicit val key: Int, val key2: String)
 
   }
-
 
 }

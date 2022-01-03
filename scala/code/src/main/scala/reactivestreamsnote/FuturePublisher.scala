@@ -1,8 +1,7 @@
 package reactivestreamsnote
 
-import monix.execution.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicBoolean
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
-
 import scala.concurrent.Future
 
 class FuturePublisher[A](future: Future[A]) extends Publisher[A] {
@@ -12,7 +11,7 @@ class FuturePublisher[A](future: Future[A]) extends Publisher[A] {
   }
 
   class FutureSubscription[B >: A](subscriber: Subscriber[B]) extends Subscription {
-    private val finished = AtomicBoolean
+    private val finished = new AtomicBoolean
 
     override def request(n: Long): Unit = ???
 

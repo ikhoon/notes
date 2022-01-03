@@ -1,13 +1,14 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.collection.immutable.Set
 
 /**
- * Created by Liam.M(엄익훈) on 8/17/16.
- */
-class SetSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/17/16.
+  */
+class SetSpec extends AnyFunSuite with Matchers {
 
   test("set") {
     val list = List(1, 1, 1, 1, 1, 1)
@@ -17,7 +18,7 @@ class SetSpec extends FunSuite with Matchers {
 
     val set2 = set1 + 2
     println(set2)
-    val set3 = Set(2,3,4,5)
+    val set3 = Set(2, 3, 4, 5)
     val set4 = set2 ++ set3
     println(set4)
 

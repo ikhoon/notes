@@ -1,15 +1,14 @@
 package shapenote
 
-
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless._
 import CovariantHelper._
-
 
 /**
   * Created by ikhoon on 2016. 8. 8..
   */
-class HeterogenousListSpec extends WordSpec with Matchers {
+class HeterogenousListSpec extends AnyWordSpec with Matchers {
 
   "Heterogenous List" should {
     "map" in {
@@ -20,7 +19,7 @@ class HeterogenousListSpec extends WordSpec with Matchers {
 
       val sets = Set(1) :: Set("foo") :: Set(true) :: HNil
 
-      val opts = sets map choose
+      val opts = sets.map(choose)
 
       opts shouldBe (Option(1) :: Option("foo") :: Option(true) :: HNil)
 
@@ -71,7 +70,7 @@ class HeterogenousListSpec extends WordSpec with Matchers {
       import syntax.typeable._
       val ffff: FFFF = apap.unify
 
-      val precise : Option[APAP] = ffff.cast[APAP]
+      val precise: Option[APAP] = ffff.cast[APAP]
       precise shouldBe Some(apap)
     }
   }

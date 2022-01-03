@@ -1,13 +1,14 @@
 package catsnote
 
 import cats.Functor
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scalaz.ListT
 
-class MonadTransformerSpec extends WordSpec with Matchers {
+class MonadTransformerSpec extends AnyWordSpec with Matchers {
 
   import scala.concurrent.ExecutionContext.Implicits.global
   import scalaz._, Scalaz._

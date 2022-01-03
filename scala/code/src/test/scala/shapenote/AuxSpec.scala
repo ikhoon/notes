@@ -1,9 +1,10 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
-class AuxSpec extends WordSpec with Matchers{
+class AuxSpec extends AnyWordSpec with Matchers{
 
   // http://gigiigig.github.io/posts/2015/09/13/aux-pattern.html
 

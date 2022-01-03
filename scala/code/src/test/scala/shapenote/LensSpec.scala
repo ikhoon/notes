@@ -1,11 +1,12 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2016. 8. 17..
   */
-class LensSpec extends WordSpec with Matchers {
+class LensSpec extends AnyWordSpec with Matchers {
 
   "Boilerplate-free lenses for arbitrary case class" should {
 

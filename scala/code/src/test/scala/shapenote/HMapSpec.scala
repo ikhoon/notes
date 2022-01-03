@@ -1,12 +1,13 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.{HMap, HNil}
 
 /**
   * Created by ikhoon on 2016. 8. 14..
   */
-class HMapSpec extends WordSpec with Matchers {
+class HMapSpec extends AnyWordSpec with Matchers {
 
   "Heterogenous maps" should {
 
@@ -28,11 +29,10 @@ class HMapSpec extends WordSpec with Matchers {
     "map" in {
       import hm._
       val l = 23 :: "bar" :: HNil
-      val m = l map hm
+      val m = l.map(hm)
       m shouldBe "foo" :: 13 :: HNil
 
     }
-
 
   }
 

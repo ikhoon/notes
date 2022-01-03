@@ -3,12 +3,13 @@ package algonote
 /**
 import algonote.Algo_2_2_DijkstraShortestPath.Graph
 import Algo_2_2_DijkstraShortestPath.Node
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 12/08/2018.
   */
-class Algo_2_2_DijkstraShortestPathTest extends FunSuite with Matchers {
+class Algo_2_2_DijkstraShortestPathTest extends AnyFunSuite with Matchers {
 
   val dijkstra = new Algo_2_2_DijkstraShortestPath()
 
@@ -25,13 +26,13 @@ class Algo_2_2_DijkstraShortestPathTest extends FunSuite with Matchers {
   }
 
   /**
-    * 1 - (1) -> 2
-    * |     /   |
-    *(4)  (2)  (6)
-    * |  /      |
-    * ⌄⌞        ⌄
-    * 3 - (3) -> 4
-    */
+  * 1 - (1) -> 2
+  * |     /   |
+  *(4)  (2)  (6)
+  * |  /      |
+  * ⌄⌞        ⌄
+  * 3 - (3) -> 4
+  */
   test("simple shortest path") {
     val graph: Graph = Map(
       1 -> Vector(Node(2, 1), Node(3, 4)),
@@ -95,4 +96,4 @@ class Algo_2_2_DijkstraShortestPathTest extends FunSuite with Matchers {
     // 3024,3684,2947,2660,2367,2399,3879,2442,2610,5130
   }
 }
-*/
+  */

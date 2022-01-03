@@ -1,13 +1,14 @@
 package algonote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source
 
 /**
   * Created by ikhoon on 01/07/2018.
   */
-class Algo_1_2_Counting_InversionsTest extends FunSuite with Matchers {
+class Algo_1_2_Counting_InversionsTest extends AnyFunSuite with Matchers {
 
   import Algo_1_2_Counting_Inversions._
   test("sorted list") {
@@ -33,7 +34,7 @@ class Algo_1_2_Counting_InversionsTest extends FunSuite with Matchers {
   }
 
   test("1,5,3,2,4") {
-    val xs = Vector(1,5,3,2,4)
+    val xs = Vector(1, 5, 3, 2, 4)
     val (sorted, count) = sortAndCount(xs)
     sorted shouldBe xs.sorted
     count shouldBe 4
@@ -43,15 +44,14 @@ class Algo_1_2_Counting_InversionsTest extends FunSuite with Matchers {
     var x = 1
     var y = 1
     for (_ <- 1 to 10 if x < 4 && y < 4) {
-     println(x)
+      println(x)
       x += 1
     }
   }
 
-
-
   test("problem set 2") {
-    val xs = Source.fromResource("count_inverting_input.txt")
+    val xs = Source
+      .fromResource("count_inverting_input.txt")
       .getLines()
       .map(_.toInt)
       .toVector

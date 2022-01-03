@@ -1,6 +1,7 @@
 package doobienote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scalaz.NonEmptyList
 
@@ -8,7 +9,7 @@ import scalaz.NonEmptyList
   * Created by ikhoon on 2016. 9. 18..
   */
 //noinspection SqlDialectInspection,SqlNoDataSourceInspection
-class ParameterizedQueries extends WordSpec with Matchers {
+class ParameterizedQueries extends AnyWordSpec with Matchers {
 
   /*
   "parameterized queries" should {
@@ -75,9 +76,9 @@ class ParameterizedQueries extends WordSpec with Matchers {
         .map(_.name)
 
       countriesNames shouldBe List("Spain", "France")
-      */
+ */
 
     }
   }
-  */
+ */
 }

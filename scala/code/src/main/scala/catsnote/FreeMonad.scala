@@ -12,7 +12,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by ikhoon on 2016. 10. 4..
   */
-
 /**
 
   ## Free Monad에 대해서 알아보자. - https://github.com/typelevel/cats/blob/master/docs/src/main/tut/freemonad.md
@@ -58,15 +57,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Get - 저장소에서 나오는 key와 연관된 값이다.
   * Delete - 저장소에서 지울 key와 연관된 값이다.
 
-*/
-
+  */
 // ## 문법에 대해서 ADT를 만들어 보자.
 sealed trait KVStoreA[A]
 case class Put[T](key: String, value: T) extends KVStoreA[Unit]
 case class Get[T](key: String) extends KVStoreA[Option[T]]
 case class Delete(key: String) extends KVStoreA[Unit]
 case class Gets[T](key: List[String]) extends KVStoreA[List[T]]
-
 
 /**
   ## ADT를 free 해보자.
@@ -78,23 +75,11 @@ case class Gets[T](key: List[String]) extends KVStoreA[List[T]]
   5. 컴파일된 코드를 실행하라.
 
   */
-
-
-
 // 구현
 object kv {
   // 1. ADT기반으로 Free type을 만들어라.
   // KVStoreA에 A를 뒤에 붙인 이유가 있었구만. type alias에 사용할라 했었다.
   type KVStore[A] = Free[KVStoreA, A]
-
-
-
-
-
-
-
-
-
 
   import cats.free.Free.liftF
   // 2. liftF을 이용하여 똑똑한 생성자를 만들라.
@@ -103,57 +88,30 @@ object kv {
   def put[T](key: String, value: T): KVStore[Unit] =
     liftF[KVStoreA, Unit](Put(key, value))
 
-
-
-
-
-
-
-
-
-
-
-
-
   def get[T](key: String): KVStore[Option[T]] =
     liftF[KVStoreA, Option[T]](Get(key))
 
   def delete(key: String): KVStore[Unit] =
     liftF[KVStoreA, Unit](Delete(key))
 
-
-
-
-
-
-
-
-
-
   // get이랑 put을 조합해서 만들자.
   def update[T](key: String, f: T => T): KVStore[Unit] =
     for {
       maybeV <- get[T](key)
       _ <- maybeV.map(v => put[T](key, f(v))).getOrElse(cats.free.Free.pure(()))
-    }  yield ()
+    } yield ()
 
   // 3. 프로그램을 만들어 보자.
   // 이제 for comprehension을 이용하여 DSL을 사용하여 프로그램을 작성하여 KVStore[_]을 만드는 것이 가능하다.
 
-  def program: KVStore[Option[Int]] = for {
-    _ <- put("wild-cats", 2)
-    _ <- update[Int]("wild-cats", _ + 12)
-    _ <- put("tame-cats", 5)
-    n <- get[Int]("wild-cats")
-    _ <- delete("tame-cats")
-  } yield n
-
-
-
-
-
-
-
+  def program: KVStore[Option[Int]] =
+    for {
+      _ <- put("wild-cats", 2)
+      _ <- update[Int]("wild-cats", _ + 12)
+      _ <- put("tame-cats", 5)
+      n <- get[Int]("wild-cats")
+      _ <- delete("tame-cats")
+    } yield n
 
   // 이것은 monadic flow 처럼 보인다. 그러나 **일련의 작업을 표현하기 위해 재귀적인 데이터 구조를 만든것 뿐이다.**
 
@@ -180,8 +138,6 @@ object kv {
   // F[G[A]] => G[F[B]] // sequence + map = traverse
   // F[A] => G[A] // natural transformation
 
-
-
   val c: List[Int] = a.toList
 
   // KVStoreA[A] => Id[A]
@@ -196,7 +152,7 @@ object kv {
         fa match {
           case Get(key) =>
             println(s"get($key)")
-             Monad[M].pure(kvs.get(key).map(_.asInstanceOf[A]))
+            Monad[M].pure(kvs.get(key).map(_.asInstanceOf[A]))
           case Put(key, value) =>
             println(s"put($key, $value)")
             kvs.put(key, value)
@@ -207,8 +163,6 @@ object kv {
             Monad[M].pure(())
         }
     }
-
-
 
   /**
 
@@ -224,7 +178,7 @@ object kv {
     * Future[_]는 비동기 연산을
     * List[_]는 여려개의 결과를 모을때
     * Option[_]은 선택적인 결과를 지원하기 위해
-    * Either[E, ?]는 실패를 지원하기 위해
+    * Either[E, *]는 실패를 지원하기 위해
     * 그리고 더 있단다....
 
     # 5. 프로그램을 실행하자
@@ -251,9 +205,7 @@ object kv {
     Id는 Monad로서 foldMap을 사용할수 있다.
 
     */
-
-
-    // TODO FIXME
+  // TODO FIXME
   //def result = program.foldMap(impureCompiler)
 
   /**
@@ -266,7 +218,6 @@ object kv {
 
     *
     */
-
   private val map: Int = List(1, 2, 3).foldMap(i => i)
 
   println(map)

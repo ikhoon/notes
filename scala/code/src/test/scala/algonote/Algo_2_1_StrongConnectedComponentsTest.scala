@@ -1,11 +1,12 @@
 package algonote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 30/07/2018.
   */
-class Algo_2_1_StrongConnectedComponentsTest extends FunSuite with Matchers {
+class Algo_2_1_StrongConnectedComponentsTest extends AnyFunSuite with Matchers {
 
   import Algo_2_1_StrongConnectedComponents._
 
@@ -80,24 +81,8 @@ class Algo_2_1_StrongConnectedComponentsTest extends FunSuite with Matchers {
       """.stripMargin
     val graph = build(inputs.split("\n"))
     val ctx = dfsLoop(rev(graph))
-    ctx.leader shouldBe Map(5 -> 9,
-                            1 -> 7,
-                            6 -> 9,
-                            9 -> 9,
-                            2 -> 9,
-                            7 -> 7,
-                            3 -> 9,
-                            8 -> 9,
-                            4 -> 7)
-    ctx.f shouldBe Map(5 -> 2,
-                       1 -> 7,
-                       6 -> 5,
-                       9 -> 6,
-                       2 -> 3,
-                       7 -> 9,
-                       3 -> 1,
-                       8 -> 4,
-                       4 -> 8)
+    ctx.leader shouldBe Map(5 -> 9, 1 -> 7, 6 -> 9, 9 -> 9, 2 -> 9, 7 -> 7, 3 -> 9, 8 -> 9, 4 -> 7)
+    ctx.f shouldBe Map(5 -> 2, 1 -> 7, 6 -> 5, 9 -> 6, 2 -> 3, 7 -> 9, 3 -> 1, 8 -> 4, 4 -> 8)
 
     val fReversed: Vector[(Int, Int)] =
       ctx.f.view.map { case (k, v) => v -> k }.toVector.sortWith {

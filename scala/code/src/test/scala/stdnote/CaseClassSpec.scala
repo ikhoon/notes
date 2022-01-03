@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/29/16.
- */
-class CaseClassSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/29/16.
+  */
+class CaseClassSpec extends AnyFunSuite with Matchers {
 
   val aOption = Option(1)
 
@@ -13,10 +14,9 @@ class CaseClassSpec extends FunSuite with Matchers {
     // 클래스의 종류 1개입니다.
     // class, case class???
 
-
     val aValue = aOption match {
       case Some(value) => value
-      case None => 0
+      case None        => 0
     }
     println(aValue)
 
@@ -53,10 +53,9 @@ class CaseClassSpec extends FunSuite with Matchers {
     var f = foo
     f = foo1
 
-    case class Bar(a: Int, b: Int)  {
+    case class Bar(a: Int, b: Int) {
       def sum() = a + b
     }
-
 
     val bar = Bar(10, 20)
     println(bar.sum())

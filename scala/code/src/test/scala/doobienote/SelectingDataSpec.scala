@@ -1,13 +1,14 @@
 package doobienote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.concurrent.Task
 import scalaz._, Scalaz._
 
 /**
   * Created by ikhoon on 2016. 9. 12..
   */
-class SelectingDataSpec extends WordSpec with Matchers {
+class SelectingDataSpec extends AnyWordSpec with Matchers {
 
   import doobie.implicits._
 

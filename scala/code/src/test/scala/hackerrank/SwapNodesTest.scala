@@ -1,10 +1,11 @@
 package hackerrank
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by Liam.M on 2019. 01. 18..
   */
-class SwapNodesTest extends FunSuite with Matchers {
+class SwapNodesTest extends AnyFunSuite with Matchers {
 
   test("""
       |3
@@ -69,7 +70,8 @@ class SwapNodesTest extends FunSuite with Matchers {
       Array(-1, -1),
     )
     val queries = Array(
-      2, 4
+      2,
+      4
     )
 
     val xxs: Array[Array[Int]] = SwapNodes.swapNodes(indexes, queries)

@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/17/16.
- */
-class MapSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/17/16.
+  */
+class MapSpec extends AnyFunSuite with Matchers {
 
   test("Map") {
     // mutable, immutable
@@ -30,6 +31,5 @@ class MapSpec extends FunSuite with Matchers {
     map4.getOrElse(4, "사") shouldBe "사"
     map1 ++ map4
   }
-
 
 }

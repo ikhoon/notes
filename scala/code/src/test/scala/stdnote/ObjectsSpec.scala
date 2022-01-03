@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/1/16.
- */
-class ObjectsSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/1/16.
+  */
+class ObjectsSpec extends AnyFunSuite with Matchers {
 
   // singleton 객체의 인스턴스가 하나이다.
   // + object, - static

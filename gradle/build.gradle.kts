@@ -19,3 +19,11 @@ tasks.create<Zip>("zip") {
     from("src")
     archiveFileName.set("gragle-note-0.2.zip")
 }
+
+ext["foo"] = 10
+
+tasks.create("myTask") {
+    doLast {
+        println("Property: ${project.extra["foo"]}")
+    }
+}

@@ -9,8 +9,8 @@ object FiberApp extends App {
   val ecOne = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
   val ecTwo = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
-  def infiniteIO(id: Int)(cs: ContextShift[IO]): IO[Fiber[IO, Unit]] = {
+  def infiniteIO(id: Int): IO[Fiber[IO, Throwable, Unit]] = {
     def repeat: IO[Unit] = IO(println(id)).flatMap(_ => repeat)
-    repeat.start(cs)
+    repeat.start
   }
 }

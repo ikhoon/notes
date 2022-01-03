@@ -1,8 +1,9 @@
 package stdnote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
-class ImplicitImportSpec extends WordSpec with Matchers {
+class ImplicitImportSpec extends AnyWordSpec with Matchers {
 
   "implicit new" should {
     "타입만 가지고 초기화를 해보자" in {
@@ -18,7 +19,7 @@ class ImplicitImportSpec extends WordSpec with Matchers {
       def bar(implicit foo: Foo[Int]) = foo
 
       println(bar.a)
-      val baz :Foo[Int] = new Foo[Int]
+      val baz: Foo[Int] = new Foo[Int]
       println(baz.a)
     }
   }

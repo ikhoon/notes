@@ -1,12 +1,13 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.{HNil, Witness, WitnessWith}
 
 /**
   * Created by ikhoon on 2016. 8. 14..
   */
-class SingletonTypedSpec extends WordSpec with Matchers {
+class SingletonTypedSpec extends AnyWordSpec with Matchers {
 
   "Singleton-typed literals" should {
 
@@ -46,6 +47,5 @@ class SingletonTypedSpec extends WordSpec with Matchers {
 
     }
   }
-
 
 }

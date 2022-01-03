@@ -1,13 +1,13 @@
 package catsnote
 
 import cats.Functor
-import org.scalatest.{Matchers, WordSpec}
-
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2016. 7. 18..
   */
-class FunctorSpec extends WordSpec with Matchers {
+class FunctorSpec extends AnyWordSpec with Matchers {
 
   "functor has a map" should {
 
@@ -20,10 +20,10 @@ class FunctorSpec extends WordSpec with Matchers {
     "create functor instance" in {
       // implicit 이 없다면?
       implicit def optionFunctor: Functor[Option] = new Functor[Option] {
-        override def map[A, B](fa: Option[A])(f: (A) => B): Option[B] = fa map f
+        override def map[A, B](fa: Option[A])(f: (A) => B): Option[B] = fa.map(f)
       }
       implicit def listFunctor: Functor[List] = new Functor[List] {
-        override def map[A, B](fa: List[A])(f: (A) => B): List[B] = fa map f
+        override def map[A, B](fa: List[A])(f: (A) => B): List[B] = fa.map(f)
       }
       case class Foo[A](a: A)
       implicit def footFunctor: Functor[Foo] = new Functor[Foo] {
@@ -39,23 +39,23 @@ class FunctorSpec extends WordSpec with Matchers {
 
     "type lambda with kind-projector" in {
 
-      implicit def function1Functor[In]: Functor[Function1[In, ?]] = new Functor[Function1[In, ?]] {
-        override def map[A, B](fa: (In) => A)(f: (A) => B): (In) => B = fa andThen f
+      implicit def function1Functor[In]: Functor[Function1[In, *]] = new Functor[Function1[In, *]] {
+        override def map[A, B](fa: (In) => A)(f: (A) => B): (In) => B = fa.andThen(f)
       }
 
       def a(x: Int): Int = x + 10
       def b(y: Int): String = y.toString
-      Functor[Function1[Int, ?]].map(a)(b)(200) shouldBe "210"
+      Functor[Function1[Int, *]].map(a)(b)(200) shouldBe "210"
     }
 
     "only type lambda function functor" in {
-      implicit def f1Functor[I]: Functor[({type L[A] = Function1[I, A]})#L] =
-        new Functor[({type L[A] = Function1[I, A]})#L]{
-          override def map[A, B](fa: (I) => A)(f: (A) => B): (I) => B = fa andThen f
+      implicit def f1Functor[I]: Functor[({ type L[A] = Function1[I, A] })#L] =
+        new Functor[({ type L[A] = Function1[I, A] })#L] {
+          override def map[A, B](fa: (I) => A)(f: (A) => B): (I) => B = fa.andThen(f)
         }
 
-      Functor[({type L[A] = Function1[Int, A]})#L]
-        .map((x : Int) => x + 10)((y: Int) => y.toString)(200) shouldBe "210"
+      Functor[({ type L[A] = Function1[Int, A] })#L]
+        .map((x: Int) => x + 10)((y: Int) => y.toString)(200) shouldBe "210"
     }
 
     "using map in cats functor instances" in {
@@ -74,13 +74,13 @@ class FunctorSpec extends WordSpec with Matchers {
     "fproduct produce pair of origal value and mapped value" in {
       import cats.implicits._
       val source = List("My Cat", "is", "Sarang.")
-      Functor[List].fproduct(source)(_.length) shouldBe List(("My Cat",6), ("is", 2), ("Sarang.", 7))
+      Functor[List].fproduct(source)(_.length) shouldBe List(("My Cat", 6), ("is", 2), ("Sarang.", 7))
     }
 
     "compose two functor" in {
       import cats.implicits.catsStdInstancesForList
       import cats.implicits.catsStdInstancesForOption
-      val listOpt = Functor[List] compose Functor[Option]
+      val listOpt = Functor[List].compose(Functor[Option])
       listOpt.map(List(Some(1), None, Some(3)))(_ + 1) shouldBe List(Some(2), None, Some(4))
     }
   }

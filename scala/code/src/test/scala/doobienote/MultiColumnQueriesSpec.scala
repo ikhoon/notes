@@ -1,14 +1,15 @@
 package doobienote
 
 import doobienote.Data.{Country, CountryHListType}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scalaz.concurrent.Task
 
 /**
   * Created by ikhoon on 2016. 9. 13..
   */
-class MultiColumnQueriesSpec extends WordSpec with Matchers {
+class MultiColumnQueriesSpec extends AnyWordSpec with Matchers {
 
   /*
   "multi column queries" should {
@@ -79,5 +80,5 @@ class MultiColumnQueriesSpec extends WordSpec with Matchers {
 
     }
   }
-  */
+ */
 }

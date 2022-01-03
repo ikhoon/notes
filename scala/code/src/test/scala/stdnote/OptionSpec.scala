@@ -1,17 +1,18 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/1/16.
- */
-class OptionSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/1/16.
+  */
+class OptionSpec extends AnyFunSuite with Matchers {
 
   test("optional") {
     // Optional
-    val someValue : Option[String] = Some("I'm wrapped in something.")
+    val someValue: Option[String] = Some("I'm wrapped in something.")
     someValue shouldBe Some("I'm wrapped in something.")
-    val noneValue : Option[String] = None
+    val noneValue: Option[String] = None
     noneValue shouldBe None
   }
 
@@ -26,8 +27,8 @@ class OptionSpec extends FunSuite with Matchers {
 
     // Some(123) => getOrElse(0) => 123
     // None => getOrElse(0) => 0
-    value1 getOrElse "No value" shouldBe "Found value"
-    value2 getOrElse "No value" shouldBe "No value"
+    value1.getOrElse("No value") shouldBe "Found value"
+    value2.getOrElse("No value") shouldBe "No value"
 
     value2.getOrElse {
       "default function"
@@ -87,9 +88,5 @@ class OptionSpec extends FunSuite with Matchers {
     result1 shouldBe 9
     result2 shouldBe 0
   }
-
-
-
-
 
 }

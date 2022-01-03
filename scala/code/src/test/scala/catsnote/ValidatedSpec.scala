@@ -2,7 +2,8 @@ package catsnote
 
 import cats.{Monad, Semigroup, SemigroupK}
 import cats.data.{NonEmptyList, Validated}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import ParallelValidation._
 import cats.data.Validated.{Invalid, Valid}
 import cats.syntax.either._
@@ -10,8 +11,7 @@ import cats.syntax.either._
 /**
   * Created by ikhoon on 2016. 8. 2..
   */
-class ValidatedSpec extends WordSpec with Matchers {
-
+class ValidatedSpec extends AnyWordSpec with Matchers {
 
   "Validated" should {
 
@@ -22,7 +22,6 @@ class ValidatedSpec extends WordSpec with Matchers {
     implicit val nelSemigroup = SemigroupK[NonEmptyList].algebra[ConfigError]
 
     "parallel validation" in {
-
 
       val config = Config(Map("url" -> "127.0.0.1", "port" -> "1337"))
       val valid = parallelValidate(
@@ -52,25 +51,27 @@ class ValidatedSpec extends WordSpec with Matchers {
 
     import cats.Applicative
 
-    implicit def validatedApplicative[E: Semigroup] : Applicative[Validated[E, ?]] =
-      new Applicative[Validated[E, ?]] {
+    implicit def validatedApplicative[E: Semigroup]: Applicative[Validated[E, *]] =
+      new Applicative[Validated[E, *]] {
         override def pure[A](x: A): Validated[E, A] = Valid(x)
 
         override def ap[A, B](ff: Validated[E, (A) => B])(fa: Validated[E, A]): Validated[E, B] =
           (ff, fa) match {
-            case (Valid(f), Valid(x)) => Valid(f(x))
+            case (Valid(f), Valid(x))       => Valid(f(x))
             case (Valid(_), i @ Invalid(_)) => i
             case (i @ Invalid(_), Valid(_)) => i
             case (Invalid(e1), Invalid(e2)) => Invalid(Semigroup[E].combine(e1, e2))
           }
       }
 
-    val config = Config(Map(
-      "name" -> "cat",
-      "age" -> "not a number",
-      "houseNumber" -> "1234",
-      "lane" -> "feline street"
-    ))
+    val config = Config(
+      Map(
+        "name" -> "cat",
+        "age" -> "not a number",
+        "houseNumber" -> "1234",
+        "lane" -> "feline street"
+      )
+    )
 
     "apply" in {
 
@@ -80,32 +81,30 @@ class ValidatedSpec extends WordSpec with Matchers {
       implicit val nelSemigroup: Semigroup[NonEmptyList[ConfigError]] =
         SemigroupK[NonEmptyList].algebra[ConfigError]
 
-
       case class Address(houseNumber: Int, street: String)
       case class Person(name: String, age: Int, address: Address)
 
       val personFromConfig: ValidatedNel[ConfigError, Person] =
-        Apply[ValidatedNel[ConfigError, ?]].map4(
+        Apply[ValidatedNel[ConfigError, *]].map4(
           config.parse[String]("name").toValidatedNel,
           config.parse[Int]("age").toValidatedNel,
           config.parse[Int]("houseNumber").toValidatedNel,
           config.parse[String]("lane").toValidatedNel
-        ){ case (name, age, houseNumber, lane) => Person(name, age, Address(houseNumber, lane)) }
+        ) { case (name, age, houseNumber, lane) => Person(name, age, Address(houseNumber, lane)) }
 
       personFromConfig.isValid shouldBe false
 
     }
 
-
     "flatMap and Xor" in {
-      implicit def validatedMonad[E]: Monad[Validated[E, ?]] = new Monad[Validated[E, ?]] {
+      implicit def validatedMonad[E]: Monad[Validated[E, *]] = new Monad[Validated[E, *]] {
         override def pure[A](x: A): Validated[E, A] = Valid(x)
 
         override def flatMap[A, B](fa: Validated[E, A])(f: (A) => Validated[E, B]): Validated[E, B] =
           fa match {
-          case Valid(x) => f(x)
-          case i @ Invalid(_) => i
-        }
+            case Valid(x)       => f(x)
+            case i @ Invalid(_) => i
+          }
 
         override def tailRecM[A, B](a: A)(f: (A) => Validated[E, Either[A, B]]): Validated[E, B] = ???
       }
@@ -117,7 +116,7 @@ class ValidatedSpec extends WordSpec with Matchers {
     }
 
     "sequential validation - andThen 1" in {
-      val houseNumber = config.parse[Int]("houseNumber") andThen { n =>
+      val houseNumber = config.parse[Int]("houseNumber").andThen { n =>
         if (n > 0) Valid(n)
         else Invalid(ParseError("houseNumber"))
       }
@@ -128,7 +127,7 @@ class ValidatedSpec extends WordSpec with Matchers {
 
     "sequential validation - andThen 2" in {
       val config1 = Config(Map("houseNumber" -> "-42"))
-      val houseNumber = config1.parse[Int]("houseNumber") andThen { n =>
+      val houseNumber = config1.parse[Int]("houseNumber").andThen { n =>
         if (n > 0) Valid(n)
         else Invalid(ParseError("houseNumber"))
       }
@@ -138,7 +137,7 @@ class ValidatedSpec extends WordSpec with Matchers {
 
     "withXor" in {
       def positive(field: String, i: Int): ConfigError Either Int = {
-        if(i >= 0) Either.right(i)
+        if (i >= 0) Either.right(i)
         else Either.left(ParseError(field))
       }
 

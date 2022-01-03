@@ -1,10 +1,9 @@
 package catsnote
 
-import org.scalatest.FunSuite
-
+import org.scalatest.funsuite.AnyFunSuite
 import scala.util.Try
 
-class NaturalTransformationSpec extends FunSuite {
+class NaturalTransformationSpec extends AnyFunSuite {
 
   test("test") {
     // M[A] => M[B]

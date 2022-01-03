@@ -1,9 +1,8 @@
 package exp
 
+import cats.effect.unsafe.implicits.global
 import java.time.LocalDateTime
-
 import parallelExperiment.withTS
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -11,11 +10,11 @@ object parallelExperiment {
 
   def main(args: Array[String]): Unit = {
     println("###### monix task ap - sequence")
-    monixtask.runWithAp() // sequence
+//    monixtask.runWithAp() // sequence
     println("###### monix task zip - parallel")
-    monixtask.runWithZip() // parallel
+//    monixtask.runWithZip() // parallel
     println("###### monix task nondeterminism ap - parallel")
-    monixtask.runWithNondeterminismAp() // parallel
+//    monixtask.runWithNondeterminismAp() // parallel
 
     println("###### scalaz task ap - sequence")
     scalaztask.runAp() // sequence
@@ -79,44 +78,44 @@ object scalaztask {
 
 object monixtask {
 
-  import cats.Applicative
-  import monix.eval.Task
-  import monix.execution.Scheduler.Implicits.global
-  val ta: Task[Int] = Task {
-    Thread.sleep(1000)
-    1
-  }
-  val tb: Task[Int] = Task {
-    Thread.sleep(1000)
-    2
-  }
-
-  // parallel
-  def runWithZip() = {
-    withTS {
-      val tc: Task[Int] = Task.parMap2(ta, tb)(_ + _)
-      Await.result(tc.runToFuture, 10 seconds)
-    }
-  }
-
-  // sequence
-  def runWithAp() = {
-    withTS {
-      val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
-      Await.result(tc.runToFuture, 10 seconds)
-    }
-  }
-
-  // parallel
-  def runWithNondeterminismAp() = {
-    import monix.execution.Scheduler.Implicits.global
-    import cats.implicits._
-    import monix.eval.Task
-    withTS {
-      val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
-      Await.result(tc.runToFuture, 10 seconds)
-    }
-  }
+//  import cats.Applicative
+//  import monix.eval.Task
+//  import monix.execution.Scheduler.Implicits.global
+//  val ta: Task[Int] = Task {
+//    Thread.sleep(1000)
+//    1
+//  }
+//  val tb: Task[Int] = Task {
+//    Thread.sleep(1000)
+//    2
+//  }
+//
+//  // parallel
+//  def runWithZip() = {
+//    withTS {
+//      val tc: Task[Int] = Task.parMap2(ta, tb)(_ + _)
+//      Await.result(tc.runToFuture, 10 seconds)
+//    }
+//  }
+//
+//  // sequence
+//  def runWithAp() = {
+//    withTS {
+//      val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
+//      Await.result(tc.runToFuture, 10 seconds)
+//    }
+//  }
+//
+//  // parallel
+//  def runWithNondeterminismAp() = {
+//    import monix.execution.Scheduler.Implicits.global
+//    import cats.implicits._
+//    import monix.eval.Task
+//    withTS {
+//      val tc: Task[Int] = Applicative[Task].map2(ta, tb)(_ + _)
+//      Await.result(tc.runToFuture, 10 seconds)
+//    }
+//  }
 }
 
 object catseffect {
@@ -128,11 +127,11 @@ object catseffect {
 
   implicitly[Applicative[IO]]
 
-  val ta = IO.async[Int] { cb =>
+  val ta = IO.async_[Int] { cb =>
     Thread.sleep(1000)
     cb(Right(1))
   }
-  val tb = IO.async[Int] { cb =>
+  val tb = IO.async_[Int] { cb =>
     Thread.sleep(1000)
     cb(Right(2))
   }

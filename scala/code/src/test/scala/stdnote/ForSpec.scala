@@ -1,34 +1,31 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by Liam.M(엄익훈) on 12/7/16.
   */
-
-
 case class MyList[A](list: List[A]) {
   // List[A] ==> f: A => List[B] ===> List[B]
-  def flatMap[B](f: A => MyList[B]) : MyList[B] = {
+  def flatMap[B](f: A => MyList[B]): MyList[B] = {
     MyList(list.flatMap(i => f(i).list))
   }
 }
 
-
-class ForSpec extends FunSuite with Matchers {
+class ForSpec extends AnyFunSuite with Matchers {
 
   test("mylist") {
     val my1 = MyList(List(1, 2, 3))
     val my2 = my1.flatMap((i: Int) => MyList(List(i + 10)))
     my2 shouldBe MyList(List("11", "12", "13"))
 
-
   }
 
   test("for basic") {
 
-    val numList = List(1,2,3)
-    val list1 =  for {
+    val numList = List(1, 2, 3)
+    val list1 = for {
       num <- numList
     } yield num.toString
 

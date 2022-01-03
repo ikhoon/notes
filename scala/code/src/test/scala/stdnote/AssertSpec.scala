@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 7/27/16.
- */
-class AssertSpec extends FunSuite with Matchers{
+  * Created by Liam.M(엄익훈) on 7/27/16.
+  */
+class AssertSpec extends AnyFunSuite with Matchers {
 
   test("true") {
     true shouldBe true

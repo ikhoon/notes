@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 9/7/16.
- */
-class CurrySpec extends FunSuite with Matchers{
+  * Created by Liam.M(엄익훈) on 9/7/16.
+  */
+class CurrySpec extends AnyFunSuite with Matchers {
   test("curry") {
     def foo(a: Int, b: Int, c: Int): Int = ???
     // (a, b, c) => d : 입력이 3개고 출력이 1개다.
@@ -27,7 +28,7 @@ class CurrySpec extends FunSuite with Matchers{
     ------- ----
           / y \
 
-          */
+     */
 
     def adder(x: Int, y: Int): Int = x + y
 
@@ -40,7 +41,7 @@ class CurrySpec extends FunSuite with Matchers{
   }
 
   test("syntax 1") {
-    def adder(x: Int)(y: Int) : Int = x + y
+    def adder(x: Int)(y: Int): Int = x + y
     val addWithOne = adder(1) _
 
     println(addWithOne(10))
@@ -54,14 +55,12 @@ class CurrySpec extends FunSuite with Matchers{
     println(addWithOne(20))
   }
   test("x + y + z = w, v1") {
-    def adder(x : Int) : Int => Int => Int =
-      (y: Int) =>
-        (z: Int) =>
-          x + y + z
+    def adder(x: Int): Int => Int => Int =
+      (y: Int) => (z: Int) => x + y + z
 
     val addWithOne = adder(1) // x = 1
-    val addWithOneAndTwo = addWithOne(2)// y = 2
-    println(addWithOneAndTwo(10))  // 13
+    val addWithOneAndTwo = addWithOne(2) // y = 2
+    println(addWithOneAndTwo(10)) // 13
     println(addWithOneAndTwo(20)) // 23
 
     val foldLeft = List(1, 2, 3).foldLeft(0) _
@@ -73,7 +72,7 @@ class CurrySpec extends FunSuite with Matchers{
     def adder2(x: Int)(y: Int)(z: Int) = x + y + z
     val addWithOne = adder2(1) _
     val addWithOneAndTwo: (Int) => Int = addWithOne(2)
-    println(addWithOneAndTwo(10))  // 13
+    println(addWithOneAndTwo(10)) // 13
     println(addWithOneAndTwo(20)) // 23
   }
 }

@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 9/7/16.
- */
-class RangeSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 9/7/16.
+  */
+class RangeSpec extends AnyFunSuite with Matchers {
 
   test("range") {
     val ten = Range(1, 10)

@@ -2,7 +2,6 @@ package fpinsnote
 
 import scalaz.Monoid
 
-
 /**
   * Created by liam on 27/01/2017.
   */
@@ -26,7 +25,6 @@ object comonad {
   // 모든 monad는 `proper morphism`이라 불리는 위의 함수를 가지고 있다.
   // 또한 `nonproper morphism`이라 불리는 특정 monad에 한정된 연산이 있다.
 
-
   // Reader monad
   case class Reader[R, A](run: R => A) {
     // Reader monad는 값에 대해서 묻는(ask)것이 있다.
@@ -36,7 +34,6 @@ object comonad {
     def join(r: Reader[R, Reader[R, A]]): Reader[R, A] =
       Reader(c => r.run(c).run(c))
   }
-
 
   // Writer monad
   case class Writer[W, A](value: A, log: W) {
@@ -52,7 +49,6 @@ object comonad {
       Writer(a, M.zero)
 
   }
-
 
   // State monad
   case class State[S, A](run: S => (A, S)) {
@@ -71,14 +67,11 @@ object comonad {
 
   }
 
-
   // Option monad
   // Option monad는 정답없이 중지할수 있다.
   def none[A]: Option[A] = None
 
   // monad에 대한 충분한 설명 이다. 이제 comonad의 차례이다.
-
-
 
   // Comonad
   // Comonad는 monad와 같은 것이지만, 단지 반대 방향이다.
@@ -90,7 +83,6 @@ object comonad {
     def duplicate[A](w: W[A]): W[W[A]]
   }
 
-
   // Identity comonad
   // 단순하고 명확한 comonad는 dumb wrapper이다.(identity comonad)
   case class Id[A](a: A) {
@@ -99,18 +91,17 @@ object comonad {
     def duplicate: Id[Id[A]] = Id(this)
   }
 
-
   // Reader comonad
   // Reader comonad는 reader monad와 같은 능력을 가지고 있다.
   // 값에 대해서 묻는것을 허락한다.
   case class Coreader[R, A](extract: A, ask: R) {
     def map[B](f: A => B): Coreader[R, B] = Coreader(f(extract), ask)
     def duplicate: Coreader[R, Coreader[R, A]] = Coreader(this, ask)
-    def extend[B](f: Coreader[R, A] => B): Coreader[R, B] = duplicate map f
+    def extend[B](f: Coreader[R, A] => B): Coreader[R, B] = duplicate.map(f)
   }
 
-  def coreaderComonad[R]: Comonad[Coreader[R, ?]] = new Comonad[Coreader[R, ?]] {
-    def map[A, B](x: Coreader[R, A])(f: A => B): Coreader[R, B] = x map f
+  def coreaderComonad[R]: Comonad[Coreader[R, *]] = new Comonad[Coreader[R, *]] {
+    def map[A, B](x: Coreader[R, A])(f: A => B): Coreader[R, B] = x.map(f)
     def counit[A](w: Coreader[R, A]): A = w extract
     def duplicate[A](w: Coreader[R, A]): Coreader[R, Coreader[R, A]] = w duplicate
   }
@@ -137,7 +128,6 @@ object comonad {
   // 그리고 우리는 flatMap으로 연결했던것 처럼 comonad는 extend를 이용하여 연결할수 있다.
   // Coreader에서는 f는 context의 타입 R을 사용이 가능하고 B를 만들어 낸다.
 
-
   // Monad의 flatMap을 이용한 연결하는 연산을 Kleisli composition이라 부르기도 한다.
   // 그리고 Comonad의 extend를 이용한 연결하는 연산을 coKleisli composition이라 부른다.
   // 혹은 Kelisli composition in comonad
@@ -145,33 +135,29 @@ object comonad {
   // `extend` 이름은 어떤 구조에 어떤 구조에 작용하는 "local" 연산을 가지고
   // 그것을 큰 구조의 모든 하위 구조에 동작하는 "global" 연산으로 "extend" 하는것을 표현한다.
 
-
   // Writer comonad
   // Wirter monad와 같이, writer comonad는log를 추가하거나 monoid를 이용하여 계산을 수행할수 있다.
   // 하지만 log를 항상 사용가능하게 간직하고 있는것이 아니라 추가할수 있게 한다.
   // 이것은 연산을 합성하고 실행을 했을때 로그가 이용가능한것과 reader monad에서 사용했던것과 같은 트릭이다.
 
   case class Cowriter[W: Monoid, A](tell: W => A) {
-    def map[B](f: A => B): Cowriter[W, B] = Cowriter(tell andThen f)
+    def map[B](f: A => B): Cowriter[W, B] = Cowriter(tell.andThen(f))
     def extract: A = tell(Monoid[W].zero)
     def duplicate: Cowriter[W, Cowriter[W, A]] =
       Cowriter(w1 => Cowriter(w2 => tell(Monoid[W].append(w1, w2))))
     def extend[B](f: Cowriter[W, A] => B): Cowriter[W, B] =
-      duplicate map f
+      duplicate.map(f)
   }
 
   // duplicate는 run 함수로 생성된 전체 Cowriter를 반환한다는것을 주의해 보면,
   // 이것의 의미는 하위 연산(map이나 extend로 으로 합성된)의 기존의 로그에 추가하거나 합사하는 `tell`함수의 하나의 의해서만 접근된다.
   // 예를 들어 `foo.extend(_.tell("hi"))는 "hi"를 foo의 로그에 추가한다.
 
-
   // Comonad laws
   // Comonad의 규칙은 monad의 규칙과 유사하다.
   // 1. left identity : wa.duplicate.extract = wa
   // 2. right identity : wa.extend(extract) = wa
   // 3. associativity: wa.duplicate.duplicate = wa.extend(duplicate)
-
-
 
   // scala comonad tutorial, part 2
 
@@ -187,7 +173,7 @@ object comonad {
     def tails: NEL[NEL[A]] =
       NEL(this, tail.map(_.tails))
     def extend[B](f: NEL[A] => B): NEL[B] =
-      tails map f
+      tails.map(f)
   }
   // nonempty 리스트는 type A의 값과 다른 리스트나 None으로 마크되어 있는 리스트의 종료를 포함하고 있다.
   // 전통적인 `List`와는 달리 head값을 얻는것이 언제나 안전하다.
@@ -211,7 +197,6 @@ object comonad {
   // extend의 이름은 "local" 연산을 받고(여기에서의 연산은 리스트에 대한 것이다)
   // "global" 연산으로 확장된다.(여기서는 리스트의 모든 suffix가 여기에 해당한다)
 
-
   // 또는 nonempty tree를 고려해보라 (Rose Trees로 불린기도 한다.)
   case class Tree[A](tip: A, sub: List[Tree[A]]) {
     def duplicate: Tree[Tree[A]] =
@@ -234,32 +219,13 @@ object comonad {
   // `t extend f` 전체 표현식의 결과가
   // 각각의 노드가 상응하는 하위 트리 `t`에 적용된 f를 포함하는 노드를 제외하고는 (뭔말이레??)
   // `t`의 구조를 미러링한 트리의 구조일것이다.
-
-
   // 디렉토리 예제에 관철하기 위해서,
   // 우리는 디렉토리 구조가 사용하는 자세한 공간의 용량
   // tip의 전체 트리 사이즈와 각각의 하위 트리의 tip들의 사이즈를 등등
   // 을 원하는건 상상할수 있다.
 
   // 그럴땐 `d extend size`는 d의 하위 디렉토리의 사이즈 트리를 재귀적으로 만들수 있다.
-
-
   // The cofree monad
   // TODO
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

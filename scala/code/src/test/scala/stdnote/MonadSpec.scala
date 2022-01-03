@@ -1,19 +1,21 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import cats.implicits._
 import cats.syntax.all._
+
 /**
   * Created by ikhoon on 2017. 3. 30..
   */
-class MonadSpec extends FunSuite with Matchers {
+class MonadSpec extends AnyFunSuite with Matchers {
 
   test("future monad") {
-    val fa : Future[Int] = Future {
+    val fa: Future[Int] = Future {
       println("fa run")
       1
     }
@@ -32,7 +34,7 @@ class MonadSpec extends FunSuite with Matchers {
 
     // fa = Future { 1 } => asyncIncrement =>  fb = Future { 2 }
 
-    val fb : Future[Int] = fa.flatMap(int => asyncIncrement(int))
+    val fb: Future[Int] = fa.flatMap(int => asyncIncrement(int))
 
     println(Await.result(fb, Duration.Inf))
 
@@ -53,8 +55,8 @@ class MonadSpec extends FunSuite with Matchers {
 
   test("fake future") {
 
-    import scala.collection.immutable.{ List => Future }
-    val fa : Future[Int] = Future {
+    import scala.collection.immutable.{List => Future}
+    val fa: Future[Int] = Future {
       println("fa run")
       1
     }
@@ -68,11 +70,10 @@ class MonadSpec extends FunSuite with Matchers {
       x + 1
     }
     val fc: Future[Future[Int]] = fa.map(int => asyncIncrement(int))
-    val fb : Future[Int] = fa.flatMap(int => asyncIncrement(int))
+    val fb: Future[Int] = fa.flatMap(int => asyncIncrement(int))
     println(fb)
     println(fc)
 
   }
-
 
 }

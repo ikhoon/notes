@@ -1,12 +1,13 @@
 package learningtypelevel
 
 import learningtypelevel.TypeProjection.StSource
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by ikhoon on 2016. 9. 5..
   */
-class ValuesNeverChangeTypesSpec extends WordSpec with Matchers {
+class ValuesNeverChangeTypesSpec extends AnyWordSpec with Matchers {
 
   "values and types" should {
 
@@ -23,7 +24,7 @@ class ValuesNeverChangeTypesSpec extends WordSpec with Matchers {
       // 이순간에는 `S`는 String디.
       // 컴파일 되는것 처럼 보이나 컴파일 되지 않는다.
 
-      assertDoesNotCompile("mxs.emit(s1)")  // 컴파일 안됨.
+      assertDoesNotCompile("mxs.emit(s1)") // 컴파일 안됨.
 
 //      Error:(21, 16) type mismatch;
 //      found   : s1.type (with underlying type StSource[String]#S)

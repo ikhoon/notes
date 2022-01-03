@@ -22,9 +22,6 @@ object Ch1_HigherKindedTypes {
 
   // 그리고 타입 생성자가 여러개 있는 경우 type parameter hole을 생성한다.
 
-
-
-
   // Either[String, _]
 
   type EitherString[T] = Either[String, T]
@@ -42,7 +39,7 @@ object Ch1_HigherKindedTypes {
   // type에도 lambda가 있다.
   // kind projector 를 이용해보자.
 
-  object FooEitherString2 extends Foo[Either[String, ?]] {
+  object FooEitherString2 extends Foo[Either[String, *]] {
     def create(i: Int): Either[String, Int] = Right(i)
   }
 
@@ -55,6 +52,5 @@ object Ch1_HigherKindedTypes {
   object FooId extends Foo[Id] {
     def create(i: Int): Id[Int] = i
   }
-
 
 }

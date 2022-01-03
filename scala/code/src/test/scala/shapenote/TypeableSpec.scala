@@ -1,13 +1,13 @@
 package shapenote
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.TypeCase
 
-
 /**
- * Created by Liam.M(엄익훈) on 8/23/16.
- */
-class TypeableSpec extends WordSpec with Matchers {
+  * Created by Liam.M(엄익훈) on 8/23/16.
+  */
+class TypeableSpec extends AnyWordSpec with Matchers {
 
   "Typeable type class which provides a type safe cast operation" should {
     "`cast` return `Option` of target type" in {
@@ -28,7 +28,7 @@ class TypeableSpec extends WordSpec with Matchers {
 
       val result = (l: Any) match {
         case `List[String]`(List(s, _*)) => s.length
-        case `List[Int]`(List(i, _*)) => i + 1
+        case `List[Int]`(List(i, _*))    => i + 1
       }
 
       result shouldBe 2

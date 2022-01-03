@@ -2,15 +2,13 @@ package mtlnote
 import scalaz.MonadReader
 
 /**
- * Created by ikhoon on 2018-12-15.
- */
-
+  * Created by ikhoon on 2018-12-15.
+  */
 object CatsMtl {
 
   /**
     * study cats mtl based on https://typelevel.org/blog/2018/10/06/intro-to-mtl.html
     */
-
   // mtl이란?
   // mtl는 monad transformer의 약어이다.
   // 이것의 주된 목적은 중복된 monad transformer를 쉽게 사용하게 하는것이다.
@@ -42,10 +40,11 @@ object CatsMtl {
   // ReaderT를 사용하면 어떻게 되나?, ReaderT는 우리에게 ask 함수를 준다. 이함수는 E에 대한 읽기전용 환경값을 준다.
   def ask[F[_]: Applicative, E]: ReaderT[F, E, E] = ???
 
-  def readerProgram : ReaderT[IO, Config, Result] = for {
-    config <- ReaderT.ask[IO, Config]
-    result <- ReaderT.liftF(serviceCall(config))
-  } yield config
+  def readerProgram: ReaderT[IO, Config, Result] =
+    for {
+      config <- ReaderT.ask[IO, Config]
+      result <- ReaderT.liftF(serviceCall(config))
+    } yield config
 
   def main2: IO[Result] = getConfig.flatMap(readerProgram.run)
 
@@ -72,24 +71,22 @@ object CatsMtl {
   def req3: Request = ???
   def req4: Request = ???
 
-  def requestWithState(r: Request): StateT[IO, Env, Response] = for {
-    env <- StateT.get[IO, Env]
-    res <- StateT.liftF(request(r, env))
-    _ <- StateT.modify[IO, Response](updateEnv(res, _))
-  } yield res
+  def requestWithState(r: Request): StateT[IO, Env, Response] =
+    for {
+      env <- StateT.get[IO, Env]
+      res <- StateT.liftF(request(r, env))
+      _ <- StateT.modify[IO, Response](updateEnv(res, _))
+    } yield res
 
-
-  def stateProgram: StateT[IO, Env, Response] = for {
-    resp1 <- requestWithState(req1)
-    resp2 <- requestWithState(req2)
-    resp3 <- requestWithState(req3)
-    resp4 <- requestWithState(req4)
-  } yield resp4
-
+  def stateProgram: StateT[IO, Env, Response] =
+    for {
+      resp1 <- requestWithState(req1)
+      resp2 <- requestWithState(req2)
+      resp3 <- requestWithState(req3)
+      resp4 <- requestWithState(req4)
+    } yield resp4
 
   def main3: IO[(Env, Response)] = stateProgram.run(initializeEnv)
-
-
 
   // Monad Transformers encode som notion of effect
   // EitherT는 short-circuiting 에러를 effect를 인코드한다.
@@ -120,15 +117,15 @@ object CatsMtl {
 
   def readerProgram2[F[_]: Monad: LiftIO](
     implicit A: ApplicativeAsk[F, Config]
-  )
-  : F[Result] = for {
-    config <- A.ask
-    res <- serviceCall(config).to[F]
-  } yield res
+  ): F[Result] =
+    for {
+      config <- A.ask
+      res <- serviceCall(config).to[F]
+    } yield res
 
   type ApplicativeConfig[F[_]] = ApplicativeAsk[F, Config]
 
-  val materializedProgram = readerProgram2[ReaderT[IO, Config, ?]]
+  val materializedProgram = readerProgram2[ReaderT[IO, Config, *]]
   def main4: IO[Result] = getConfig.flatMap(materializedProgram.run)
 
   // 괜찮아 보이긴 하는데 더 좋아진건 안보인다.
@@ -148,11 +145,11 @@ object CatsMtl {
   def program[F[_]: MonadAppError: ApplicativeConfig, LiftIO]: F[Result] = ???
   //
 
-  def readerProgram3[F[_]: MonadAppError: ApplicativeConfig: LiftIO]: F[Result] = for {
-    config <- ApplicativeAsk[F, Config]
-        .ask.ensure(InvalidConfig)(validConfig)
-    res <- serviceCall(config).to[F]
-  } yield res
+  def readerProgram3[F[_]: MonadAppError: ApplicativeConfig: LiftIO]: F[Result] =
+    for {
+      config <- ApplicativeAsk[F, Config].ask.ensure(InvalidConfig)(validConfig)
+      res <- serviceCall(config).to[F]
+    } yield res
 
   // 꽤 심플하다.(글쎄다) 사실 여러개중첩하는것 보다야
   // 우리는 ReaderT, EitherT, IO의 모나드 stack을 사용할것이다.
@@ -200,11 +197,12 @@ object CatsMtl {
 
   type MonadStateEnv[F[_]] = MonadState[F, Env]
 
-  def requestWithState[F[_]: MonadStateEnv: Monad: LiftIO](c: Config, req: Request): F[Response] = for {
-    env <- MonadState[F, Env].get
-    res <- newServiceCall(c, req, env).to[F]
-    _ <- MonadState.modify[F, Env](s => updateEnv(res, s))
-  } yield res
+  def requestWithState[F[_]: MonadStateEnv: Monad: LiftIO](c: Config, req: Request): F[Response] =
+    for {
+      env <- MonadState[F, Env].get
+      res <- newServiceCall(c, req, env).to[F]
+      _ <- MonadState.modify[F, Env](s => updateEnv(res, s))
+    } yield res
 
   // TODO FIXME
 //  def stateProgram1[F[_]: ApplicativeConfig: MonadAppError: MonadStateEnv: LiftIO]: F[Results] = for {
@@ -216,7 +214,7 @@ object CatsMtl {
 //  } yield responses
 //
 //
-//  val materializedStateProgram1 = stateProgram1[StateT[EitherT[ReaderT[IO, Config, ?], AppError, ?], Env, ?]]
+//  val materializedStateProgram1 = stateProgram1[StateT[EitherT[ReaderT[IO, Config, *], AppError, *], Env, *]]
 //
 //  def main6: IO[Either[AppError, (Env, Results)]] =
 //    getConfig.flatMap { conf =>
@@ -225,8 +223,5 @@ object CatsMtl {
 //        .value
 //        .run(conf)
 //    }
-
-
-
 
 }

@@ -1,11 +1,12 @@
 package stdnote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Created by Liam.M(엄익훈) on 8/3/16.
- */
-class LambdaSpec extends FunSuite with Matchers {
+  * Created by Liam.M(엄익훈) on 8/3/16.
+  */
+class LambdaSpec extends AnyFunSuite with Matchers {
 
   test("lambda") {
     // method, function
@@ -36,9 +37,6 @@ class LambdaSpec extends FunSuite with Matchers {
     // val
   }
 
-
-
-
   test("function vs method") {
     // method
     def foo(a: String): String = {
@@ -53,7 +51,7 @@ class LambdaSpec extends FunSuite with Matchers {
     }
 
     // int => string 인자로 받는다.
-    def myFirstHigh(value: Int)(f : Int => String): String = {
+    def myFirstHigh(value: Int)(f: Int => String): String = {
       f(value)
     }
 
@@ -93,17 +91,13 @@ class LambdaSpec extends FunSuite with Matchers {
     // 4. flatMap을 이용해서 List(11, 12, 22, 23, 33, 34)를 만들어 보시오.
     // `꽃` 함수형 언어에의 꽃
     // map + flatten
-    list.flatMap { i => List(i * 11, i * 11 + 1) }
+    list.flatMap { i =>
+      List(i * 11, i * 11 + 1)
+    }
     list.flatMap(i => List(i * 11, i * 11 + 1))
     list.map(i => List(i * 11, i * 11 + 1)).flatten
-
-
-
 
   }
 
 }
-
-
 /// top
-

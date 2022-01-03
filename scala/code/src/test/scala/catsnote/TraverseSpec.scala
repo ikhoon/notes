@@ -3,7 +3,8 @@ package catsnote
 import cats.data.Validated.{Invalid, Valid}
 import cats.{Applicative, Semigroup, Traverse}
 import cats.data._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import cats.syntax._
 import cats.syntax.either._
 import cats.implicits._
@@ -15,16 +16,15 @@ import scala.language.postfixOps
 /**
   * Created by ikhoon on 2016. 7. 24..
   */
-class TraverseSpec extends WordSpec with Matchers {
+class TraverseSpec extends AnyWordSpec with Matchers {
 
   "Traverse" should {
 
-    def parseIntEither(s: String) : Either[NumberFormatException, Int] =
+    def parseIntEither(s: String): Either[NumberFormatException, Int] =
       Right(s.toInt)
 
-    def parseIntValidated(s: String) : ValidatedNel[NumberFormatException, Int] =
+    def parseIntValidated(s: String): ValidatedNel[NumberFormatException, Int] =
       Validated.catchOnly[NumberFormatException](s.toInt).toValidatedNel
-
 
     "traverseU - Either - unapply with traverse for Applicative[F[A,B]]" in {
       import cats.instances.list._
@@ -43,7 +43,6 @@ class TraverseSpec extends WordSpec with Matchers {
       Traverse[List].traverse(List("1", "2", "3"))(parseIntValidated).isValid shouldBe true
 
       Traverse[List].traverse(List("1", "abc", "3", "def"))(parseIntValidated).isValid shouldBe false
-
 
     }
 

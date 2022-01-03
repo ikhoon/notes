@@ -1,13 +1,14 @@
 package algonote
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import scala.collection.immutable
 
 /**
   * Created by ikhoon on 15/07/2018.
   */
-class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
+class Algo_1_4_KargerMinCutTest extends AnyFunSuite with Matchers {
 
   import Algo_1_4_KargerMinCut._
   test("build graph") {
@@ -19,7 +20,6 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
         |4 2 3
       """.stripMargin
         .split("\n")
-
 
     val graph = Algo_1_4_KargerMinCut.build(matrix)
     graph.size shouldBe 4
@@ -44,7 +44,6 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
       """.stripMargin
         .split("\n")
 
-
     val graph = Algo_1_4_KargerMinCut.build(matrix)
     (1 to 100).foreach { i =>
       val cuts = Algo_1_4_KargerMinCut.findMinCut(graph)
@@ -58,7 +57,6 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
     * | /  \|      | /  \ |
     * 5 --- 6      7 ---- 8
     */
-
   test("find min 2") {
     val matrix =
       """
@@ -86,10 +84,11 @@ class Algo_1_4_KargerMinCutTest extends FunSuite with Matchers {
     sorted.foreach(println)
   }
 
-
   test("find mincut submit") {
-    val matrix = scala.io.Source.fromResource("karger_mincut_input.txt")
-      .getLines().toArray
+    val matrix = scala.io.Source
+      .fromResource("karger_mincut_input.txt")
+      .getLines()
+      .toArray
     val graph = Algo_1_4_KargerMinCut.build(matrix)
 
     val all: immutable.Seq[Graph] = (1 to 100).map { i =>
